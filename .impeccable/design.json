@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T20:05:20.491012+00:00",
+  "title": "Design System: Blunder School",
+  "extensions": {
+    "colorMeta": {
+      "acid": {
+        "role": "primary",
+        "displayName": "Acid",
+        "tonalRamp": [
+          "oklch(15% 0.1661 119.75)",
+          "oklch(26% 0.1661 119.75)",
+          "oklch(38% 0.1661 119.75)",
+          "oklch(49% 0.1661 119.75)",
+          "oklch(61% 0.1661 119.75)",
+          "oklch(72% 0.1661 119.75)",
+          "oklch(84% 0.1661 119.75)",
+          "oklch(95% 0.1661 119.75)"
+        ]
+      },
+      "acid-dark": {
+        "role": "primary",
+        "displayName": "Acid Dark",
+        "tonalRamp": [
+          "oklch(15% 0.0592 125.69)",
+          "oklch(26% 0.0592 125.69)",
+          "oklch(38% 0.0592 125.69)",
+          "oklch(49% 0.0592 125.69)",
+          "oklch(61% 0.0592 125.69)",
+          "oklch(72% 0.0592 125.69)",
+          "oklch(84% 0.0592 125.69)",
+          "oklch(95% 0.0592 125.69)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0082 128.89)",
+          "oklch(26% 0.0082 128.89)",
+          "oklch(38% 0.0082 128.89)",
+          "oklch(49% 0.0082 128.89)",
+          "oklch(61% 0.0082 128.89)",
+          "oklch(72% 0.0082 128.89)",
+          "oklch(84% 0.0082 128.89)",
+          "oklch(95% 0.0082 128.89)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0135 126.26)",
+          "oklch(26% 0.0135 126.26)",
+          "oklch(38% 0.0135 126.26)",
+          "oklch(49% 0.0135 126.26)",
+          "oklch(61% 0.0135 126.26)",
+          "oklch(72% 0.0135 126.26)",
+          "oklch(84% 0.0135 126.26)",
+          "oklch(95% 0.0135 126.26)"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised",
+        "tonalRamp": [
+          "oklch(15% 0.0184 125.24)",
+          "oklch(26% 0.0184 125.24)",
+          "oklch(38% 0.0184 125.24)",
+          "oklch(49% 0.0184 125.24)",
+          "oklch(61% 0.0184 125.24)",
+          "oklch(72% 0.0184 125.24)",
+          "oklch(84% 0.0184 125.24)",
+          "oklch(95% 0.0184 125.24)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0147 115.04)",
+          "oklch(26% 0.0147 115.04)",
+          "oklch(38% 0.0147 115.04)",
+          "oklch(49% 0.0147 115.04)",
+          "oklch(61% 0.0147 115.04)",
+          "oklch(72% 0.0147 115.04)",
+          "oklch(84% 0.0147 115.04)",
+          "oklch(95% 0.0147 115.04)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0325 125.36)",
+          "oklch(26% 0.0325 125.36)",
+          "oklch(38% 0.0325 125.36)",
+          "oklch(49% 0.0325 125.36)",
+          "oklch(61% 0.0325 125.36)",
+          "oklch(72% 0.0325 125.36)",
+          "oklch(84% 0.0325 125.36)",
+          "oklch(95% 0.0325 125.36)"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "tonalRamp": [
+          "oklch(15% 0.0326 126.27)",
+          "oklch(26% 0.0326 126.27)",
+          "oklch(38% 0.0326 126.27)",
+          "oklch(49% 0.0326 126.27)",
+          "oklch(61% 0.0326 126.27)",
+          "oklch(72% 0.0326 126.27)",
+          "oklch(84% 0.0326 126.27)",
+          "oklch(95% 0.0326 126.27)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "tonalRamp": [
+          "oklch(15% 0.0227 124.64)",
+          "oklch(26% 0.0227 124.64)",
+          "oklch(38% 0.0227 124.64)",
+          "oklch(49% 0.0227 124.64)",
+          "oklch(61% 0.0227 124.64)",
+          "oklch(72% 0.0227 124.64)",
+          "oklch(84% 0.0227 124.64)",
+          "oklch(95% 0.0227 124.64)"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Warning",
+        "tonalRamp": [
+          "oklch(15% 0.0962 65.31)",
+          "oklch(26% 0.0962 65.31)",
+          "oklch(38% 0.0962 65.31)",
+          "oklch(49% 0.0962 65.31)",
+          "oklch(61% 0.0962 65.31)",
+          "oklch(72% 0.0962 65.31)",
+          "oklch(84% 0.0962 65.31)",
+          "oklch(95% 0.0962 65.31)"
+        ]
+      },
+      "board-light": {
+        "role": "neutral",
+        "displayName": "Board Light",
+        "tonalRamp": [
+          "oklch(15% 0.0337 110.81)",
+          "oklch(26% 0.0337 110.81)",
+          "oklch(38% 0.0337 110.81)",
+          "oklch(49% 0.0337 110.81)",
+          "oklch(61% 0.0337 110.81)",
+          "oklch(72% 0.0337 110.81)",
+          "oklch(84% 0.0337 110.81)",
+          "oklch(95% 0.0337 110.81)"
+        ]
+      },
+      "board-dark": {
+        "role": "neutral",
+        "displayName": "Board Dark",
+        "tonalRamp": [
+          "oklch(15% 0.0435 126.55)",
+          "oklch(26% 0.0435 126.55)",
+          "oklch(38% 0.0435 126.55)",
+          "oklch(49% 0.0435 126.55)",
+          "oklch(61% 0.0435 126.55)",
+          "oklch(72% 0.0435 126.55)",
+          "oklch(84% 0.0435 126.55)",
+          "oklch(95% 0.0435 126.55)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Condensed display",
+        "purpose": "Identity and short primary headings."
+      },
+      "headline": {
+        "displayName": "Coach headline",
+        "purpose": "Review and teaching headings."
+      },
+      "body": {
+        "displayName": "Teaching text",
+        "purpose": "Plain explanations and supporting text."
+      }
+    },
+    "shadows": [
+      {
+        "name": "board",
+        "value": "0 10px 30px #0003",
+        "purpose": "Ground the playing surface."
+      },
+      {
+        "name": "sticky-coach",
+        "value": "0 6px 18px #0003",
+        "purpose": "Separate the phone coach strip from scrolled content."
+      },
+      {
+        "name": "dialog",
+        "value": "0 20px 60px #0007",
+        "purpose": "Separate promotion choices from the board."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Short content reveal."
+      },
+      {
+        "name": "control-transition",
+        "value": ".18s",
+        "purpose": "Color, border, and background state changes. Disable under reduced-motion preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-phone",
+        "value": "380px"
+      },
+      {
+        "name": "phone",
+        "value": "420px"
+      },
+      {
+        "name": "stacked-play",
+        "value": "760px"
+      },
+      {
+        "name": "compact-columns",
+        "value": "1000px"
+      },
+      {
+        "name": "compact-shell",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "description": "The main retry or practice action.",
+      "html": "<button class=\"ds-primary\">Try this position again</button>",
+      "css": ".ds-primary{font-family:DM Sans,sans-serif;border-radius:0;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:var(--acid,#d6f369);color:var(--ink,#191b17);border:1px solid var(--acid,#d6f369);padding:12px 16px;min-height:45px;font-size:12px;font-weight:700}.ds-primary:hover{background:#e5ff8d;border-color:#e5ff8d}.ds-primary:focus-visible{outline:2px solid var(--acid,#d6f369);outline-offset:4px;}.ds-primary:active{transform:translateY(1px)}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "description": "A bordered alternative action.",
+      "html": "<button class=\"ds-secondary\">Show me the idea</button>",
+      "css": ".ds-secondary{font-family:DM Sans,sans-serif;border-radius:0;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--paper,#eceee3);border:1px solid var(--line,#3b4033);padding:10px 12px;min-height:42px;font-size:11px}.ds-secondary:hover{background:var(--raised,#2c3026);border-color:var(--muted,#a5ae98)}.ds-secondary:focus-visible{outline:2px solid var(--acid,#d6f369);outline-offset:4px;}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Text action",
+      "kind": "button",
+      "description": "A quiet return or continue action.",
+      "html": "<button class=\"ds-text\">Continue this game</button>",
+      "css": ".ds-text{font-family:DM Sans,sans-serif;border-radius:0;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--muted,#a5ae98);border:0;padding:10px 0;font-size:11px}.ds-text:hover{color:var(--acid,#d6f369)}.ds-text:focus-visible{outline:2px solid var(--acid,#d6f369);outline-offset:4px;}"
+    },
+    {
+      "name": "Coach question",
+      "kind": "input",
+      "description": "A plainly labeled question field.",
+      "html": "<label class=\"ds-field\">Ask the coach<input placeholder=\"Ask about moves, threats, castling\u2026\" /></label>",
+      "css": ".ds-field{display:grid;gap:8px;font:12px DM Sans,sans-serif;color:var(--muted,#a5ae98)}.ds-field input{font:16px DM Sans,sans-serif;padding:13px 10px;border:1px solid var(--line,#3b4033);border-radius:0;background:var(--ink,#191b17);color:var(--paper,#eceee3);caret-color:var(--acid,#d6f369)}.ds-field input:hover{border-color:var(--muted,#a5ae98)}.ds-field input:focus-visible{border-color:var(--acid,#d6f369);outline:2px solid var(--acid,#d6f369);outline-offset:4px;}"
+    },
+    {
+      "name": "Main navigation",
+      "kind": "nav",
+      "description": "The active view has an acid underline.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><button aria-current=\"page\">Play &amp; learn</button><button>Learn</button><button>Your lessons</button></nav>",
+      "css": ".ds-nav{display:flex;gap:24px;border-bottom:1px solid var(--line,#3b4033)}.ds-nav button{font-family:DM Sans,sans-serif;border-radius:0;cursor:pointer;transition:background .18s,color .18s,border-color .18s;background:transparent;color:var(--muted,#a5ae98);border:0;border-bottom:3px solid transparent;padding:20px 2px;font-size:13px;font-weight:600}.ds-nav button[aria-current]{color:var(--acid,#d6f369);border-bottom-color:var(--acid,#d6f369)}.ds-nav button:hover{color:var(--paper,#eceee3)}.ds-nav button:focus-visible{outline:2px solid var(--acid,#d6f369);outline-offset:4px;}"
+    },
+    {
+      "name": "Coach container",
+      "kind": "card",
+      "description": "Bordered teaching surface with a clear header and body.",
+      "html": "<aside class=\"ds-coach\"><header>YOUR CORNER.</header><p>Look for checks, captures, and threats before choosing a move.</p></aside>",
+      "css": ".ds-coach{background:var(--surface,#22251e);color:var(--paper,#eceee3);border:1px solid var(--line,#3b4033);max-width:420px}.ds-coach header{padding:19px 23px;border-bottom:1px solid var(--line,#3b4033);font:700 26px Barlow Condensed,sans-serif}.ds-coach p{padding:23px;margin:0;color:var(--muted,#a5ae98);font:13px/1.6 DM Sans,sans-serif}",
+      "refersTo": "coach-panel"
+    },
+    {
+      "name": "Club rule marker",
+      "kind": "chip",
+      "description": "Small printed identity label used beside supporting copy.",
+      "html": "<span class=\"ds-rule\">CLUB RULE #1</span>",
+      "css": ".ds-rule{display:inline-block;background:var(--acid,#d6f369);color:var(--ink,#191b17);font:700 13px Barlow Condensed,sans-serif;letter-spacing:.04em;padding:5px 9px;transform:rotate(-2deg)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The gritty chess club",
+    "overview": "Dark olive surfaces, acid yellow accents, rough print texture, and condensed type give the app its approved character. The chess pieces remain clear. The coach uses calm, readable explanations beside the board.",
+    "keyCharacteristics": [
+      "Dark olive and warm paper.",
+      "Square controls with clear borders.",
+      "Bold condensed headings and plain teaching text.",
+      "Slightly tilted identity marks and restrained grain."
+    ],
+    "rules": [],
+    "dos": [
+      "**Do** preserve the olive, acid, and warm-paper palette.",
+      "**Do** keep pieces and legal destinations clear at phone size.",
+      "**Do** use bold type for short headings and plain type for teaching.",
+      "**Do** retain keyboard focus, text labels, and reduced-motion support."
+    ],
+    "donts": [
+      "**Don't** replace the approved rough club character with a generic glossy dashboard.",
+      "**Don't** use decorative rotation on the board or teaching panels.",
+      "**Don't** use color alone to explain a move or control state.",
+      "**Don't** turn incidental small metadata sizes into a global text standard."
+    ]
+  }
+}

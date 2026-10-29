@@ -1,0 +1,13 @@
+node_modules/
+dist/
+public/engine/
+.env*
+!.env.example
+*.tsbuildinfo
+playwright-report/
+test-results/
+.DS_Store
+.impeccable/mocks/
+.vercel/
+.impeccable/review/
+.vercel
