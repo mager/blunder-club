@@ -39,7 +39,7 @@ The Vercel project is `blunder-school`, connected to this repository. Set `TYPES
 
 ## Google login and cloud saves
 
-Firebase project: `blunder-school-513120`. Firestore is in `us-central1` on its free tier. The web app is registered; owner-only rules are deployed.
+Firebase project: `blunder-school-513120`. Firestore is in `us-central1` on its free tier. The web app is registered, Google sign-in is enabled, and owner-only rules are deployed. The production domain and local development hosts are authorized.
 
 1. In Firebase Authentication, click **Get started**, enable **Google**, and select a support email.
 2. Add `blunder-school.vercel.app`, `localhost`, and `127.0.0.1` under Authentication → Settings → Authorized domains.
@@ -48,11 +48,11 @@ Firebase project: `blunder-school-513120`. Firestore is in `us-central1` on its 
 
 A Google account owns `/users/{uid}/progress/current`. The document contains the current board, saved lessons, practice topics, and counters; it does not contain email or display name. Guest lessons are imported only after a successful transaction. Account caches use separate browser keys; signing out returns to guest state. Cloud write failures retain a local copy. Revision checks stop silent overwrites from concurrent devices; sign out/in or retry sync combines lessons and chooses the newer board. Board timestamps change only when the board changes. Lesson deletion timestamps prevent an older device copy from restoring removed lessons. Counters merge with the maximum value to avoid counting the same imported history twice; they are not additive across simultaneous device sessions.
 
-`firestore.rules` denies all other document paths. The eight rule cases in `tests/firestore-rules.json` were checked against the deployed rules through Firebase's Rules API. `tests/cloud.test.ts` checks migration, account isolation, offline import, and revision conflicts. A real Google sign-in still needs a browser acceptance test after provider setup.
+`firestore.rules` denies all other document paths. The eight rule cases in `tests/firestore-rules.json` were checked against the deployed rules through Firebase's Rules API. `tests/cloud.test.ts` checks migration, account isolation, offline import, and revision conflicts. After setup, sign in through Google and check for “Progress saved.” Then open the app on a second device with the same Google account to verify your lessons.
 
 ## Prototype limits
 
-Guest progress uses localStorage, separately for each browser and origin. Google login and cloud saves are implemented behind `VITE_FIREBASE_AUTH_ENABLED`; enable that flag only after the Firebase setup below is complete. No account is required for guest play. Localhost progress does not automatically transfer to the live URL until imported through the same Google account.
+Guest progress uses localStorage, separately for each browser and origin. Google login and cloud saves are enabled on the live site. `VITE_FIREBASE_AUTH_ENABLED` controls this feature for other deployments. No account is required for guest play. Localhost progress does not automatically transfer to the live URL until imported through the same Google account.
 
 Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire.
 
