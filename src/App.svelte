@@ -285,8 +285,9 @@
       }
       if (id !== request) return;
       phase = 'over';
-      for (const moment of keyMoments) { review = { ...moment, shown: false }; saveLesson(); }
-      review = null; persist(); void chooseNextSkill(id);
+      review = null;
+      for (const moment of keyMoments) recordLesson({ ...moment, shown: false });
+      persist(); void chooseNextSkill(id);
     } catch (e) { fail(e, id); }
   }
   async function chooseNextSkill(id: number) {

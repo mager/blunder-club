@@ -40,7 +40,7 @@ describe('progress migration',()=>{
 describe('progress conflict recovery',()=>{
  it('does not refresh the board timestamp for analysis or settings changes',()=>{
   const old={...emptyProgress(),moves:['d4'],updatedAt:5};
-  const analyzed=stampBoardProgress({...old,sound:true},old,100);
+  const analyzed=stampBoardProgress({...old,sound:true,saved:[lesson]},old,100);
   expect(analyzed.updatedAt).toBe(5);
   expect(mergeProgress({...emptyProgress(),moves:['e4'],updatedAt:10},analyzed).moves).toEqual(['e4']);
  });
