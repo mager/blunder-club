@@ -11,7 +11,7 @@
   import { makeGame, lessons, playUci, moveFromLine, describeMove, lineToSan, mistakeLoss, resultText, attackedPieces, pieceNames } from './chess';
 
   type Phase = 'loading' | 'ready' | 'thinking' | 'review' | 'over' | 'error' | 'report';
-  import { type SavedLesson, type Progress } from './progress';
+  import { stampBoardProgress, type SavedLesson, type Progress } from './progress';
   import { createProgressSync, cloudConfigured, type SaveStatus } from './cloud';
   import type { User } from 'firebase/auth';
   let sync: ReturnType<typeof createProgressSync>;
@@ -38,6 +38,8 @@
   let error = $state('');
   let notification = $state('');
   let saved = $state<SavedLesson[]>([]);
+  let removedLessons = $state<Record<string, number>>({});
+  let lastProgress: Progress | null = null;
   let retries = $state(0);
   let played = $state(0);
   let sound = $state(false);
@@ -87,6 +89,7 @@
     activeLesson = data.lessonId === 'saved' && data.customFen
       ? {...lessons[0], id:'saved', title:'Your second chance', fen:data.customFen, tip:'Look for the threat you missed last time. Try the position before asking for a hint.'}
       : [italian,...lessons].find(item => item.id === data.lessonId) || lessons[0];
+    lastProgress = data; removedLessons = data.removedLessons;
     moves = data.moves; saved = data.saved; retries = data.retries; played = data.played;
     sound = data.sound; coachMode = data.coachMode; practiced = data.practiced;
     openingDone = activeLesson.id === 'italian' && moves.length >= openingSteps.length * 2;
@@ -94,10 +97,10 @@
   }
   function persist() {
     if (!storageReady) return;
-    const data: Progress = { lessonId:activeLesson.id, moves:openingReview?.before ?? review?.before ?? moves,
-      saved, retries, played, sound, coachMode, practiced, updatedAt:Date.now(),
-      ...(activeLesson.id === 'saved' ? {customFen:activeLesson.fen} : {}) };
-    sync.save(data);
+    const data = stampBoardProgress({ lessonId:activeLesson.id, moves:openingReview?.before ?? review?.before ?? moves,
+      saved, retries, played, sound, coachMode, practiced, removedLessons, updatedAt:lastProgress?.updatedAt || 0,
+      ...(activeLesson.id === 'saved' ? {customFen:activeLesson.fen} : {}) }, lastProgress);
+    lastProgress = data; sync.save(data);
   }
   async function signIn() {
     authBusy = true;
@@ -446,7 +449,7 @@
       <section class="library"><div class="library-heading"><h1>LESS THEORY.<br /><span>MORE TRYING.</span></h1><p>Your learning is a network, not a checklist.<br />Follow the idea your last game brought up.</p></div><SkillMap counts={skillCounts} {practiced} onStart={startById}/><div class="opening-feature"><div><span>START WITH A PLAN</span><h2>The Italian Game.</h2><p>Learn the center. Develop with purpose. Castle.<br />Then try the same opening without the prompts.</p></div><button class="primary-button" onclick={() => start(italian)}>Learn this opening <ArrowRight size={18}/></button></div><div class="practice-list">{#each lessons as lesson, i}<button class="practice-row" onclick={() => start(lesson)}><span class="practice-index">{String(i + 1).padStart(2, '0')}</span><span class="practice-title"><strong>{lesson.title}</strong><span>{lesson.detail}</span></span><span class="practice-focus">{lesson.focus}</span><ArrowUpRight size={25}/></button>{/each}</div><p class="library-note">Starting a board replaces your current game. Your saved lessons stay with you.</p></section>
     {:else}
       <section class="library"><div class="library-heading"><h1>YOUR MISTAKES.<br /><span>YOUR PLAYBOOK.</span></h1><p>The moves you stopped to understand.<br />{account ? 'Your account keeps these lessons ready for another look.' : 'Saved in this browser. Sign in to take them with you.'}</p></div>
-        {#if saved.length}<div class="saved-list">{#each saved as lesson}<article class="saved-lesson"><div class="saved-notation"><span>{lesson.move}</span><ArrowRight size={20}/><strong>{lesson.best}</strong></div><span class="saved-pattern">{lesson.pattern || 'A move worth revisiting'}</span><p>{lesson.text}</p><button class="primary-button" onclick={() => practiceSaved(lesson)}>Play this position again <RotateCcw size={16}/></button><div class="saved-meta"><span>{lesson.count && lesson.count > 1 ? `${lesson.count} encounters · ` : ''}{new Date(lesson.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span><button class="text-button" onclick={() => { saved = saved.filter(l => l.id !== lesson.id); persist(); }}>Remove <X size={14}/></button></div></article>{/each}</div>
+        {#if saved.length}<div class="saved-list">{#each saved as lesson}<article class="saved-lesson"><div class="saved-notation"><span>{lesson.move}</span><ArrowRight size={20}/><strong>{lesson.best}</strong></div><span class="saved-pattern">{lesson.pattern || 'A move worth revisiting'}</span><p>{lesson.text}</p><button class="primary-button" onclick={() => practiceSaved(lesson)}>Play this position again <RotateCcw size={16}/></button><div class="saved-meta"><span>{lesson.count && lesson.count > 1 ? `${lesson.count} encounters · ` : ''}{new Date(lesson.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span><button class="text-button" onclick={() => { removedLessons = {...removedLessons,[lesson.id]:Date.now()}; saved = saved.filter(l => l.id !== lesson.id); persist(); }}>Remove <X size={14}/></button></div></article>{/each}</div>
         {:else}<div class="empty-journal"><BookOpen size={44} strokeWidth={1.2}/><h2>Nothing to unlearn. Yet.</h2><p>When the coach catches a mistake, choose “Keep this lesson.”<br />Your own chess playbook starts there.</p><button class="primary-button" onclick={() => view = 'play'}>Back to the board <ArrowRight size={17}/></button></div>{/if}
       </section>
     {/if}

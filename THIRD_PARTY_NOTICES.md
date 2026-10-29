@@ -15,6 +15,7 @@ Stockfish.js is maintained by Nathan Rugg and Chess.com, based on Stockfish and 
 ## Other dependencies
 
 - chess.js: BSD-2-Clause; https://github.com/jhlywa/chess.js
+- Firebase JavaScript SDK: Apache-2.0; https://github.com/firebase/firebase-js-sdk
 - Svelte: MIT; https://github.com/sveltejs/svelte
 - Lucide: ISC; https://lucide.dev/license
 - Barlow Condensed and DM Sans: SIL Open Font License 1.1; self-hosted via Fontsource packages. License files remain in the corresponding npm packages.

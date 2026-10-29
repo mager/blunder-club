@@ -1,5 +1,5 @@
 import {describe,expect,it} from 'vitest';
-import {emptyProgress,mergeProgress,normalizeProgress} from '../src/progress';
+import {emptyProgress,mergeProgress,normalizeProgress,stampBoardProgress} from '../src/progress';
 import {lessons} from '../src/chess';
 const lesson={id:'position-1',fen:lessons[0].fen,move:'e4',best:'d4',text:'Look at the center.',date:'2026-10-29',count:2};
 describe('progress migration',()=>{
@@ -33,5 +33,32 @@ describe('progress migration',()=>{
  });
  it('removes malformed positions and invalid counters',()=>{
    expect(normalizeProgress({saved:[{...lesson,fen:'invalid'}],played:-2,retries:Infinity})).toMatchObject({saved:[],played:0,retries:0});
+ });
+});
+
+
+describe('progress conflict recovery',()=>{
+ it('does not refresh the board timestamp for analysis or settings changes',()=>{
+  const old={...emptyProgress(),moves:['d4'],updatedAt:5};
+  const analyzed=stampBoardProgress({...old,sound:true},old,100);
+  expect(analyzed.updatedAt).toBe(5);
+  expect(mergeProgress({...emptyProgress(),moves:['e4'],updatedAt:10},analyzed).moves).toEqual(['e4']);
+ });
+ it('does not let an empty offline fallback replace an existing cloud game',()=>{
+  const fallback=stampBoardProgress(emptyProgress(),emptyProgress(),100);
+  expect(mergeProgress({...emptyProgress(),moves:['e4'],updatedAt:10},fallback).moves).toEqual(['e4']);
+ });
+ it('dates a deliberate board change',()=>{
+  expect(stampBoardProgress({...emptyProgress(),moves:['e4']},emptyProgress(),100).updatedAt).toBe(100);
+ });
+ it('keeps a removed lesson deleted when an older device reconnects',()=>{
+  const old={...emptyProgress(),saved:[lesson]};
+  const deletion={...emptyProgress(),removedLessons:{[lesson.id]:Date.parse('2026-10-30')}};
+  expect(mergeProgress(deletion,old).saved).toEqual([]);
+  expect(mergeProgress(old,deletion).saved).toEqual([]);
+ });
+ it('allows a fresh encounter after a lesson was removed',()=>{
+  const deletion={...emptyProgress(),removedLessons:{[lesson.id]:Date.parse('2026-10-30')}};
+  expect(mergeProgress(deletion,{...emptyProgress(),saved:[{...lesson,date:'2026-10-31'}]}).saved).toHaveLength(1);
  });
 });

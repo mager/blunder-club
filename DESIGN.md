@@ -117,6 +117,10 @@ The board is an eight-column square grid with outlined pieces. Labels stay at it
 ### Progress and learning map
 Opening steps use numbered circles with a filled active state and completed check marks. The learning map uses bordered rectangular nodes and visible connections on desktop. On phones, nodes form a two-column list with the related skills stated in text.
 
+### Account controls
+
+The header shows device-save status for guests. When Firebase Authentication is enabled, a bordered Google sign-in control replaces this status; signed-in players see their name, save status, and sign-out action. At widths below 1000px, account controls use a separate row. Save failures remain visible and retain the local copy.
+
 ## Do's and Don'ts
 
 ### Do:
