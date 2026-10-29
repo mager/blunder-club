@@ -14,6 +14,7 @@
     "@fontsource/dm-sans": "^5.2.8",
     "@lucide/svelte": "^1.64.0",
     "chess.js": "1.4.0",
+    "firebase": "12.4.0",
     "stockfish": "19.0.1",
     "svelte": "^5.0.0"
   },
@@ -24,5 +25,8 @@
     "typescript": "~5.9.3",
     "vite": "^8.0.0",
     "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "1.14.7"
   }
 }

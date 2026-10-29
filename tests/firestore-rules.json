@@ -1,0 +1,14 @@
+{
+  "testSuite": {
+    "testCases": [
+      {"expectation":"ALLOW","request":{"auth":{"uid":"alice","token":{}},"method":"get","path":"/databases/(default)/documents/users/alice/progress/current"}},
+      {"expectation":"DENY","request":{"auth":{"uid":"bob","token":{}},"method":"get","path":"/databases/(default)/documents/users/alice/progress/current"}},
+      {"expectation":"DENY","request":{"method":"get","path":"/databases/(default)/documents/users/alice/progress/current"}},
+      {"expectation":"DENY","request":{"auth":{"uid":"alice","token":{}},"method":"get","path":"/databases/(default)/documents/users/alice/admin/secret"}},
+      {"expectation":"ALLOW","request":{"auth":{"uid":"alice","token":{}},"method":"create","path":"/databases/(default)/documents/users/alice/progress/current","time":"2026-10-29T20:00:00Z","resource":{"data":{"schemaVersion":1,"revision":1,"payload":"{}","updatedAt":"2026-10-29T20:00:00Z"}}}},
+      {"expectation":"DENY","request":{"auth":{"uid":"bob","token":{}},"method":"create","path":"/databases/(default)/documents/users/alice/progress/current","time":"2026-10-29T20:00:00Z","resource":{"data":{"schemaVersion":1,"revision":1,"payload":"{}","updatedAt":"2026-10-29T20:00:00Z"}}}},
+      {"expectation":"DENY","request":{"auth":{"uid":"alice","token":{}},"method":"update","path":"/databases/(default)/documents/users/alice/progress/current","time":"2026-10-29T20:00:00Z","resource":{"data":{"schemaVersion":1,"revision":1,"payload":"{}","updatedAt":"2026-10-29T20:00:00Z"}}},"resource":{"data":{"revision":1}}},
+      {"expectation":"ALLOW","request":{"auth":{"uid":"alice","token":{}},"method":"update","path":"/databases/(default)/documents/users/alice/progress/current","time":"2026-10-29T20:00:00Z","resource":{"data":{"schemaVersion":1,"revision":2,"payload":"{}","updatedAt":"2026-10-29T20:00:00Z"}}},"resource":{"data":{"revision":1}}}
+    ]
+  }
+}
