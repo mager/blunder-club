@@ -1294,3 +1294,5 @@ summary {
   .pause-actions .primary-button { min-height: 42px; padding: 10px 14px; font-size: 12px; }
   .pause-actions .text-button, .pause-actions > span { font-size: 12px; }
 }
+
+.game-menu-links { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
