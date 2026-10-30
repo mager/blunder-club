@@ -11,7 +11,7 @@ The board is the main interface. Board, guide, and controls fit the visible wind
 - Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
 - Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings let you rethink or play anyway. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
 - Learn a six-move Italian Game line through center control, development, and castling. Repeat it without hints.
-- Explore a graph of six connected skills. Save mistake positions and practice them again.
+- Explore a graph of six connected skills. “Your second chance” brings back up to three distinct positions from your saved mistakes. Choose a move before seeing the answer, inspect a failed move’s reply, then retry. Sound alternatives pass; hints and retries are recorded separately from first-try solutions. Practice preserves the original game, including after a refresh. Finished games offer “Practice this” for the main turning point.
 - Track recurring patterns with memorable names alongside their actual chess concepts.
 - Jev chooses the next skill and teaching action from engine evidence. Authored explanations and Stockfish supply the chess content.
 
@@ -48,7 +48,7 @@ Firebase project: `blunder-school-513120`. Firestore is in `us-central1` on its 
 3. Set the four `VITE_FIREBASE_*` web config fields shown in `.env.example` in Vercel and local development. These identify the public web app; they are not admin credentials.
 4. Set `VITE_FIREBASE_AUTH_ENABLED=true`, then rebuild/deploy.
 
-A Google account owns `/users/{uid}/progress/current`. The document contains the current board, saved lessons, practice topics, and counters; it does not contain email or display name. Guest lessons are imported only after a successful transaction. Account caches use separate browser keys; signing out returns to guest state. Cloud write failures retain a local copy. Revision checks stop silent overwrites from concurrent devices; sign out/in or retry sync combines lessons and chooses the newer board. Board timestamps change only when the board changes. Lesson deletion timestamps prevent an older device copy from restoring removed lessons. Counters merge with the maximum value to avoid counting the same imported history twice; they are not additive across simultaneous device sessions.
+A Google account owns `/users/{uid}/progress/current`. The document contains the current board, saved lessons, practice topics, and counters; it does not contain email or display name. Guest lessons are imported only after a successful transaction. Account caches use separate browser keys; signing out returns to guest state. Cloud write failures retain a local copy. Revision checks stop silent overwrites from concurrent devices; sign out/in or retry sync combines lessons and chooses the newer board. Board timestamps change only when the board changes. Lesson deletion timestamps prevent an older device copy from restoring removed lessons. Practice evidence uses the latest attempt record per saved position when device copies merge. Counters merge with the maximum value to avoid counting the same imported history twice; they are not additive across simultaneous device sessions.
 
 `firestore.rules` denies all other document paths. The eight rule cases in `tests/firestore-rules.json` were checked against the deployed rules through Firebase's Rules API. `tests/cloud.test.ts` checks migration, account isolation, offline import, and revision conflicts. After setup, sign in through Google and check for “Progress saved.” Then open the app on a second device with the same Google account to verify your lessons.
 
@@ -56,7 +56,7 @@ A Google account owns `/users/{uid}/progress/current`. The document contains the
 
 Guest progress uses localStorage, separately for each browser and origin. Google login and cloud saves are enabled on the live site. `VITE_FIREBASE_AUTH_ENABLED` controls this feature for other deployments. No account is required for guest play. Localhost progress does not automatically transfer to the live URL until imported through the same Google account.
 
-Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire.
+Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire. Personal practice checks one decision at a time; passing a position is not proof of lasting mastery. A refresh ends the practice session and returns to the original game, while retaining completed attempt results.
 
 The API has a bounded request cache and warm-instance request limits. These are prototype controls, not a durable global spending cap. Before a broad public launch, add authenticated requests and a shared quota store.
 
@@ -69,6 +69,7 @@ The API has a bounded request cache and warm-instance request limits. These are 
 - `src/learning.ts`: opening line and connected skill definitions.
 - `src/rules.ts`: ordered teaching decision table.
 - `src/coaching.ts`: isolated rehearsal boards and warning thresholds.
+- `src/practice.ts`: personal position queue, move assessment, practice records, and original-game preservation.
 - `src/opponent.ts`, `src/opponent.worker.ts`: bounded practice opponents.
 - `src/opponent-client.ts`: worker lifecycle, request IDs, and timeouts.
 - `server/coach.mjs`: validated Jev choice boundary and fallback.

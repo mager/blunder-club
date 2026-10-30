@@ -1,8 +1,9 @@
 import { makeGame, lessons } from './chess';
 import { italian, skills } from './learning';
+import { normalizePractice, type PracticeRecord } from './practice';
 import type { OpponentLevel } from './opponent';
 export type CoachMode = 'warn' | 'live' | 'after';
-export type SavedLesson = { id: string; move: string; best: string; text: string; fen: string; date: string; skill?: string; pattern?: string; count?: number };
+export type SavedLesson = { id: string; move: string; best: string; text: string; fen: string; date: string; skill?: string; pattern?: string; count?: number; practice?: PracticeRecord };
 export type Progress = { lessonId: string; customFen?: string; moves: string[]; saved: SavedLesson[]; retries: number; played: number; sound: boolean; coachMode: CoachMode; opponentLevel: OpponentLevel; practiced: string[]; updatedAt: number; removedLessons: Record<string, number> };
 export const emptyProgress = (): Progress => ({lessonId:'free',moves:[],saved:[],retries:0,played:0,sound:false,coachMode:'warn',opponentLevel:'casual',practiced:[],updatedAt:0,removedLessons:{}});
 export function normalizeProgress(value: unknown): Progress {
@@ -19,7 +20,7 @@ export function normalizeProgress(value: unknown): Progress {
   clean.saved = Array.isArray(data.saved) ? data.saved.filter(item => {
     if (!item || !['id','move','best','text','fen','date'].every(key => typeof item[key as keyof SavedLesson] === 'string') || item.text.length > 3000 || item.id.length > 150) return false;
     try { makeGame(item.fen,[]); return true; } catch { return false; }
-  }).slice(0,50).map(item => ({...item,count:Math.min(10000,Math.max(1,Number(item.count)||1))})) : [];
+  }).slice(0,50).map(item => { const {practice:rawPractice,...lesson} = item; const practice=normalizePractice(rawPractice); return {...lesson,...(practice ? {practice} : {}),count:Math.min(10000,Math.max(1,Number(item.count)||1))}; }) : [];
   clean.practiced = Array.isArray(data.practiced) ? [...new Set(data.practiced.filter(id => skills.some(skill => skill.id === id)))] : [];
   clean.retries = Number.isSafeInteger(data.retries) && data.retries! >= 0 ? data.retries! : 0;
   clean.played = Number.isSafeInteger(data.played) && data.played! >= 0 ? data.played! : 0;
@@ -36,7 +37,7 @@ export function mergeProgress(account: Progress, guest: Progress): Progress {
   const combined = new Map(account.saved.map(item => [item.id,item]));
   for (const item of guest.saved) {
     const old = combined.get(item.id);
-    combined.set(item.id, {...(old && old.date > item.date ? old : item),count:Math.max(old?.count||1,item.count||1)});
+    combined.set(item.id, {...(old && old.date > item.date ? old : item),count:Math.max(old?.count||1,item.count||1), ...((old?.practice || item.practice) ? {practice:(old?.practice?.lastAttempt || 0) > (item.practice?.lastAttempt || 0) ? old!.practice : item.practice || old?.practice} : {})});
   }
   const useGuestBoard = guest.updatedAt > account.updatedAt || (guest.updatedAt === account.updatedAt && !account.moves.length && guest.moves.length > 0);
   return {...(useGuestBoard ? guest : account),
