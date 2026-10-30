@@ -19,3 +19,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Board rehearsal extension
 The user requested Impeccable overdrive, continued iteration without routine questions, real wins and losses, optional warnings, and full games. Preserve the approved visual world. The signature extension is a three-step board rehearsal: Before, the candidate move, and the engine reply. The live game stays separate. Replay controls replace the normal toolbar to preserve board size. Adjacent moves glide for 240ms, including the rook during castling; reduced motion uses an immediate update. Coaching timing and opponent strength are separate choices in More. No rating claims, confetti, or extra dashboard.
+
+
+## Single-screen play (current layout)
+The user rejected scrolling during play. The game now occupies 100dvh, with a 56px header (48px on narrow screens). ResizeObserver measures the guide and board controls, then uses the remaining width and height for the square board. On narrow screens the compact guide remains below the board; short landscape windows use two columns. Primary decisions remain visible together. The former duplicate sticky pause actions are removed. Longer hint explanations and coach questions open in focused dialogs. The end summary shows the main turning point; Full review opens the remaining points and practice action. No page overflow is clipped to conceal missing controls. Verified via resized Chromium viewports: 320×568, 390×844, 471×611, 844×390, 1440×900.

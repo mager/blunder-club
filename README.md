@@ -6,7 +6,7 @@ Live: https://blunder-school.vercel.app
 
 ## Play and learn
 
-The board is the main interface. Rook gives one short cue at a time. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
+The board is the main interface. Board, guide, and controls fit the visible window without page scrolling. Rook gives one short cue at a time. Longer explanations and questions open in focused panels. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
 
 - Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
 - Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings let you rethink or play anyway. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
@@ -65,6 +65,7 @@ The API has a bounded request cache and warm-instance request limits. These are 
 - `src/App.svelte`: game, coaching, report, and local progress state.
 - `src/engine.ts`: worker lifecycle, UCI messages, and analysis queue.
 - `src/chess.ts`: move helpers and practice positions.
+- `src/fit-board.ts`: sizes the square board from the space left by its controls and guide.
 - `src/learning.ts`: opening line and connected skill definitions.
 - `src/rules.ts`: ordered teaching decision table.
 - `src/coaching.ts`: isolated rehearsal boards and warning thresholds.

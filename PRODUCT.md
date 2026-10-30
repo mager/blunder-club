@@ -12,7 +12,7 @@ Nextmove teaches chess through play. A coach stays beside the board, offers opti
 People who want to learn chess by playing. V1 is designed for a beginner around rating 350 who repeats mistakes and wants to understand openings and strategy.
 
 ## Brand Commitments
-Approved name: Nextmove. A board-first learning game. The player learns by making decisions, seeing consequences, and retrying. Keep the coach concise. No welcome hero, slogans, or lesson dashboard in the play area.
+Approved name: Nextmove. A board-first learning game. The player learns by making decisions, seeing consequences, and retrying. Keep the coach concise. Board, guide, and main controls must fit one window without page scrolling; longer explanations open in a focused panel. No welcome hero, slogans, or lesson dashboard in the play area.
 
 ## Stack
 Implementation for the prototype (React was rejected by the user): Svelte and TypeScript, chess.js for rules, and Stockfish Lite in a browser worker. No player account or player API key is needed. The coach uses authored explanations grounded in legal moves and engine lines. An optional server-side Jev decision selects the next skill and teaching action; it does not generate chess explanations.

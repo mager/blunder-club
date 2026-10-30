@@ -1286,15 +1286,6 @@ summary {
   }
 }
 
-/* Keep paused-game decisions with the board on short phone and app windows. */
-.pause-actions { display: none; }
-@media (max-width: 760px) and (max-height: 760px) {
-  .board-column.paused .opponent { display: none; }
-  .pause-actions { position: sticky; top: 0; z-index: 4; background: var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 10px; }
-  .pause-actions .primary-button { min-height: 42px; padding: 10px 14px; font-size: 12px; }
-  .pause-actions .text-button, .pause-actions > span { font-size: 12px; }
-}
-
 .game-menu-links { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
 /* Rehearsal stays on the board. The actual game is unchanged. */
@@ -1332,4 +1323,65 @@ summary {
   .replay-strip { gap: 2px; }
   .replay-strip button { padding-inline: 10px; }
   .replay-strip > span { font-size: 11px; }
+}
+
+/* One play screen: size the board from the remaining space, not width alone. */
+.app-shell { height: 100dvh; min-height: 0; display: flex; flex-direction: column; }
+.game-header { flex: 0 0 56px; height: 56px; width: 100%; margin: 0 auto; }
+.game-stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 8px 24px max(12px, env(safe-area-inset-bottom));
+  grid-template-columns: var(--board-size) 260px;
+  gap: 32px;
+  align-content: center;
+}
+.board-column { width: var(--board-size); flex: none; }
+.coach-dock { width: 260px; padding: 0; flex: none; }
+.player-strip { min-height: 32px; }
+.board-toolbar { margin: 0; }
+.replay-strip { padding-block: 0; min-height: 44px; }
+.guide-identity { margin-bottom: 12px; }
+.coach-actions { margin-top: 12px; }
+.hint-actions { display: flex; align-items: center; gap: 16px; }
+.hint-actions .primary-button { flex: 1; }
+.coach-turn .moment-list { margin-top: 8px; }
+.coach-turn .moment-list button { min-height: 44px; padding: 8px 0; }
+.coach-turn > .text-button { min-height: 36px; }
+@media (max-width: 760px) {
+  .game-header { height: 48px; flex-basis: 48px; }
+  .game-stage { display: flex; flex-direction: column; justify-content: center; max-width: 560px; gap: 10px; padding: 0 14px max(8px, env(safe-area-inset-bottom)); }
+  .board-column { width: var(--board-size); }
+  .player-strip { min-height: 26px; }
+  .player-token { width: 18px; height: 22px; }
+  .player-token .chess-piece { width: 20px; height: 20px; }
+  .coach-dock { width: 100%; max-width: 480px; padding: 0 4px; }
+  .guide-identity { margin-bottom: 4px; height: 24px; }
+  .guide-identity > button { height: 24px; }
+  .coach-turn h1 { font-size: 20px; line-height: 1.15; margin-bottom: 4px; }
+  .coach-turn > p { font-size: 13px; line-height: 1.4; }
+  .coach-actions { margin-top: 6px; gap: 8px; }
+  .coach-actions .primary-button { min-width: 120px; }
+  .coach-actions .text-button { min-height: 44px; }
+  .opening-progress { margin-top: 8px; }
+  .opening-invite { margin: 0; padding: 0; min-height: 32px; }
+  .idea-choices { margin: 6px 0; }
+  .idea-choices button { min-height: 40px; }
+  .replay-strip > span { display: none; }
+  .replay-strip { justify-content: center; }
+  .board-toolbar { gap: 4px; }
+  .board-toolbar button { padding-inline: 12px; }
+}
+@media (min-width: 640px) and (max-height: 540px) {
+  .game-stage { display: grid; grid-template-columns: var(--board-size) 240px; max-width: 1100px; gap: 24px; padding: 4px 20px max(8px, env(safe-area-inset-bottom)); }
+  .coach-dock { width: 240px; padding: 0; }
+  .guide-identity { margin-bottom: 4px; }
+  .coach-turn h1 { font-size: 20px; margin-bottom: 4px; }
+  .coach-turn > p { font-size: 13px; line-height: 1.4; }
+  .coach-actions { margin-top: 6px; gap: 8px; }
+  .player-strip { min-height: 26px; }
+  .replay-strip > span { display: none; }
 }

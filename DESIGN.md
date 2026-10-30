@@ -137,19 +137,21 @@ Charcoal ink is the page. Surface and raised provide quiet panel and hover layer
 
 DM Sans carries the wordmark, headings, controls, and coaching. Barlow Condensed carries selected chess notation only: replies, move choices, turning points, and saved positions. The move sheet uses DM Sans with tabular numbers.
 
-The headline and body tokens describe the desktop coach. The headline becomes 32px on large screens, 26px at the intermediate breakpoint, 23px on phones, and 22px on narrow phones. Phone coach body text is 13px with a 1.55 line height. Dialog titles use the title token. The wordmark is 25px and weight 700, then 22px or 20px on phones. Labels range from 11–13px. Question inputs stay at 16px. Use small type for supporting state, not long teaching text.
+The headline and body tokens describe the desktop coach. The headline becomes 32px on large screens, 26px at the intermediate breakpoint, and 20px on phones and in short landscape windows. Phone headings use a 1.15 line height. Phone and short-landscape coach body text is 13px with a 1.4 line height. Dialog titles use the title token. The wordmark is 25px and weight 700, then 22px or 20px on phones. Labels range from 11–13px. Question inputs stay at 16px. Use small type for supporting state, not long teaching text.
 
 **The Plain Cue Rule.** Keep coaching in sentence case and plain type. Reserve condensed type for chess notation.
 
 ## Layout
 
-The header is centered within 1600px, with a 72px height and 36px horizontal padding. The desktop stage pairs the board with a 260px coach dock and a 56px gap. Board size is the minimum of 720px, viewport height minus 260px, and viewport width minus 400px. Player strips sit directly above and below it; Hint, Undo, and More sit beneath.
+The play shell uses the full dynamic viewport height (100dvh). The header and play stage share a centered container of at most 1600px. The header is 56px high, with 36px horizontal padding, reduced to 24px at widths of 1050px or less. The stage fills the space below it. On desktop, the board and a 260px coach dock use two columns with a 32px gap. Stage padding is 8px above, 24px at each side, and at least 12px below, including the safe-area inset.
 
-At widths of at least 1550px, the dock is 280px and the gap is 72px. At 1050px or less, the dock is 230px, the gap is 32px, and the board uses the minimum of 650px, viewport height minus 260px, and viewport width minus 332px.
+The board fits the space that remains after the player strips, toolbar or replay controls, guide, gaps, and padding. ResizeObserver measures the stage, board column, and guide; window and visual-viewport resize events also update the size. The square uses the smaller available width or height, capped at 720px with an 80px lower bound. Its size can change when the guide content changes. Player strips sit directly above and below it, with a 32px minimum height on desktop. The toolbar follows without an extra margin.
 
-At 760px or less, the stage stacks within 560px with 14px side padding and a 20px gap. The header is 60px. The board fills its column; the coach follows within 480px. At 380px or less, stage padding is 8px and the gap is 14px. The page has a 320px minimum width.
+At widths of 760px or less, the header is 48px high. The stage stacks the board and guide within 560px, with 14px side padding, a 10px gap, and at least 8px bottom clearance including the safe-area inset. The guide fills the column up to 480px, with 4px side padding. Player strips have a 26px minimum height. The board uses the remaining height after the guide, so the guide and main decisions stay visible together. The page has a 320px minimum width.
 
-When both width and height are at most 760px, paused-game actions become sticky above the board. They replace the opponent strip while paused and keep retry, reply, or review actions within reach. They are hidden outside this condition.
+Short landscape windows use two columns when width is at least 640px and height is at most 540px. This stage is at most 1100px wide, with a 240px guide, a 24px gap, 20px side padding, 4px top padding, and at least 8px bottom clearance. Compact guide text and 26px player strips leave space for the board.
+
+**The One Screen Rule.** Keep the board, guide, and main controls visible without page scrolling. Resize the board to fit the available space; do not clip page overflow to hide controls. Pause actions appear once in the guide, with no duplicate sticky action row.
 
 Dialogs are at most 460px wide, or 700px for practice and saved positions, with 14px minimum side clearance. Their headers stay visible while content scrolls. The learning map changes to two columns on phones.
 
@@ -169,28 +171,32 @@ The board has nearly square corners. Controls have a small curve; dialogs have a
 Primary actions use jade with dark text. Primary and secondary buttons have a 44px minimum height; secondary actions use a thin line border and raised hover fill. Text actions remain muted until hover. Disabled buttons use 0.4 opacity. Focus uses a 2px jade outline with a 4px offset. Icon controls are 42px square.
 
 ### Coach and move choices
-A small circular guide mark introduces one short cue and a brief explanation. Mistake review changes the guide mark and heading to warm warning. Retry and continue actions stay together. Longer explanations open through native disclosures. Hints reveal an arrow and optional move choices; the selected choice has a deep-jade fill and a visible border. Opening progress uses six bars.
+A small circular guide mark introduces one short cue and a brief explanation. Mistake review changes the guide mark and heading to warm warning. Retry and continue actions stay together. Longer move explanations open in a focused dialog through Why? or Why this move? Hints reveal an arrow and optional move choices; the selected choice has a deep-jade fill and a visible border. Play and Why? share a compact action row. Opening progress uses six bars. On phones, guide spacing is reduced: 4px below the identity row and heading, then 6px before actions. Primary actions retain their 44px minimum height; move choices use a 40px minimum height.
 
 ### Question input
-The optional question form uses an unfilled field with a bottom border, an adjacent send button, and an accessible label. Preserve the global focus outline and readable placeholder.
+Ask Rook and What’s the threat? open the coach dialog. The optional question form stays in that dialog and uses an unfilled field with a bottom border, an adjacent send button, and an accessible label. Preserve the global focus outline and readable placeholder.
 
 ### Header, toolbar, and modes
-The header contains the wordmark, session selector, and account access. Account text collapses to an accessible icon on phones. The board toolbar has three labeled controls. Coaching modes use a dark segmented control with a raised, jade-text active segment and an `aria-pressed` state. Practice, saved positions, account, and move history open in dialogs.
+The header contains the wordmark, session selector, and account access. Account text collapses to an accessible icon on phones. The board toolbar has three labeled controls. During a warning or review, Before, the candidate move, and Their reply replace the normal toolbar alongside More. These replay controls have a 44px minimum height; the Preview label is hidden on phones and in short landscape windows. Coaching modes use a dark segmented control with a raised, jade-text active segment and an `aria-pressed` state. Practice, saved positions, account, and move history open in dialogs.
 
 ### Chessboard
 The board is a square eight-column grid. SVG pieces occupy 81% of each square and have contrasting outlines and a small shadow. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark SVG arrow points from the hinted piece to its destination.
 
 Each square has an accessible piece-and-square label. Arrow keys move focus; Enter selects a piece or destination; Escape clears selection. The focused square uses a dark inset outline. Retain disabled and pressed semantics while play pauses.
 
+### Game summary
+The guide shows one main turning point with Keep playing or Play again. Full review opens all turning points and the available practice action in a dialog. Selecting a turning point closes the dialog and starts its board review.
+
 ### Dialogs and saved rows
-Dialogs use the surface color, a thin line border, a sticky header, and a close control. Practice choices and saved positions use separated rows rather than elevated cards. Promotion uses the same dialog material with four piece buttons. Notifications use the raised color and a dismiss action.
+Move explanations, coach questions, and full game review use the same dialog surface as secondary tasks. Dialogs use the surface color, a thin line border, a sticky header, and a close control. Practice choices and saved positions use separated rows rather than elevated cards. Promotion uses the same dialog material with four piece buttons. Notifications use the raised color and a dismiss action.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep the board, pieces, destinations, and hint arrow clear at phone size.
 - **Do** use jade for actions and current state, with labels or shapes for meaning.
-- **Do** keep the coach concise and put longer explanations in a disclosure.
+- **Do** keep the coach concise and put longer move explanations and questions in dialogs.
+- **Do** fit the board, guide, and main controls in one window without page scrolling.
 - **Do** preserve keyboard focus, accessible labels, and reduced-motion support.
 
 ### Don't:
