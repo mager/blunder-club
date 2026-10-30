@@ -10,6 +10,11 @@
   const files = 'abcdefgh';
   let squares = $derived(Array.from({ length: 64 }, (_, i) => `${files[flipped ? 7 - i % 8 : i % 8]}${flipped ? Math.floor(i / 8) + 1 : 8 - Math.floor(i / 8)}` as Square));
   let checkSquare = $derived(game.isCheck() ? game.board().flat().find(p => p?.type === 'k' && p.color === game.turn())?.square : null);
+  function point(square: string) {
+    const file = files.indexOf(square[0]); const rank = Number(square[1]);
+    return { x: (flipped ? 7 - file : file) * 10 + 5, y: (flipped ? rank - 1 : 8 - rank) * 10 + 5 };
+  }
+  let arrow = $derived(hint ? { from: point(hint.slice(0,2)), to: point(hint.slice(2,4)) } : null);
   function key(event: KeyboardEvent, index: number) {
     const delta: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 8, ArrowUp: -8 };
     if (event.key in delta) {
@@ -44,4 +49,5 @@
       </button>
     {/each}
   </div>
+  {#if arrow}<svg class="board-arrows" viewBox="0 0 80 80" aria-hidden="true"><defs><marker id="hint-arrowhead" markerWidth="5" markerHeight="5" refX="3.7" refY="2.5" orient="auto"><path d="M0 0 L4.5 2.5 L0 5 Z" fill="#234a32"/></marker></defs><line class="hint-arrow" x1={arrow.from.x} y1={arrow.from.y} x2={arrow.to.x} y2={arrow.to.y} marker-end="url(#hint-arrowhead)"/></svg>{/if}
 </div>

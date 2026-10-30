@@ -28,10 +28,10 @@ export function describeMove(fen: string, uci: string): { title: string; detail:
   if (game.isCheck()) return { title: 'Make a forcing move', detail: `${move.san} puts the king in check. Your opponent must deal with the threat.` };
   if (move.piece === 'n' || move.piece === 'b') {
     if (move.from[1] === '1' || move.from[1] === '8') return { title: 'Bring a piece into play', detail: `Move your ${pieceNames[move.piece]} off the back rank to ${move.to}, where it can join the game.` };
-    return { title: `Reposition your ${pieceNames[move.piece]}`, detail: `From ${move.to}, your ${pieceNames[move.piece]} reaches a different set of squares. Follow the line below to see the idea.` };
+    return { title: `Reposition your ${pieceNames[move.piece]}`, detail: `From ${move.to}, your ${pieceNames[move.piece]} reaches a different set of squares. Open the possible line to see the replies.` };
   }
   if (move.piece === 'p' && ['d4', 'e4', 'd5', 'e5'].includes(move.to)) return { title: 'Claim the center', detail: `The pawn on ${move.to} controls nearby central squares and opens lines for your pieces.` };
-  return { title: `Improve your ${pieceNames[move.piece]}`, detail: `Try ${move.san}. The engine prefers this placement after checking the replies shown below.` };
+  return { title: `Improve your ${pieceNames[move.piece]}`, detail: `Try ${move.san}. The engine prefers this placement after a short search.` };
 }
 export function mistakeLoss(before: Line, after: Line): number { return Math.max(0, before.score + after.score); }
 export function resultText(game: Chess): string | null {

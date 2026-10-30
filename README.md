@@ -1,10 +1,12 @@
-# Blunder School
+# Nextmove
 
-**Bad moves. Better chess.** A chess coach for beginners who learn by playing.
+A board-first chess game for beginners who learn by playing. Make a move, see the consequence, and try again.
 
 Live: https://blunder-school.vercel.app
 
 ## Play and learn
+
+The board is the main interface. Rook gives one short cue at a time. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
 
 - Play White against Stockfish Lite with no clock.
 - Choose live coaching or play first and review later. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.

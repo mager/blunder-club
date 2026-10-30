@@ -6,13 +6,13 @@
 web
 
 ## Product Purpose
-Blunder School teaches chess through play. A coach stays beside the board, offers options, explains mistakes, and lets the player retry.
+Nextmove teaches chess through play. A coach stays beside the board, offers options, explains mistakes, and lets the player retry.
 
 ## Users
 People who want to learn chess by playing. V1 is designed for a beginner around rating 350 who repeats mistakes and wants to understand openings and strategy.
 
 ## Brand Commitments
-Approved name: Blunder School. Approved line: Bad moves. Better chess. Gritty, fun, and focused on learning. Rough print textures, bold type, clear move highlights, and a patient coach.
+Approved name: Nextmove. A board-first learning game. The player learns by making decisions, seeing consequences, and retrying. Keep the coach concise. No welcome hero, slogans, or lesson dashboard in the play area.
 
 ## Stack
 Implementation for the prototype (React was rejected by the user): Svelte and TypeScript, chess.js for rules, and Stockfish Lite in a browser worker. No player account or player API key is needed. The coach uses authored explanations grounded in legal moves and engine lines. An optional server-side Jev decision selects the next skill and teaching action; it does not generate chess explanations.

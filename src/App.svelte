@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ArrowUpRight, ArrowRight, RotateCcw, RefreshCw, Lightbulb, Flag, X, Check, ChevronRight, Send, BookOpen, Volume2, VolumeX, Swords, Zap, Bookmark, MoveUpRight, Asterisk, Target } from '@lucide/svelte';
+  import { ArrowUpRight, ArrowRight, RotateCcw, RefreshCw, Lightbulb, X, ChevronRight, ChevronDown, Send, Volume2, VolumeX, Zap, Bookmark, MoveUpRight, Target, Ellipsis, UserRound, SlidersHorizontal, MessageCircle, AudioLines, ListOrdered, Plus } from '@lucide/svelte';
   import type { Square, PieceSymbol, Move } from 'chess.js';
   import Board from './Board.svelte';
   import SkillMap from './SkillMap.svelte';
@@ -32,7 +32,9 @@
   let hint = $state<string | null>(null);
   let option = $state<number | null>(null);
   let flipped = $state(false);
-  let view = $state<'play' | 'practice' | 'journal'>('play');
+  let panel = $state<'game' | 'account' | 'practice' | 'journal' | 'moves' | 'new' | null>(null);
+  let showIdeas = $state(false);
+  let questionOpen = $state(false);
   let review = $state<Review | null>(null);
   let promotion = $state<{ from: Square; to: Square } | null>(null);
   let error = $state('');
@@ -45,17 +47,13 @@
   let sound = $state(false);
   let query = $state('');
   let answer = $state('');
-  let lastQuestion = $state('');
-  let lessonSaved = $state(false);
   let coachMode = $state<'live' | 'after'>('live');
   let openingReview = $state<{ before: string[]; move: Move } | null>(null);
   let recall = $state(false);
   let openingDone = $state(false);
   let practiced = $state<string[]>([]);
-  let guideNote = $state('');
   let reportProgress = $state('');
   let reportMoves = $state<string[] | null>(null);
-  let reportTitle = $state('');
   let recommendation = $state<{skill: string; source: string; confidence?: number; action?: string} | null>(null);
   let reviewingReport = $state(false);
   type Moment = { before: string[]; fen: string; move: Move; best: Line; reply: Line; loss: number };
@@ -67,7 +65,25 @@
   let skillCounts = $derived(saved.reduce((all, item) => { if (item.skill) all[item.skill] = (all[item.skill] || 0) + (item.count || 1); return all; }, {} as Record<string, number>));
   let storageReady = false;
   let audio: AudioContext | null = null;
-  let status = $derived(phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Warming up the coach' : phase === 'thinking' ? 'Checking the board…' : phase === 'review' ? 'Let’s look at that move' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
+  let status = $derived(phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Loading…' : phase === 'thinking' ? 'Thinking…' : phase === 'review' ? 'Your second chance' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
+
+  let cueTitle = $derived(step ? (recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? 'Their move.' : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
+  let cueText = $derived(step ? (recall ? 'Center. Active pieces. Safe king.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? 'Watch what Black changes.' : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
+  function toggleHint() {
+    if (showIdeas || hint) { showIdeas = false; hint = null; option = null; answer = ''; return; }
+    if (step) openingHint(); else preview(0);
+  }
+  function showThreats() { ask('What is the threat?'); }
+  function focusCoach() {
+    const coach = document.querySelector<HTMLElement>('.coach-dock');
+    coach?.scrollIntoView({block:'end', behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+    coach?.focus({preventScroll:true});
+  }
+  function openPanel(node: HTMLDialogElement) {
+    const previous = document.activeElement as HTMLElement | null;
+    node.showModal();
+    return { destroy() { node.close(); previous?.focus(); } };
+  }
 
   onMount(() => {
     engine = new ChessEngine();
@@ -85,7 +101,7 @@
   });
   function restoreProgress(data: Progress) {
     request++; review = null; openingReview = null; reportMoves = null; reviewingReport = false;
-    promotion = null; moments = []; assessed.clear(); recommendation = null; answer = ''; lastQuestion = ''; guideNote = ''; recall = false;
+    promotion = null; moments = []; assessed.clear(); recommendation = null; answer = ''; recall = false;
     activeLesson = data.lessonId === 'saved' && data.customFen
       ? {...lessons[0], id:'saved', title:'Your second chance', fen:data.customFen, tip:'Look for the threat you missed last time. Try the position before asking for a hint.'}
       : [italian,...lessons].find(item => item.id === data.lessonId) || lessons[0];
@@ -135,7 +151,7 @@
   async function prepare() {
     const id = ++request;
     const current = makeGame(activeLesson.fen, moves);
-    selected = null; hint = null; option = null; lines = [];
+    selected = null; hint = null; option = null; showIdeas = false; lines = [];
     if (current.isGameOver()) { persist(); await buildReport(); return; }
     phase = 'thinking';
     try {
@@ -162,11 +178,11 @@
     const current = makeGame(activeLesson.fen, moves);
     let move: Move;
     try { move = current.move({ from, to, ...(promote ? { promotion: promote } : {}) }); } catch { return; }
-    promotion = null; selected = null; hint = null; option = null; answer = ''; lastQuestion = '';
+    promotion = null; selected = null; hint = null; option = null; showIdeas = false; answer = '';
     if (step && `${move.from}${move.to}${move.promotion || ''}` !== step.move) {
       openingReview = { before, move }; moves = [...moves, move.san]; selected = null; phase = 'review'; persist(); return;
     }
-    if (step) guideNote = step.after;
+
     moves = [...moves, move.san]; played++; ping();
     const id = ++request; phase = 'thinking'; lines = [];
     if (current.isGameOver()) { persist(); await buildReport(); return; }
@@ -181,7 +197,7 @@
       }
       if (best && loss >= 120 && coachMode === 'live' && activeLesson.id !== 'italian') {
         review = { before, fen: previousFen, move, best, reply: next[0], loss, shown: false };
-        phase = 'review'; lessonSaved = false; saveLesson(); void chooseNextSkill(id); ping(true); persist();
+        phase = 'review'; saveLesson(); void chooseNextSkill(id); ping(true); persist();
       } else { await botTurn(current, next, id); }
     } catch (e) { fail(e, id); }
   }
@@ -194,14 +210,14 @@
       return;
     }
     selected = selected === square ? null : game.get(square)?.color === 'w' ? square : null;
-    hint = null; option = null;
+    hint = null; option = null; showIdeas = false;
   }
-  function preview(index: number) { if (phase !== 'ready') return; option = index; hint = lines[index].move; selected = null; }
+  function preview(index: number) { if (phase !== 'ready') return; if (!lines[index]) return; showIdeas = true; option = index; hint = lines[index].move; selected = null; }
   function playOption() { if (option === null) return; const uci = lines[option].move; void play(uci.slice(0, 2) as Square, uci.slice(2, 4) as Square, uci[4] as PieceSymbol | undefined); }
   function retry() {
     if (openingReview) { moves = openingReview.before; openingReview = null; retries++; persist(); void prepare(); return; }
     if (!review) return;
-    const before = review.before; review = null; reviewingReport = false; reportMoves = null; moments = moments.filter(m => m.before.length < before.length); for (const ply of assessed) if (ply >= before.length) assessed.delete(ply); moves = before; retries++; answer = ''; lastQuestion = ''; persist(); void prepare();
+    const before = review.before; review = null; reviewingReport = false; reportMoves = null; moments = moments.filter(m => m.before.length < before.length); for (const ply of assessed) if (ply >= before.length) assessed.delete(ply); moves = before; retries++; answer = ''; persist(); void prepare();
   }
   function showConsequence() {
     if (!review || review.shown) return;
@@ -219,10 +235,10 @@
     if (phase !== 'ready' && phase !== 'over') return;
     if (!moves.length) return;
     const remove = game.turn() === 'w' ? 2 : 1;
-    moves = moves.slice(0, Math.max(0, moves.length - remove)); openingDone = false; reportMoves = null; moments = moments.filter(m => m.before.length < moves.length); for (const ply of assessed) if (ply >= moves.length) assessed.delete(ply); retries++; answer = ''; lastQuestion = ''; persist(); void prepare();
+    moves = moves.slice(0, Math.max(0, moves.length - remove)); openingDone = false; reportMoves = null; moments = moments.filter(m => m.before.length < moves.length); for (const ply of assessed) if (ply >= moves.length) assessed.delete(ply); retries++; answer = ''; persist(); void prepare();
   }
   function start(lesson: typeof lessons[number]) {
-    request++; recommendation = null; openingReview = null; openingDone = false; recall = false; guideNote = ''; moments = []; assessed.clear(); reportMoves = null; reviewingReport = false; activeLesson = lesson; moves = []; review = null; promotion = null; answer = ''; lastQuestion = ''; view = 'play';
+    request++; recommendation = null; openingReview = null; openingDone = false; recall = false; moments = []; assessed.clear(); reportMoves = null; reviewingReport = false; activeLesson = lesson; moves = []; review = null; promotion = null; answer = ''; panel = null; showIdeas = false; questionOpen = false;
     persist(); void prepare();
   }
   function recordLesson(r: Review, encounter = false) {
@@ -235,7 +251,7 @@
   }
   function saveLesson() {
     if (!review) return;
-    recordLesson(review); lessonSaved = true;
+    recordLesson(review);
   }
   function reviewText(r: Review): string {
     const reply = lineToSan(r.move.after, r.reply.pv, 4).join(' → ');
@@ -244,7 +260,7 @@
   function ask(question: string) {
     if (phase !== 'ready' && phase !== 'review') return;
     const text = question.trim(); if (!text) return;
-    lastQuestion = text; query = '';
+    query = '';
     if (step && /why|plan|position|help|best|idea|opening/i.test(text)) { answer = `${step.why} ${step.watch}`; } else if (/threat|attack|danger|safe|check/i.test(text)) {
       const targets = attackedPieces(game);
       answer = game.isCheck() ? 'Your king is in check. You must capture the checking piece, block the check, or move your king. Select your pieces to see legal escapes.' : targets.length ? `Black attacks your ${targets.join(', your ')}. An attacked piece is not always lost: look for defenders and check the next exchange.` : 'None of your pieces are directly attacked. Look for checks, captures, and threats before choosing a move.';
@@ -265,8 +281,7 @@
     phase = 'report'; selected = null; hint = null; option = null;
     const playedMoves = [...moves];
     reportMoves = playedMoves;
-    const fullGame = makeGame(activeLesson.fen, playedMoves);
-    reportTitle = resultText(fullGame) || 'Game paused. Let’s learn from it.';
+
     try {
       for (let ply = 0; ply < playedMoves.length; ply += 2) {
         if (id !== request) return;
@@ -313,7 +328,7 @@
     startById(skills.find(skill => skill.id === recommendation?.skill)?.lesson || 'hanging');
   }
   function inspectMoment(moment: Moment) {
-    moves = [...moment.before, moment.move.san]; review = { ...moment, shown: false }; reviewingReport = true; phase = 'review'; lessonSaved = true;
+    moves = [...moment.before, moment.move.san]; review = { ...moment, shown: false }; reviewingReport = true; phase = 'review';
   }
   function practiceSaved(lesson: SavedLesson) {
     start({ id: 'saved', title: 'Your second chance', detail: 'A position from your own game.', fen: lesson.fen, focus: lesson.pattern || 'Look again', tip: 'You have seen this position before. Check the threats and find a better move. Ask for a hint only if you need one.' });
@@ -321,140 +336,119 @@
   function startById(id: string) { start([italian, ...lessons].find(lesson => lesson.id === id) || lessons[0]); }
   function openingHint() {
     if (!step) return;
-    hint = step.move; answer = step.why; lastQuestion = 'The idea behind this move';
+    hint = step.move; answer = ''; selected = null;
   }
   function exitOpening() {
-    openingReview = null; activeLesson = lessons[0]; openingDone = false; guideNote = ''; persist(); void prepare();
+    openingReview = null; activeLesson = lessons[0]; openingDone = false; persist(); void prepare();
   }
 
   function showPromotion(node: HTMLDialogElement) {
     node.showModal();
     return { destroy() { node.close(); } };
   }
-  function jumpTo(selector: string) {
-    document.querySelector(selector)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
-  }
+
   function reloadEngine() { request++; engine.dispose(); engine = new ChessEngine(); error = ''; void prepare(); }
 </script>
 
-<svelte:head><title>Blunder School — Bad moves. Better chess.</title></svelte:head>
+<svelte:head><title>Nextmove — Play. See. Try again.</title></svelte:head>
 
 <div class="app-shell">
-  <header class="site-header">
-    <a class="brand" href="#play" onclick={(event) => { event.preventDefault(); view = 'play'; }} aria-label="Blunder School home">
-      <span class="brand-mark"><Piece type="n" color="b" /></span><span>BLUNDER<span class="brand-second">SCHOOL<span class="brand-period">.</span></span></span>
-    </a>
-    <nav aria-label="Main navigation">
-      <button class:active={view === 'play'} onclick={() => view = 'play'}><Swords size={16} />Play & learn</button>
-      <button class:active={view === 'practice'} onclick={() => view = 'practice'}><Zap size={16} />Learn</button>
-      <button class:active={view === 'journal'} onclick={() => view = 'journal'}><BookOpen size={16} />Your lessons{#if saved.length}<span class="count">{saved.length}</span>{/if}</button>
-    </nav>
-    <div class="account-control">
-      {#if account}<span class="account-name">{account.displayName?.split(' ')[0] || 'Your account'}</span><span class="save-status" role="status">{saveStatus === 'saved' ? 'Progress saved' : saveStatus === 'saving' ? 'Saving…' : saveStatus === 'loading' ? 'Loading progress…' : 'Saved on this device'}</span><button class="text-button" disabled={authBusy || saveStatus === 'loading'} onclick={signOutAccount}>Sign out</button>
-      {:else if cloudConfigured}<button class="google-signin" disabled={authBusy || saveStatus === 'loading'} onclick={signIn}>Continue with Google <ArrowUpRight size={14}/></button><span class="save-status">Guest progress stays on this device</span>
-      {:else}<span class="save-status">Progress saved on this device</span>{/if}
-      {#if account && (saveStatus === 'offline' || saveStatus === 'conflict')}<button class="text-button" onclick={() => sync.retry()}>Retry cloud sync</button>{/if}
-    </div>
+  <header class="game-header">
+    <a class="wordmark" href="#play" aria-label="Nextmove home" onclick={(event) => { event.preventDefault(); panel = null; }}><MoveUpRight size={24} strokeWidth={2.5}/><span>nextmove</span></a>
+    <button class="session-name" onclick={() => panel = 'new'}>{activeLesson.id === 'free' ? 'Free play' : activeLesson.title}<ChevronDown size={14}/></button>
+    <button class="account-button" aria-label={account ? 'Your account and saved progress' : 'Sign in and save progress'} onclick={() => panel = 'account'}><span class="save-dot" class:synced={saveStatus === 'saved'}></span><span>{account ? account.displayName?.split(' ')[0] || 'Account' : 'Save progress'}</span><UserRound size={17}/></button>
   </header>
 
-  <main inert={saveStatus === 'loading'}>
-    {#if view === 'play'}
-      <section class="intro" aria-label="Welcome">
-        <h1>BAD MOVES.<br /><span>BETTER CHESS.</span></h1>
-        <div class="intro-note"><span class="drawn-arrow" aria-hidden="true"><MoveUpRight size={31} strokeWidth={1.5} /></span><p>No clock. No judgment.<br />Just you, the board, and your next good idea.</p></div>
-        <div class="session-label"><span class="live-dot"></span> LEARNING MODE <small>Mistakes come with a second chance.</small></div>
-      </section>
-      <div class="session-controls">{#if activeLesson.id === 'italian'}<div class="guided-mode"><strong>Guided opening</strong><span>Learn one idea at a time.</span><button class="text-button" disabled={!['ready','review'].includes(phase)} onclick={exitOpening}>Switch to free play <ArrowRight size={14}/></button></div>{:else}<div class="mode-switch" aria-label="Coaching mode"><button class:active={coachMode === 'live'} aria-pressed={coachMode === 'live'} onclick={() => { coachMode = 'live'; persist(); }}>Coach as I play</button><button class:active={coachMode === 'after'} aria-pressed={coachMode === 'after'} onclick={() => { coachMode = 'after'; persist(); }}>Play first. Review after.</button></div>{/if}<button class="text-button" disabled={!moves.length || !['ready','over'].includes(phase)} onclick={() => { review = null; void buildReport(); }}>Review this game <ArrowUpRight size={15}/></button></div>
-      {#if activeLesson.id === 'italian'}<div class="opening-path"><div><strong>THE ITALIAN GAME</strong><span>{recall ? 'Recall round · find the ideas yourself' : 'Your first opening · learn the reason for every move'}</span></div><ol>{#each openingSteps as stage, i}<li class:done={i < openingIndex} class:current={i === openingIndex && !openingDone}><span>{#if i < openingIndex}<Check size={11}/>{:else}{i+1}{/if}</span>{stage.short}</li>{/each}</ol></div>{/if}
-      <div class="mobile-coach"><button onclick={() => jumpTo('.coach-panel')}><Lightbulb size={16}/><span><strong>Rook’s corner</strong><small>{step?.question || (phase === 'review' ? 'A mistake worth a second look.' : phase === 'over' ? 'Your game review is ready.' : 'Checks. Captures. Threats. What do you see?')}</small></span><ChevronRight size={16}/></button><button class="back-to-board" onclick={() => jumpTo('.board-column')}>Board</button></div>
-      <div class="play-layout">
-        <section class="board-column" aria-label="Your game">
-          <div class="player-row opponent">
-            <span class="player-avatar bot"><Swords size={20} /></span><div><strong>The house</strong><span>Stockfish Lite · no clock</span></div>
-            <span class="side-label">BLACK</span>
-          </div>
-          <div class="board-wrap">
-            <Board {game} {selected} {destinations} {lastMove} {hint} {flipped} disabled={phase !== 'ready' || !!promotion} {onSquare} />
-            {#if promotion}
-              <dialog class="promotion-picker" use:showPromotion oncancel={(event) => { event.preventDefault(); promotion = null; }} aria-label="Choose a promotion piece"><h2>Pick your new piece.</h2><div class="promotion-pieces">{#each ['q', 'r', 'b', 'n'] as piece}<button aria-label={`Promote to ${pieceNames[piece as PieceSymbol]}`} onclick={() => { if (promotion) void play(promotion.from, promotion.to, piece as PieceSymbol); }}><Piece type={piece as PieceSymbol} color="w" /></button>{/each}</div><button class="text-button" onclick={() => promotion = null}>Cancel</button></dialog>
-            {/if}
-          </div>
-          <div class="player-row you"><span class="player-avatar"><Piece type="n" color="w" small /></span><div><strong>You <span class="you-badge">THE LEARNER</span></strong><span>{game.isCheck() && game.turn() === 'w' ? 'Your king needs you.' : 'Every good player started here.'}</span></div><span class="turn-status" class:busy={phase === 'thinking'}><span class="live-dot"></span>{status}</span></div>
-          <div class="board-tools">
-            <button onclick={() => hint ? (hint = null, option = null) : step ? openingHint() : preview(0)} disabled={phase !== 'ready' || !lines.length}><Lightbulb size={17} />{hint ? 'Hide hint' : 'Give me a hint'}</button>
-            <div class="tool-group"><button title="Take back your last turn" aria-label="Take back your last turn" onclick={undo} disabled={!moves.length || !['ready', 'over'].includes(phase)}><RotateCcw size={17} /></button><button title="Flip board" aria-label="Flip board" onclick={() => flipped = !flipped}><RefreshCw size={16} /></button><button title={sound ? 'Mute move sounds' : 'Enable move sounds'} aria-label={sound ? 'Mute move sounds' : 'Enable move sounds'} aria-pressed={sound} onclick={() => { sound = !sound; ping(); persist(); }}>{#if sound}<Volume2 size={17} />{:else}<VolumeX size={17} />{/if}</button><span class="tool-divider"></span><button onclick={() => view = 'practice'}><Flag size={15} /><span>New game</span></button></div>
-          </div>
-          <details class="move-history"><summary>Move sheet <span>{moves.length ? `${Math.ceil(moves.length / 2)} ${moves.length <= 2 ? 'turn' : 'turns'}` : 'The story starts with your first move.'}</span></summary><div class="notation">{#each moves as move, i}{#if i % 2 === 0}<span class="move-number">{Math.floor(i / 2) + 1}.</span>{/if}<span>{move}</span>{/each}{#if !moves.length}<p>No moves yet. Select a white piece to begin.</p>{/if}</div></details>
-        </section>
-
-        <aside class="coach-panel" aria-label="Chess coach">
-          <div class="coach-header"><div class="coach-avatar"><Piece type="r" color="b" /></div><div><h2>YOUR CORNER.</h2><span>Rook · your local chess coach</span></div><Asterisk class="coach-star" size={34} strokeWidth={1.5}/></div>
-          <div class="coach-content" aria-live="polite" aria-atomic="false">
-            {#if phase === 'report'}
-              <div class="end-mark"><Target size={32}/></div><h3 class="coach-title">FINDING THE<br />TURNING POINTS.</h3><p class="coach-copy">{reportProgress || 'Looking back through your game.'}</p><p class="analysis-note">The engine checks each of your moves. A long game can take a little time.</p>
-            {:else if openingReview}
-              <div class="review-heading"><span class="review-symbol">!?</span><span>A different idea.</span></div><h3 class="coach-title">BACK TO<br />THE PLAN.</h3><p class="coach-copy">{openingReview.move.san} is a legal move. It takes us away from this Italian Game practice line. That alone does not make it a blunder.</p><p class="coach-copy">{openingSteps[Math.floor(openingReview.before.length / 2)]?.why}</p><button class="primary-button" onclick={retry}>Try the opening idea again <RotateCcw size={17}/></button><button class="text-button" onclick={exitOpening}>Keep my move and play freely <ArrowRight size={14}/></button>
-            {:else if phase === 'error'}
-              <div class="coach-message"><h3>A small timeout.</h3><p>{error}</p><button class="primary-button" onclick={reloadEngine}>Reload engine <RefreshCw size={16}/></button></div>
-            {:else if phase === 'review' && review}
-              <div class="review-heading"><span class="review-symbol">?!</span><span>{classifyMistake(review.move, review.reply, review.best).name}</span></div>
-              <h3 class="coach-title">LET’S RUN<br />THAT BACK.</h3><p class="coach-copy">{reviewText(review)}</p>
-              <div class="review-line"><span>YOU PLAYED <strong>{review.move.san}</strong></span><ArrowRight size={17}/><span>TRY INSTEAD <strong>{moveFromLine(review.fen, review.best).san}</strong></span></div>
-              <p class="analysis-note">{review.reply.mate && review.reply.mate > 0 ? `Black can force mate in ${review.reply.mate}.` : `The short search estimates a loss of ${Math.min(review.loss / 100, 99).toFixed(1)} pawns of position value.`}</p>
-              <button class="primary-button" onclick={retry}>Take it back. Try again. <RotateCcw size={17} /></button>
-              <div class="review-actions"><button class="secondary-button" onclick={showConsequence} disabled={review.shown}>{review.shown ? 'Reply shown on the board' : 'Show their reply'}<ArrowUpRight size={15} /></button><button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to report' : 'Play on'} <ArrowRight size={14} /></button></div>
-              <button class="save-lesson" onclick={saveLesson} disabled={lessonSaved}>{#if lessonSaved}<Check size={16}/>Lesson saved{:else}<Bookmark size={16}/>Keep this lesson{/if}</button>
-            {:else if phase === 'over'}
-              <div class="end-mark"><Flag size={32} /></div><h3 class="coach-title">HERE’S WHERE<br />IT TURNED.</h3><p class="coach-copy">{reportTitle}</p>
-              {#if keyMoments.length}<p class="report-intro">The largest changes the engine found. Pick a moment, see the reply, then try a better idea.</p><div class="report-moments">{#each keyMoments as moment}{@const pattern = classifyMistake(moment.move, moment.reply, moment.best)}<button onclick={() => inspectMoment(moment)}><span class="moment-turn">{Math.floor(moment.before.length / 2)+1}.</span><span><strong>{pattern.name}</strong><small>{moment.move.san} · {skills.find(skill => skill.id === pattern.skill)?.name}</small></span><ArrowUpRight size={19}/></button>{/each}</div><p class="analysis-note">These are short engine searches, not a complete verdict on your game. The positions are saved in Your lessons.</p>{:else}<p class="coach-copy">No large mistakes were found in the positions checked. Keep looking for checks, captures, and threats.</p>{/if}
-              {#if recommendation}{@const skill = skills.find(item => item.id === recommendation?.skill)!}<div class="next-skill"><span>{recommendation.source === 'jev' ? 'JEV’S NEXT STEP' : 'YOUR NEXT STEP'}</span><h4>{skill.name}</h4><p>{skill.text}</p><button class="primary-button" onclick={followRecommendation}>{recommendation.action === 'retry_position' ? 'Retry my position' : recommendation.action === 'show_reply' ? 'See the missed reply' : 'Practice this idea'} <ArrowRight size={17}/></button><small>{recommendation.source === 'jev' ? 'Selected by Jev from your game evidence.' : 'Selected by the local teaching rules.'}</small></div>{:else}<button class="primary-button" onclick={() => view = 'practice'}>Find my next lesson <ArrowRight size={17}/></button>{/if}{#if reportMoves && !game.isGameOver()}<button class="secondary-button" onclick={resumeReport}>Continue this game <ArrowRight size={16}/></button>{/if}<button class="secondary-button" onclick={() => start(lessons[0])}>Play another game <RefreshCw size={16}/></button>
-            {:else if openingDone && activeLesson.id === 'italian'}
-              <div class="end-mark"><Check size={32}/></div><h3 class="coach-title">A PLAN.<br />NOT A SCRIPT.</h3><p class="coach-copy">You claimed the center, developed three pieces, and castled. That is the point of this opening. Your opponent will not always play this line.</p><ul class="opening-recap"><li>Center: a pawn on e4, supported by d3.</li><li>Development: two knights and a bishop are active.</li><li>King safety: your king is castled.</li></ul><button class="primary-button" onclick={() => { start(italian); recall = true; }}>Try it without hints <RotateCcw size={17}/></button><button class="secondary-button" onclick={exitOpening}>Play on from this position <ArrowRight size={16}/></button>
-            {:else if step}
-              <div class="opening-mission"><span class="mission-number">{String(openingIndex + 1).padStart(2, '0')}<small>/ 06</small></span><h3>{recall ? 'What comes next?' : step.title}</h3></div><p class="coach-copy">{recall ? 'Use the ideas you learned: center, active pieces, safe king. Find the next move without looking at the answer.' : step.question}</p>
-              {#if guideNote}<p class="last-idea"><Check size={15}/>{guideNote}</p>{/if}
-              {#if !recall}<div class="why-this"><h4>WHY THIS MATTERS</h4><p>{step.why}</p></div>{/if}
-              <button class="secondary-button" disabled={phase !== 'ready'} onclick={openingHint}>Show me the idea <Lightbulb size={16}/></button><p class="option-help">{phase === 'ready' ? 'Make your move on the board. You have time.' : 'Setting up the next position…'}</p>
-            {:else if coachMode === 'after' && option === null}
-              <div class="coach-message"><span class="speech-marker" aria-hidden="true">“</span><h3>Play your game.<br />I’m paying attention.</h3><p>I’ll keep the analysis for the review. Your moves will show us what to work on next.</p></div><div class="preflight"><h3>BEFORE YOU MOVE</h3><ol><li>What did their last move threaten?</li><li>Is the square I want to use safe?</li><li>Am I leaving anything undefended?</li></ol></div><button class="secondary-button" disabled={!moves.length || phase !== 'ready'} onclick={() => void buildReport()}>Pause & find the turning points <ArrowUpRight size={15}/></button><p class="option-help">A hint is still here if you need one. No rating to protect.</p>
-            {:else}
-              <div class="coach-message"><span class="speech-marker" aria-hidden="true">“</span><h3>{moves.length === 0 ? 'You don’t have to be good to play here.' : game.isCheck() ? 'First things first. Protect your king.' : 'Pause. Look. Make your move.'}</h3><p>{moves.length === 0 ? activeLesson.tip : 'Look for checks, captures, and threats. Then pick the idea you want to try.'}</p></div>
-              <div class="options-heading"><h3>A FEW GOOD IDEAS</h3><span>{phase === 'ready' ? 'PICK ONE TO EXPLORE' : 'CHECKING THE POSITION'}</span></div>
-              {#if phase !== 'ready'}
-                <div class="thinking-state"><span class="thinking-pawn"><Piece type="n" color="w" /></span><p>Looking a few moves ahead…<small>The engine runs right here in your browser.</small></p></div>
-              {:else}
-                <div class="move-options">
-                  {#each lines as line, i}
-                    {@const move = moveFromLine(game.fen(), line)}
-                    {@const explanation = describeMove(game.fen(), line.move)}
-                    <button class="move-option" class:chosen={option === i} onclick={() => preview(i)} aria-pressed={option === i}><span class="option-notation">{move.san}</span><span class="option-copy"><strong>{explanation.title}</strong><span>{pieceNames[move.piece]} {move.from} → {move.to}</span></span>{#if i === 0}<span class="best-label">TOP PICK</span>{:else}<ChevronRight size={17}/>{/if}</button>
-                  {/each}
-                </div>
-                {#if option !== null && lines[option]}
-                  <div class="option-detail"><p>{describeMove(game.fen(), lines[option].move).detail}</p><div class="variation"><span>ONE POSSIBLE LINE</span><strong>{lineToSan(game.fen(), lines[option].pv).join(' → ')}</strong></div><button class="primary-button" onclick={playOption}>Play {moveFromLine(game.fen(), lines[option]).san} <ArrowRight size={17}/></button></div>
-                {:else}<p class="option-help">Tap an idea to see it on the board.<br />Or trust your gut. We’ll work through it.</p>{/if}
-              {/if}
-            {/if}
-          </div>
-          {#if (phase === 'ready' || phase === 'review') && !openingReview}
-            <div class="coach-questions"><span>LET’S TALK CHESS</span><div><button onclick={() => ask('What is the threat?')}>What’s the threat? <ArrowUpRight size={13}/></button><button onclick={() => ask('Explain this position')}>Explain the position <ArrowUpRight size={13}/></button></div>
-              {#if answer}<div class="coach-answer" role="status"><div><strong>{lastQuestion}</strong><button aria-label="Close coach answer" onclick={() => answer = ''}><X size={14}/></button></div><p>{answer}</p></div>{/if}
-              <form onsubmit={(event) => { event.preventDefault(); ask(query); }}><label class="sr-only" for="coach-question">Ask the local coach about moves, threats, or castling</label><input id="coach-question" bind:value={query} maxlength="240" placeholder="Ask about moves, threats, castling…"/><button aria-label="Ask coach" disabled={!query.trim()}><Send size={16}/></button></form>
-            </div>
-          {/if}
-          <div class="coach-footnote"><span class="live-dot"></span> {recommendation?.source === 'jev' ? 'JEV + STOCKFISH' : 'LOCAL COACH'} <span>Evidence first. One lesson at a time.</span></div>
-        </aside>
+  <main class="game-stage" inert={saveStatus === 'loading'}>
+    <section class="board-column" class:paused={['review','report','over'].includes(phase)} aria-label="Your chess game">
+      {#if ['review','report','over'].includes(phase)}
+        <div class="pause-actions" aria-label="Paused game actions">
+          {#if openingReview}<button class="primary-button" onclick={retry}>Try again <RotateCcw size={15}/></button><button class="text-button" onclick={exitOpening}>Keep playing <ArrowRight size={15}/></button>
+          {:else if review}<button class="primary-button" onclick={review.shown ? retry : showConsequence}>{review.shown ? 'Try again' : 'See the reply'}{#if review.shown}<RotateCcw size={15}/>{:else}<ArrowRight size={15}/>{/if}</button><button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to review' : 'Play on'}</button>
+          {:else}<span>{phase === 'report' ? 'Reviewing…' : 'Review ready'}</span><button class="primary-button" onclick={focusCoach}>{phase === 'report' ? 'See progress' : 'See review'} <ArrowRight size={15}/></button>{/if}
+        </div>
+      {/if}
+      <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>The house</strong></span><span>{activeLesson.id === 'italian' ? `Italian · ${Math.min(openingIndex + 1, 6)} / 6` : 'No clock'}</span></div>
+      <div class="board-wrap">
+        <Board {game} {selected} {destinations} {lastMove} {hint} {flipped} disabled={phase !== 'ready' || !!promotion} {onSquare}/>
       </div>
-      <div class="below-board"><span class="club-rule">CLUB RULE #1</span><p>A blunder is only wasted if you learn nothing from it.</p><span>{played} moves explored <i>/</i> {retries} second {retries === 1 ? 'chance' : 'chances'}</span></div>
-    {:else if view === 'practice'}
-      <section class="library"><div class="library-heading"><h1>LESS THEORY.<br /><span>MORE TRYING.</span></h1><p>Your learning is a network, not a checklist.<br />Follow the idea your last game brought up.</p></div><SkillMap counts={skillCounts} {practiced} onStart={startById}/><div class="opening-feature"><div><span>START WITH A PLAN</span><h2>The Italian Game.</h2><p>Learn the center. Develop with purpose. Castle.<br />Then try the same opening without the prompts.</p></div><button class="primary-button" onclick={() => start(italian)}>Learn this opening <ArrowRight size={18}/></button></div><div class="practice-list">{#each lessons as lesson, i}<button class="practice-row" onclick={() => start(lesson)}><span class="practice-index">{String(i + 1).padStart(2, '0')}</span><span class="practice-title"><strong>{lesson.title}</strong><span>{lesson.detail}</span></span><span class="practice-focus">{lesson.focus}</span><ArrowUpRight size={25}/></button>{/each}</div><p class="library-note">Starting a board replaces your current game. Your saved lessons stay with you.</p></section>
-    {:else}
-      <section class="library"><div class="library-heading"><h1>YOUR MISTAKES.<br /><span>YOUR PLAYBOOK.</span></h1><p>The moves you stopped to understand.<br />{account ? 'Your account keeps these lessons ready for another look.' : 'Saved in this browser. Sign in to take them with you.'}</p></div>
-        {#if saved.length}<div class="saved-list">{#each saved as lesson}<article class="saved-lesson"><div class="saved-notation"><span>{lesson.move}</span><ArrowRight size={20}/><strong>{lesson.best}</strong></div><span class="saved-pattern">{lesson.pattern || 'A move worth revisiting'}</span><p>{lesson.text}</p><button class="primary-button" onclick={() => practiceSaved(lesson)}>Play this position again <RotateCcw size={16}/></button><div class="saved-meta"><span>{lesson.count && lesson.count > 1 ? `${lesson.count} encounters · ` : ''}{new Date(lesson.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span><button class="text-button" onclick={() => { removedLessons = {...removedLessons,[lesson.id]:Date.now()}; saved = saved.filter(l => l.id !== lesson.id); persist(); }}>Remove <X size={14}/></button></div></article>{/each}</div>
-        {:else}<div class="empty-journal"><BookOpen size={44} strokeWidth={1.2}/><h2>Nothing to unlearn. Yet.</h2><p>When the coach catches a mistake, choose “Keep this lesson.”<br />Your own chess playbook starts there.</p><button class="primary-button" onclick={() => view = 'play'}>Back to the board <ArrowRight size={17}/></button></div>{/if}
-      </section>
-    {/if}
-    {#if notification}<div class="notification" role="status">{notification}<button aria-label="Dismiss notification" onclick={() => notification = ''}><X size={16}/></button></div>{/if}
+      <div class="player-strip"><span class="player-id"><span class="player-token"><Piece type="k" color="w"/></span><strong>You</strong></span><span class="turn-status" class:busy={phase === 'thinking' || phase === 'loading'} role="status"><span class="status-dot"></span>{status}</span></div>
+      <div class="board-toolbar" aria-label="Game controls">
+        <button class:active={showIdeas || !!hint} disabled={phase !== 'ready' || !lines.length} onclick={toggleHint}><Lightbulb size={18}/><span>{showIdeas || hint ? 'Hide hint' : 'Hint'}</span></button>
+        <button aria-label="Take back your last turn" disabled={!moves.length || !['ready','over'].includes(phase)} onclick={undo}><RotateCcw size={17}/><span>Undo</span></button>
+        <button onclick={() => panel = 'game'} aria-label="Game menu"><Ellipsis size={21}/><span>More</span></button>
+      </div>
+    </section>
+
+    <aside class="coach-dock" class:intervention={phase === 'review'} aria-label="Your chess guide" tabindex="-1">
+      <div class="guide-identity"><span class="guide-mark"><AudioLines size={18}/></span><strong>Rook</strong><span>Your guide</span><button aria-label="Coach settings" title="Coach settings" onclick={() => panel = 'game'}><SlidersHorizontal size={16}/></button></div>
+      <div class="coach-turn" aria-live="polite">
+        {#if phase === 'report'}
+          <h1>Finding the turning point.</h1><p class="quiet">{reportProgress || 'Checking your moves…'}</p><div class="thinking-track" aria-hidden="true"></div>
+        {:else if phase === 'error'}
+          <h1>The engine stopped.</h1><p>{error}</p><button class="primary-button" onclick={reloadEngine}>Try again <RefreshCw size={16}/></button>
+        {:else if openingReview}
+          <h1>A different path.</h1><p>{openingReview.move.san} is legal. This practice line has another idea.</p><div class="coach-actions"><button class="primary-button" onclick={retry}>Try again <RotateCcw size={16}/></button><button class="text-button" onclick={exitOpening}>Keep playing <ArrowRight size={16}/></button></div>
+        {:else if phase === 'review' && review}
+          {@const pattern = classifyMistake(review.move, review.reply, review.best)}
+          <h1>{pattern.name}.</h1><p>{pattern.explanation.split('. ')[0]}.</p>
+          {#if review.shown}<div class="reply-line"><span>You played <b>{review.move.san}</b></span><ArrowRight size={15}/><span>Black replies <b>{lineToSan(review.move.after, review.reply.pv, 1)[0]}</b></span></div>{/if}
+          <div class="coach-actions"><button class="primary-button" onclick={review.shown ? retry : showConsequence}>{review.shown ? 'Try again' : 'See the reply'} {#if review.shown}<RotateCcw size={16}/>{:else}<ArrowRight size={16}/>{/if}</button>{#if !review.shown}<button class="secondary-button" onclick={retry}>Undo</button>{/if}<button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to review' : 'Play on'}</button></div>
+          <details class="explanation"><summary>Why this move?</summary><p>{reviewText(review)}</p><small>Short engine analysis. Lesson saved.</small></details>
+        {:else if phase === 'over'}
+          <h1>{game.isCheckmate() ? (game.turn() === 'w' ? 'Let’s run it back.' : 'That’s checkmate.') : game.isDraw() ? 'A draw.' : 'The turning points.'}</h1>{#if game.isGameOver()}<p>{resultText(game)}</p>{/if}
+          {#if keyMoments.length}<p>Try the moves that changed your game.</p><div class="moment-list">{#each keyMoments as moment}<button onclick={() => inspectMoment(moment)}><b>{Math.floor(moment.before.length/2)+1}. {moment.move.san}</b><span>{classifyMistake(moment.move,moment.reply,moment.best).name}</span><ArrowRight size={15}/></button>{/each}</div>{:else}<p>No large mistakes found in the positions checked.</p>{/if}
+          <div class="coach-actions">{#if reportMoves && !game.isGameOver()}<button class="primary-button" onclick={resumeReport}>Keep playing <ArrowRight size={16}/></button>{:else}<button class="primary-button" onclick={() => start(lessons[0])}>Play again <ArrowRight size={16}/></button>{/if}</div>
+          {#if recommendation}<button class="text-button" onclick={followRecommendation}>Practice {skills.find(s => s.id === recommendation?.skill)?.name.toLowerCase()} <ArrowUpRight size={14}/></button>{/if}
+        {:else if openingDone && activeLesson.id === 'italian'}
+          <h1>You have an opening.</h1><p>Center claimed. Pieces active. King safe.</p><div class="coach-actions"><button class="primary-button" onclick={exitOpening}>Keep playing <ArrowRight size={16}/></button><button class="text-button" onclick={() => { start(italian); recall = true; }}>Try without hints</button></div>
+        {:else}
+          <h1>{cueTitle}</h1><p>{cueText}</p>
+          {#if step}
+            <div class="opening-progress" aria-label={`Opening step ${Math.min(openingIndex+1,6)} of 6`}>{#each openingSteps as item, i}<span class:done={i < openingIndex} class:current={i === openingIndex} title={item.short}></span>{/each}</div>
+            {#if hint}<details class="explanation"><summary>Why this move?</summary><p>{step.why}</p></details>{/if}
+          {:else if showIdeas && phase === 'ready'}
+            <div class="idea-choices" aria-label="Moves to explore">{#each lines as line, i}<button class:chosen={option === i} aria-pressed={option === i} onclick={() => preview(i)}>{moveFromLine(game.fen(),line).san}</button>{/each}</div>
+            {#if option !== null && lines[option]}<p class="hint-detail">{describeMove(game.fen(),lines[option].move).detail}</p><button class="primary-button" onclick={playOption}>Play {moveFromLine(game.fen(),lines[option]).san} <ArrowRight size={16}/></button><details class="explanation"><summary>See a possible line</summary><p class="variation">{lineToSan(game.fen(),lines[option].pv).join(' → ')}</p></details>{/if}
+          {/if}
+          {#if phase === 'ready' && !showIdeas && !hint}<div class="coach-actions"><button class="text-button" onclick={showThreats}>What’s the threat? <ArrowUpRight size={15}/></button><button class="icon-button" aria-label="Ask Rook a question" onclick={() => questionOpen = !questionOpen}><MessageCircle size={17}/></button></div>{/if}
+        {/if}
+      </div>
+      {#if answer}<div class="coach-answer"><button class="close-answer" aria-label="Close coach answer" onclick={() => answer = ''}><X size={15}/></button><p>{answer}</p></div>{/if}
+      {#if questionOpen && (phase === 'ready' || phase === 'review')}<form class="coach-form" onsubmit={(event) => {event.preventDefault(); ask(query);}}><label class="sr-only" for="coach-question">Ask about moves, threats, or castling</label><input id="coach-question" bind:value={query} maxlength="240" placeholder="Ask Rook…"/><button aria-label="Send question" disabled={!query.trim()}><Send size={17}/></button></form>{/if}
+      {#if phase === 'ready' && !step && !showIdeas && !answer && activeLesson.id === 'free' && moves.length === 0}<button class="opening-invite" onclick={() => start(italian)}>Learn an opening <ArrowRight size={15}/></button>{/if}
+    </aside>
   </main>
-  <footer><a href="/engine/SOURCE-AND-NOTICES.txt" target="_blank" rel="noreferrer">Engine source & licenses <ArrowUpRight size={12}/></a><span>BLUNDER SCHOOL<span class="brand-period">.</span> <span>A LITTLE BETTER, EVERY GAME.</span></span><a href="https://github.com/mager/blunder-club" target="_blank" rel="noreferrer">Made for the learning curve <ArrowUpRight size={13}/></a></footer>
 </div>
+
+{#if panel}
+  <dialog class="game-dialog" class:wide={panel === 'practice' || panel === 'journal'} use:openPanel oncancel={() => panel = null} aria-label={panel === 'account' ? 'Account' : panel === 'practice' ? 'Practice' : panel === 'journal' ? 'Saved positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? 'New game' : 'Game menu'}>
+    <div class="dialog-header"><h2>{panel === 'account' ? 'Your progress' : panel === 'practice' ? 'Find your next move.' : panel === 'journal' ? 'Your positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? 'A fresh board.' : 'Your game'}</h2><button class="icon-button" aria-label="Back to board" onclick={() => panel = null}><X size={22}/></button></div>
+    <div class="dialog-body">
+      {#if panel === 'game'}
+        <div class="mode-switch" aria-label="Coaching mode"><button class:active={coachMode === 'live'} aria-pressed={coachMode === 'live'} onclick={() => {coachMode='live';persist();}}>Coach as I play</button><button class:active={coachMode === 'after'} aria-pressed={coachMode === 'after'} onclick={() => {coachMode='after';persist();}}>Review after</button></div>
+        {#if activeLesson.id === 'italian'}<button class="menu-row" onclick={() => {exitOpening();panel=null;}}>Leave the opening guide <ArrowRight size={18}/></button>{/if}
+        <button class="menu-row" disabled={!moves.length || !['ready','over'].includes(phase)} onclick={() => {panel=null; review=null; void buildReport();}}>Review this game <Target size={19}/></button>
+        <button class="menu-row" onclick={() => panel='practice'}>Practice <Zap size={19}/></button><button class="menu-row" onclick={() => panel='journal'}>Saved positions <span>{saved.length}</span></button><button class="menu-row" onclick={() => panel='moves'}>Move sheet <ListOrdered size={19}/></button>
+        <div class="menu-tools"><button class="secondary-button" onclick={() => flipped = !flipped}><RefreshCw size={17}/>Flip board</button><button class="secondary-button" aria-pressed={sound} onclick={() => {sound=!sound;ping();persist();}}>{#if sound}<Volume2 size={17}/>{:else}<VolumeX size={17}/>{/if}Sound {sound ? 'on' : 'off'}</button></div>
+        <button class="menu-row separated" onclick={() => panel='new'}>New game <Plus size={19}/></button>
+        <a class="license-link" href="/engine/SOURCE-AND-NOTICES.txt" target="_blank" rel="noreferrer">Engine & licenses <ArrowUpRight size={12}/></a>
+      {:else if panel === 'account'}
+        {#if account}<p class="account-name">{account.displayName || 'Signed in'}</p><p class="quiet" role="status">{saveStatus === 'saved' ? 'Progress saved' : saveStatus === 'saving' ? 'Saving…' : saveStatus === 'loading' ? 'Loading progress…' : 'Saved on this device'}</p>{#if saveStatus === 'offline' || saveStatus === 'conflict'}<button class="primary-button" onclick={() => sync.retry()}>Retry cloud save</button>{/if}<button class="secondary-button" disabled={authBusy || saveStatus === 'loading'} onclick={signOutAccount}>Sign out</button>{:else}<p>Keep your positions and progress across devices.</p>{#if cloudConfigured}<button class="primary-button" disabled={authBusy || saveStatus === 'loading'} onclick={signIn}>{authBusy ? 'Opening Google…' : 'Continue with Google'}<ArrowUpRight size={18}/></button>{/if}<p class="quiet">Guest progress stays on this device.</p>{/if}
+      {:else if panel === 'moves'}
+        {#if moves.length}<div class="move-sheet">{#each moves as move, i}{#if i % 2 === 0}<span>{Math.floor(i / 2)+1}.</span>{/if}<b>{move}</b>{/each}</div>{:else}<p>No moves yet.</p>{/if}
+      {:else if panel === 'new'}
+        {#if moves.length}<p class="quiet">This replaces the current game. Saved positions stay.</p>{/if}
+        <button class="start-choice" onclick={() => start(lessons[0])}><span><strong>Just play</strong><small>You, the board, and Rook.</small></span><ArrowRight size={23}/></button><button class="start-choice" onclick={() => start(italian)}><span><strong>Learn an opening</strong><small>The Italian Game · 6 moves</small></span><ArrowRight size={23}/></button><button class="text-button" onclick={() => panel='practice'}>Pick a practice position <ChevronRight size={16}/></button>
+      {:else if panel === 'practice'}
+        <p class="quiet">Practice starts a new board. Saved positions stay.</p>
+        <div class="practice-list">{#each [italian,...lessons.filter(l => l.id !== 'free')] as lesson}<button class="start-choice" onclick={() => start(lesson)}><span><strong>{lesson.title}</strong><small>{lesson.focus}</small></span><ArrowRight size={20}/></button>{/each}</div>
+        <details class="learning-map"><summary>Your learning map</summary><SkillMap counts={skillCounts} {practiced} onStart={startById}/></details>
+      {:else if panel === 'journal'}
+        {#if saved.length}<p class="quiet">Replay a position to replace the current board.</p><div class="saved-list">{#each saved as lesson}<article class="saved-position"><div><strong>{lesson.pattern || 'Try this again'}</strong><span>{lesson.move} <ArrowRight size={14}/> {lesson.best}</span></div><button class="secondary-button" onclick={() => practiceSaved(lesson)}>Replay <RotateCcw size={15}/></button><details class="explanation"><summary>What happened?</summary><p>{lesson.text}</p><button class="text-button" onclick={() => {removedLessons={...removedLessons,[lesson.id]:Date.now()};saved=saved.filter(l=>l.id!==lesson.id);persist();}}>Remove position <X size={14}/></button></details></article>{/each}</div>{:else}<div class="empty-state"><Bookmark size={32}/><h3>Your games will fill this.</h3><p>Mistakes become positions you can replay.</p><button class="primary-button" onclick={() => panel=null}>Back to the board <ArrowRight size={17}/></button></div>{/if}
+      {/if}
+    </div>
+  </dialog>
+{/if}
+{#if promotion}<dialog class="promotion-picker" use:showPromotion oncancel={() => promotion=null} aria-label="Choose a promotion piece"><h2>Choose your piece.</h2><div class="promotion-pieces">{#each ['q','r','b','n'] as piece}<button aria-label={`Promote to ${pieceNames[piece as PieceSymbol]}`} onclick={() => {if(promotion) void play(promotion.from,promotion.to,piece as PieceSymbol);}}><Piece type={piece as PieceSymbol} color="w"/></button>{/each}</div><button class="text-button" onclick={() => promotion=null}>Cancel</button></dialog>{/if}
+{#if notification}<div class="notification" role="status"><span>{notification}</span><button class="icon-button" aria-label="Dismiss notification" onclick={() => notification=''}><X size={18}/></button></div>{/if}
