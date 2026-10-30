@@ -8,10 +8,13 @@
   import Piece from './Piece.svelte';
   import { ChessEngine } from './engine';
   import type { Line } from './engine';
+  import { PracticeOpponent } from './opponent-client';
+  import { opponents, type OpponentLevel } from './opponent';
+  import { rehearsal, needsWarning, type TurningPoint } from './coaching';
   import { makeGame, lessons, playUci, moveFromLine, describeMove, lineToSan, mistakeLoss, resultText, attackedPieces, pieceNames } from './chess';
 
-  type Phase = 'loading' | 'ready' | 'thinking' | 'review' | 'over' | 'error' | 'report';
-  import { stampBoardProgress, type SavedLesson, type Progress } from './progress';
+  type Phase = 'loading' | 'ready' | 'thinking' | 'review' | 'over' | 'error' | 'report' | 'warning';
+  import { stampBoardProgress, type SavedLesson, type Progress, type CoachMode } from './progress';
   import { createProgressSync, cloudConfigured, type SaveStatus } from './cloud';
   import type { User } from 'firebase/auth';
   let sync: ReturnType<typeof createProgressSync>;
@@ -20,6 +23,7 @@
   let authBusy = $state(false);
   type Review = { before: string[]; fen: string; move: Move; best: Line; reply: Line; loss: number; shown: boolean };
   let engine: ChessEngine;
+  let opponent: PracticeOpponent;
   let request = 0;
   let activeLesson = $state(lessons[0]);
   let moves = $state<string[]>([]);
@@ -36,6 +40,11 @@
   let showIdeas = $state(false);
   let questionOpen = $state(false);
   let review = $state<Review | null>(null);
+  let warning = $state<(TurningPoint & {next:Line[]}) | null>(null);
+  let lessonStage = $state<0|1|2>(1);
+  let checkingMove = $state<string | null>(null);
+  let boardGame = $derived(warning ? rehearsal(warning,lessonStage) : review ? rehearsal(review,lessonStage) : game);
+  let boardLastMove = $derived(warning || review ? boardGame.history({verbose:true}).at(-1) ?? null : lastMove);
   let promotion = $state<{ from: Square; to: Square } | null>(null);
   let error = $state('');
   let notification = $state('');
@@ -47,7 +56,8 @@
   let sound = $state(false);
   let query = $state('');
   let answer = $state('');
-  let coachMode = $state<'live' | 'after'>('live');
+  let coachMode = $state<CoachMode>('warn');
+  let opponentLevel = $state<OpponentLevel>('casual');
   let openingReview = $state<{ before: string[]; move: Move } | null>(null);
   let recall = $state(false);
   let openingDone = $state(false);
@@ -56,7 +66,7 @@
   let reportMoves = $state<string[] | null>(null);
   let recommendation = $state<{skill: string; source: string; confidence?: number; action?: string} | null>(null);
   let reviewingReport = $state(false);
-  type Moment = { before: string[]; fen: string; move: Move; best: Line; reply: Line; loss: number };
+  type Moment = TurningPoint;
   let moments = $state<Moment[]>([]);
   const assessed = new Set<number>();
   let openingIndex = $derived(Math.floor(moves.length / 2));
@@ -65,10 +75,10 @@
   let skillCounts = $derived(saved.reduce((all, item) => { if (item.skill) all[item.skill] = (all[item.skill] || 0) + (item.count || 1); return all; }, {} as Record<string, number>));
   let storageReady = false;
   let audio: AudioContext | null = null;
-  let status = $derived(phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Loading…' : phase === 'thinking' ? 'Thinking…' : phase === 'review' ? 'Your second chance' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
+  let status = $derived(phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Loading…' : phase === 'warning' ? 'Move not played' : phase === 'thinking' ? (checkingMove ? 'Checking your move…' : 'Thinking…') : phase === 'review' ? 'Your second chance' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
 
-  let cueTitle = $derived(step ? (recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? 'Their move.' : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
-  let cueText = $derived(step ? (recall ? 'Center. Active pieces. Safe king.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? 'Watch what Black changes.' : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
+  let cueTitle = $derived(step ? (recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? (checkingMove ? 'One moment.' : 'Their move.') : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
+  let cueText = $derived(step ? (recall ? 'Center. Active pieces. Safe king.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? (checkingMove ? `Checking ${checkingMove} before Black replies.` : 'Watch what Black changes.') : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
   function toggleHint() {
     if (showIdeas || hint) { showIdeas = false; hint = null; option = null; answer = ''; return; }
     if (step) openingHint(); else preview(0);
@@ -86,7 +96,7 @@
   }
 
   onMount(() => {
-    engine = new ChessEngine();
+    engine = new ChessEngine(); opponent = new PracticeOpponent();
     sync = createProgressSync({
       apply: restoreProgress,
       account: value => { account = value; },
@@ -97,24 +107,24 @@
       error: message => { notification = message; },
     });
     sync.start();
-    return () => { request++; sync.dispose(); engine.dispose(); void audio?.close(); };
+    return () => { request++; sync.dispose(); engine.dispose(); opponent.dispose(); void audio?.close(); };
   });
   function restoreProgress(data: Progress) {
-    request++; review = null; openingReview = null; reportMoves = null; reviewingReport = false;
+    request++; review = null; warning = null; checkingMove = null; openingReview = null; reportMoves = null; reviewingReport = false;
     promotion = null; moments = []; assessed.clear(); recommendation = null; answer = ''; recall = false;
     activeLesson = data.lessonId === 'saved' && data.customFen
       ? {...lessons[0], id:'saved', title:'Your second chance', fen:data.customFen, tip:'Look for the threat you missed last time. Try the position before asking for a hint.'}
       : [italian,...lessons].find(item => item.id === data.lessonId) || lessons[0];
     lastProgress = data; removedLessons = data.removedLessons;
     moves = data.moves; saved = data.saved; retries = data.retries; played = data.played;
-    sound = data.sound; coachMode = data.coachMode; practiced = data.practiced;
+    sound = data.sound; coachMode = data.coachMode; opponentLevel = data.opponentLevel; practiced = data.practiced;
     openingDone = activeLesson.id === 'italian' && moves.length >= openingSteps.length * 2;
     storageReady = true; void prepare();
   }
   function persist() {
     if (!storageReady) return;
-    const data = stampBoardProgress({ lessonId:activeLesson.id, moves:openingReview?.before ?? review?.before ?? moves,
-      saved, retries, played, sound, coachMode, practiced, removedLessons, updatedAt:lastProgress?.updatedAt || 0,
+    const data = stampBoardProgress({ lessonId:activeLesson.id, moves:reviewingReport && reportMoves ? reportMoves : openingReview?.before ?? review?.before ?? moves,
+      saved, retries, played, sound, coachMode, opponentLevel, practiced, removedLessons, updatedAt:lastProgress?.updatedAt || 0,
       ...(activeLesson.id === 'saved' ? {customFen:activeLesson.fen} : {}) }, lastProgress);
     lastProgress = data; sync.save(data);
   }
@@ -151,7 +161,7 @@
   async function prepare() {
     const id = ++request;
     const current = makeGame(activeLesson.fen, moves);
-    selected = null; hint = null; option = null; showIdeas = false; lines = [];
+    selected = null; hint = null; option = null; showIdeas = false; checkingMove = null; warning = null; lines = [];
     if (current.isGameOver()) { persist(); await buildReport(); return; }
     phase = 'thinking';
     try {
@@ -163,10 +173,10 @@
   }
   async function botTurn(current: ReturnType<typeof makeGame>, choices: Line[], id: number) {
     if (id !== request) return;
-    // A consistent learning opponent: choose a near-equal second line occasionally.
     const openingReply = activeLesson.id === 'italian' && !openingDone ? openingSteps[Math.floor((moves.length - 1) / 2)]?.reply : undefined;
-    const choice = choices[1] && choices[0].score - choices[1].score < 35 && moves.length % 4 === 1 ? choices[1] : choices[0];
-    const move = playUci(current, openingReply || choice.move);
+    const uci = openingReply || (opponentLevel === 'challenge' ? choices[0].move : await opponent.choose(current.fen(),opponentLevel));
+    if (id !== request) return;
+    const move = playUci(current, uci);
     moves = [...moves, move.san]; ping();
     if (activeLesson.id === 'italian' && moves.length === openingSteps.length * 2 && !openingDone) { openingDone = true; practiced = [...new Set([...practiced, 'center', 'development', 'king'])]; }
     persist();
@@ -183,23 +193,56 @@
       openingReview = { before, move }; moves = [...moves, move.san]; selected = null; phase = 'review'; persist(); return;
     }
 
-    moves = [...moves, move.san]; played++; ping();
-    const id = ++request; phase = 'thinking'; lines = [];
-    if (current.isGameOver()) { persist(); await buildReport(); return; }
+    const id = ++request; phase = 'thinking'; checkingMove = move.san;
+    // Keep the live board and saved game unchanged until the player commits.
+    hint = `${move.from}${move.to}${move.promotion || ''}`;
+    if (current.isGameOver()) {
+      moves = [...before,move.san]; played++; checkingMove = null; ping(); persist(); await buildReport(); return;
+    }
+    const alreadyPlayed = coachMode !== 'warn';
+    if (alreadyPlayed) { moves = [...before,move.san]; played++; checkingMove = null; hint = null; ping(); persist(); }
     try {
       const next = await engine.analyze(current.fen());
       if (id !== request) return;
-      const loss = best ? mistakeLoss(best, next[0]) : 0;
-      if (best) {
-        assessed.add(before.length);
-        moments = [...moments.filter(m => m.before.length !== before.length), { before, fen: previousFen, move, best, reply: next[0], loss }];
-        if (loss >= 120 && activeLesson.id !== 'italian') recordLesson({ before, fen: previousFen, move, best, reply: next[0], loss, shown: false }, true);
+      checkingMove = null; hint = null;
+      const loss = best ? mistakeLoss(best,next[0]) : 0;
+      const point = best ? {before,fen:previousFen,move,best,reply:next[0],loss} : null;
+      if (point && needsWarning(loss,activeLesson.id,coachMode)) {
+        warning = {...point,next}; lessonStage = 0; phase = 'warning'; ping(true);
+        return;
       }
-      if (best && loss >= 120 && coachMode === 'live' && activeLesson.id !== 'italian') {
-        review = { before, fen: previousFen, move, best, reply: next[0], loss, shown: false };
-        phase = 'review'; saveLesson(); void chooseNextSkill(id); ping(true); persist();
-      } else { await botTurn(current, next, id); }
-    } catch (e) { fail(e, id); }
+      await commitMove(before,move,next,point,id,false,alreadyPlayed);
+    } catch (e) { checkingMove = null; hint = null; fail(e,id); }
+  }
+  async function commitMove(before:string[],move:Move,next:Line[],point:TurningPoint|null,id:number,accepted=false,alreadyPlayed=false) {
+    if (id !== request) return;
+    warning = null; hint = null;
+    if (!alreadyPlayed) { moves = [...before,move.san]; played++; ping(); }
+    if (point) {
+      assessed.add(before.length);
+      moments = [...moments.filter(m=>m.before.length !== before.length),point];
+      if (point.loss >= 120 && activeLesson.id !== 'italian') recordLesson({...point,shown:false},true);
+    }
+    if (point && point.loss >= 120 && coachMode === 'live' && activeLesson.id !== 'italian' && !accepted) {
+      review = {...point,shown:false}; lessonStage = 1; phase = 'review';
+      void chooseNextSkill(id); ping(true); persist();
+    } else {
+      phase = 'thinking'; persist();
+      await botTurn(makeGame(activeLesson.fen,moves),next,id);
+    }
+  }
+  function rethink() { warning = null; hint = null; lessonStage = 1; phase = 'ready'; }
+  async function acceptWarning() {
+    if (!warning || phase !== 'warning') return;
+    const point = warning; const id = request;
+    phase = 'thinking';
+    try { await commitMove(point.before,point.move,point.next,point,id,true); }
+    catch (e) { fail(e,id); }
+  }
+  function replayStage(stage:0|1|2) {
+    lessonStage = stage; answer = '';
+    if (review && stage === 2) review = {...review,shown:true};
+    ping();
   }
   function onSquare(square: Square) {
     if (phase !== 'ready' || promotion) return;
@@ -220,12 +263,15 @@
     const before = review.before; review = null; reviewingReport = false; reportMoves = null; moments = moments.filter(m => m.before.length < before.length); for (const ply of assessed) if (ply >= before.length) assessed.delete(ply); moves = before; retries++; answer = ''; persist(); void prepare();
   }
   function showConsequence() {
-    if (!review || review.shown) return;
-    const current = makeGame(activeLesson.fen, moves);
-    const reply = playUci(current, review.reply.move);
-    moves = [...moves, reply.san]; review = { ...review, shown: true }; ping(true);
+    if (!review) return;
+    review = {...review,shown:true}; lessonStage = 2; ping(true);
   }
-  function continueGame() { if (!review) return; review = null; if (reviewingReport && reportMoves) { moves = reportMoves; reviewingReport = false; phase = 'over'; return; } persist(); void prepare(); }
+  function continueGame() {
+    if (!review) return;
+    const played = [...review.before,review.move.san]; review = null; lessonStage = 1;
+    if (reviewingReport && reportMoves) {moves = reportMoves; reviewingReport = false; phase = 'over'; return;}
+    moves = played; persist(); void prepare();
+  }
   function resumeReport() {
     if (!reportMoves) return;
     moves = [...reportMoves]; reportMoves = null; reviewingReport = false; review = null;
@@ -238,7 +284,7 @@
     moves = moves.slice(0, Math.max(0, moves.length - remove)); openingDone = false; reportMoves = null; moments = moments.filter(m => m.before.length < moves.length); for (const ply of assessed) if (ply >= moves.length) assessed.delete(ply); retries++; answer = ''; persist(); void prepare();
   }
   function start(lesson: typeof lessons[number]) {
-    request++; recommendation = null; openingReview = null; openingDone = false; recall = false; moments = []; assessed.clear(); reportMoves = null; reviewingReport = false; activeLesson = lesson; moves = []; review = null; promotion = null; answer = ''; panel = null; showIdeas = false; questionOpen = false;
+    request++; warning = null; checkingMove = null; lessonStage = 1; recommendation = null; openingReview = null; openingDone = false; recall = false; moments = []; assessed.clear(); reportMoves = null; reviewingReport = false; activeLesson = lesson; moves = []; review = null; promotion = null; answer = ''; panel = null; showIdeas = false; questionOpen = false;
     persist(); void prepare();
   }
   function recordLesson(r: Review, encounter = false) {
@@ -249,16 +295,12 @@
     if (!previous || encounter) saved = [{ id, move: r.move.san, best, text: reviewText(r), fen: r.fen, date: new Date().toISOString(), skill: pattern.skill, pattern: pattern.name, count: (previous?.count || 0) + 1 }, ...saved.filter(item => item.id !== id)].slice(0, 50);
     persist();
   }
-  function saveLesson() {
-    if (!review) return;
-    recordLesson(review);
-  }
   function reviewText(r: Review): string {
     const reply = lineToSan(r.move.after, r.reply.pv, 4).join(' → ');
     return `${classifyMistake(r.move, r.reply, r.best).explanation} ${r.move.san} gives your opponent a stronger position. They can play ${reply}. Compare it with ${moveFromLine(r.fen, r.best).san}, the engine’s first choice before your move.`;
   }
   function ask(question: string) {
-    if (phase !== 'ready' && phase !== 'review') return;
+    if (phase !== 'ready') return;
     const text = question.trim(); if (!text) return;
     query = '';
     if (step && /why|plan|position|help|best|idea|opening/i.test(text)) { answer = `${step.why} ${step.watch}`; } else if (/threat|attack|danger|safe|check/i.test(text)) {
@@ -278,7 +320,7 @@
 
   async function buildReport() {
     const id = ++request;
-    phase = 'report'; selected = null; hint = null; option = null;
+    phase = 'report'; selected = null; hint = null; option = null; answer = '';
     const playedMoves = [...moves];
     reportMoves = playedMoves;
 
@@ -328,7 +370,8 @@
     startById(skills.find(skill => skill.id === recommendation?.skill)?.lesson || 'hanging');
   }
   function inspectMoment(moment: Moment) {
-    moves = [...moment.before, moment.move.san]; review = { ...moment, shown: false }; reviewingReport = true; phase = 'review';
+    answer = '';
+    moves = [...moment.before, moment.move.san]; review = { ...moment, shown: false }; lessonStage = 1; reviewingReport = true; phase = 'review';
   }
   function practiceSaved(lesson: SavedLesson) {
     start({ id: 'saved', title: 'Your second chance', detail: 'A position from your own game.', fen: lesson.fen, focus: lesson.pattern || 'Look again', tip: 'You have seen this position before. Check the threats and find a better move. Ask for a hint only if you need one.' });
@@ -347,7 +390,7 @@
     return { destroy() { node.close(); } };
   }
 
-  function reloadEngine() { request++; engine.dispose(); engine = new ChessEngine(); error = ''; void prepare(); }
+  function reloadEngine() { request++; engine.dispose(); opponent.dispose(); engine = new ChessEngine(); opponent = new PracticeOpponent(); error = ''; void prepare(); }
 </script>
 
 <svelte:head><title>Nextmove — Play. See. Try again.</title></svelte:head>
@@ -360,33 +403,48 @@
   </header>
 
   <main class="game-stage" inert={saveStatus === 'loading'}>
-    <section class="board-column" class:paused={['review','report','over'].includes(phase)} aria-label="Your chess game">
-      {#if ['review','report','over'].includes(phase)}
+    <section class="board-column" class:paused={['warning','review','report','over'].includes(phase)} aria-label="Your chess game">
+      {#if ['warning','review','report','over'].includes(phase)}
         <div class="pause-actions" aria-label="Paused game actions">
-          {#if openingReview}<button class="primary-button" onclick={retry}>Try again <RotateCcw size={15}/></button><button class="text-button" onclick={exitOpening}>Keep playing <ArrowRight size={15}/></button>
+          {#if warning}<button class="primary-button" onclick={rethink}>Rethink <RotateCcw size={15}/></button><button class="text-button" onclick={acceptWarning}>Play anyway <ArrowRight size={15}/></button>
+          {:else if openingReview}<button class="primary-button" onclick={retry}>Try again <RotateCcw size={15}/></button><button class="text-button" onclick={exitOpening}>Keep playing <ArrowRight size={15}/></button>
           {:else if review}<button class="primary-button" onclick={review.shown ? retry : showConsequence}>{review.shown ? 'Try again' : 'See the reply'}{#if review.shown}<RotateCcw size={15}/>{:else}<ArrowRight size={15}/>{/if}</button><button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to review' : 'Play on'}</button>
           {:else}<span>{phase === 'report' ? 'Reviewing…' : 'Review ready'}</span><button class="primary-button" onclick={focusCoach}>{phase === 'report' ? 'See progress' : 'See review'} <ArrowRight size={15}/></button>{/if}
         </div>
       {/if}
-      <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>The house</strong></span><span>{activeLesson.id === 'italian' ? `Italian · ${Math.min(openingIndex + 1, 6)} / 6` : 'No clock'}</span></div>
-      <div class="board-wrap">
-        <Board {game} {selected} {destinations} {lastMove} {hint} {flipped} disabled={phase !== 'ready' || !!promotion} {onSquare}/>
+      <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>{opponents.find(item=>item.id === opponentLevel)?.name}</strong></span><span>{activeLesson.id === 'italian' ? `Italian · ${Math.min(openingIndex + 1, 6)} / 6` : 'No clock'}</span></div>
+      <div class="board-wrap" class:rehearsing={!!warning || !!review}>
+        <Board game={boardGame} {selected} {destinations} lastMove={boardLastMove} hint={(warning || review) && lessonStage === 0 ? `${(warning || review)!.move.from}${(warning || review)!.move.to}` : hint} {flipped} disabled={phase !== 'ready' || !!promotion} {onSquare}/>
       </div>
       <div class="player-strip"><span class="player-id"><span class="player-token"><Piece type="k" color="w"/></span><strong>You</strong></span><span class="turn-status" class:busy={phase === 'thinking' || phase === 'loading'} role="status"><span class="status-dot"></span>{status}</span></div>
+      {#if warning || review}
+        <div class="replay-strip" aria-label="Explore this move">
+          <span>Preview</span>
+          <button class:active={lessonStage === 0} aria-pressed={lessonStage === 0} onclick={() => replayStage(0)}>Before</button>
+          <button class:active={lessonStage === 1} aria-pressed={lessonStage === 1} onclick={() => replayStage(1)}>{(warning || review)?.move.san}</button>
+          <button class:active={lessonStage === 2} aria-pressed={lessonStage === 2} onclick={() => replayStage(2)}>Their reply <ArrowRight size={14}/></button>
+          <button class="replay-menu" onclick={() => panel = 'game'} aria-label="Game menu"><Ellipsis size={21}/></button>
+        </div>
+      {:else}
       <div class="board-toolbar" aria-label="Game controls">
         <button class:active={showIdeas || !!hint} disabled={phase !== 'ready' || !lines.length} onclick={toggleHint}><Lightbulb size={18}/><span>{showIdeas || hint ? 'Hide hint' : 'Hint'}</span></button>
         <button aria-label="Take back your last turn" disabled={!moves.length || !['ready','over'].includes(phase)} onclick={undo}><RotateCcw size={17}/><span>Undo</span></button>
         <button onclick={() => panel = 'game'} aria-label="Game menu"><Ellipsis size={21}/><span>More</span></button>
       </div>
+      {/if}
     </section>
 
-    <aside class="coach-dock" class:intervention={phase === 'review'} aria-label="Your chess guide" tabindex="-1">
+    <aside class="coach-dock" class:intervention={phase === 'review' || phase === 'warning'} aria-label="Your chess guide" tabindex="-1">
       <div class="guide-identity"><span class="guide-mark"><AudioLines size={18}/></span><strong>Rook</strong><span>Your guide</span><button aria-label="Coach settings" title="Coach settings" onclick={() => panel = 'game'}><SlidersHorizontal size={16}/></button></div>
       <div class="coach-turn" aria-live="polite">
         {#if phase === 'report'}
           <h1>Finding the turning point.</h1><p class="quiet">{reportProgress || 'Checking your moves…'}</p><div class="thinking-track" aria-hidden="true"></div>
         {:else if phase === 'error'}
           <h1>The engine stopped.</h1><p>{error}</p><button class="primary-button" onclick={reloadEngine}>Try again <RefreshCw size={16}/></button>
+        {:else if warning}
+          <h1>Before you play {warning.move.san}.</h1><p>{classifyMistake(warning.move,warning.reply,warning.best).explanation.split('. ')[0]}.</p>
+          <div class="coach-actions"><button class="primary-button" onclick={rethink}>Rethink <RotateCcw size={16}/></button><button class="text-button" onclick={acceptWarning}>Play anyway <ArrowRight size={16}/></button></div>
+          <p class="rehearsal-note">Explore the reply below the board. Then choose.</p>
         {:else if openingReview}
           <h1>A different path.</h1><p>{openingReview.move.san} is legal. This practice line has another idea.</p><div class="coach-actions"><button class="primary-button" onclick={retry}>Try again <RotateCcw size={16}/></button><button class="text-button" onclick={exitOpening}>Keep playing <ArrowRight size={16}/></button></div>
         {:else if phase === 'review' && review}
@@ -415,7 +473,7 @@
         {/if}
       </div>
       {#if answer}<div class="coach-answer"><button class="close-answer" aria-label="Close coach answer" onclick={() => answer = ''}><X size={15}/></button><p>{answer}</p></div>{/if}
-      {#if questionOpen && (phase === 'ready' || phase === 'review')}<form class="coach-form" onsubmit={(event) => {event.preventDefault(); ask(query);}}><label class="sr-only" for="coach-question">Ask about moves, threats, or castling</label><input id="coach-question" bind:value={query} maxlength="240" placeholder="Ask Rook…"/><button aria-label="Send question" disabled={!query.trim()}><Send size={17}/></button></form>{/if}
+      {#if questionOpen && phase === 'ready'}<form class="coach-form" onsubmit={(event) => {event.preventDefault(); ask(query);}}><label class="sr-only" for="coach-question">Ask about moves, threats, or castling</label><input id="coach-question" bind:value={query} maxlength="240" placeholder="Ask Rook…"/><button aria-label="Send question" disabled={!query.trim()}><Send size={17}/></button></form>{/if}
       {#if phase === 'ready' && !step && !showIdeas && !answer && activeLesson.id === 'free' && moves.length === 0}<button class="opening-invite" onclick={() => start(italian)}>Learn an opening <ArrowRight size={15}/></button>{/if}
     </aside>
   </main>
@@ -426,7 +484,11 @@
     <div class="dialog-header"><h2>{panel === 'account' ? 'Your progress' : panel === 'practice' ? 'Find your next move.' : panel === 'journal' ? 'Your positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? 'A fresh board.' : 'Your game'}</h2><button class="icon-button" aria-label="Back to board" onclick={() => panel = null}><X size={22}/></button></div>
     <div class="dialog-body">
       {#if panel === 'game'}
-        <div class="mode-switch" aria-label="Coaching mode"><button class:active={coachMode === 'live'} aria-pressed={coachMode === 'live'} onclick={() => {coachMode='live';persist();}}>Coach as I play</button><button class:active={coachMode === 'after'} aria-pressed={coachMode === 'after'} onclick={() => {coachMode='after';persist();}}>Review after</button></div>
+        <fieldset class="game-setting" disabled={!(['ready','over'].includes(phase))}><legend>When should Rook step in?</legend>
+          <div class="mode-switch">{#each [{id:'warn',label:'Before a mistake'},{id:'live',label:'After a mistake'},{id:'after',label:'After the game'}] as mode}<button class:active={coachMode === mode.id} aria-pressed={coachMode === mode.id} onclick={() => {coachMode=mode.id as CoachMode;persist();}}>{mode.label}</button>{/each}</div>
+          <p class="setting-note">{coachMode === 'warn' ? 'See a warning. Decide whether to play it.' : coachMode === 'live' ? 'Play your move. Pause to learn from a mistake.' : 'Play a full game. Rook reviews it at the end.'}</p>
+        </fieldset>
+        <fieldset class="game-setting" disabled={!(['ready','over'].includes(phase))}><legend>Your opponent</legend><div class="mode-switch">{#each opponents as level}<button class:active={opponentLevel === level.id} aria-pressed={opponentLevel === level.id} onclick={() => {opponentLevel=level.id;persist();}}>{level.name}</button>{/each}</div><p class="setting-note">{opponents.find(item=>item.id === opponentLevel)?.detail}</p></fieldset>
         {#if activeLesson.id === 'italian'}<button class="menu-row" onclick={() => {exitOpening();panel=null;}}>Leave the opening guide <ArrowRight size={18}/></button>{/if}
         <button class="menu-row" disabled={!moves.length || !['ready','over'].includes(phase)} onclick={() => {panel=null; review=null; void buildReport();}}>Review this game <Target size={19}/></button>
         <button class="menu-row" onclick={() => panel='practice'}>Practice <Zap size={19}/></button><button class="menu-row" onclick={() => panel='journal'}>Saved positions <span>{saved.length}</span></button><button class="menu-row" onclick={() => panel='moves'}>Move sheet <ListOrdered size={19}/></button>

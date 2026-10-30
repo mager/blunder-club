@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Chess, Square, PieceSymbol } from 'chess.js';
+  import { tick } from 'svelte';
+  import type { Chess, Square, PieceSymbol, Move } from 'chess.js';
   import Piece from './Piece.svelte';
   import { squareName } from './chess';
   let { game, selected, destinations, lastMove, hint, flipped, disabled, onSquare }: {
@@ -15,6 +16,39 @@
     return { x: (flipped ? 7 - file : file) * 10 + 5, y: (flipped ? rank - 1 : 8 - rank) * 10 + 5 };
   }
   let arrow = $derived(hint ? { from: point(hint.slice(0,2)), to: point(hint.slice(2,4)) } : null);
+  let priorFen = '';
+  let priorMove: Move | undefined;
+  let priorFlip = false;
+  let motionVersion = 0;
+  // Animate only an adjacent legal move, including its rook when castling.
+  // Loading a game, jumping to a position, and flipping stay immediate.
+  $effect.pre(() => {
+    const fen = game.fen(); const flip = flipped;
+    const latest = game.history({verbose:true}).at(-1);
+    const forward = latest && priorFen === latest.before;
+    const backward = priorMove && fen === priorMove.before && priorFen === priorMove.after;
+    const move = forward ? latest : backward ? priorMove : undefined;
+    const shouldMove = move && flip === priorFlip;
+    priorFen = fen; priorMove = latest; priorFlip = flip;
+    const version = ++motionVersion;
+    if (!shouldMove || !move) return;
+    const pairs = [{from:move.from,to:move.to}];
+    if (move.isKingsideCastle()) pairs.push({from:`h${move.from[1]}` as Square,to:`f${move.from[1]}` as Square});
+    if (move.isQueensideCastle()) pairs.push({from:`a${move.from[1]}` as Square,to:`d${move.from[1]}` as Square});
+    void tick().then(() => {
+      if (version !== motionVersion || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      for (const pair of pairs) {
+        const from = backward ? pair.to : pair.from; const to = backward ? pair.from : pair.to;
+        const square = document.getElementById(`square-${to}`);
+        const piece = square?.querySelector<SVGElement>('.chess-piece');
+        if (!square || !piece?.animate) continue;
+        const a = point(from); const b = point(to); const size = square.getBoundingClientRect().width;
+        square.style.zIndex = '3';
+        const animation = piece.animate([{transform:`translate(${(a.x-b.x)/10*size}px, ${(a.y-b.y)/10*size}px)`},{transform:'translate(0, 0)'}],{duration:240,easing:'cubic-bezier(0.16, 1, 0.3, 1)'});
+        animation.onfinish = animation.oncancel = () => {square.style.zIndex = '';};
+      }
+    });
+  });
   function key(event: KeyboardEvent, index: number) {
     const delta: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 8, ArrowUp: -8 };
     if (event.key in delta) {

@@ -1,8 +1,10 @@
 import { makeGame, lessons } from './chess';
 import { italian, skills } from './learning';
+import type { OpponentLevel } from './opponent';
+export type CoachMode = 'warn' | 'live' | 'after';
 export type SavedLesson = { id: string; move: string; best: string; text: string; fen: string; date: string; skill?: string; pattern?: string; count?: number };
-export type Progress = { lessonId: string; customFen?: string; moves: string[]; saved: SavedLesson[]; retries: number; played: number; sound: boolean; coachMode: 'live' | 'after'; practiced: string[]; updatedAt: number; removedLessons: Record<string, number> };
-export const emptyProgress = (): Progress => ({lessonId:'free',moves:[],saved:[],retries:0,played:0,sound:false,coachMode:'live',practiced:[],updatedAt:0,removedLessons:{}});
+export type Progress = { lessonId: string; customFen?: string; moves: string[]; saved: SavedLesson[]; retries: number; played: number; sound: boolean; coachMode: CoachMode; opponentLevel: OpponentLevel; practiced: string[]; updatedAt: number; removedLessons: Record<string, number> };
+export const emptyProgress = (): Progress => ({lessonId:'free',moves:[],saved:[],retries:0,played:0,sound:false,coachMode:'warn',opponentLevel:'casual',practiced:[],updatedAt:0,removedLessons:{}});
 export function normalizeProgress(value: unknown): Progress {
   const data = value && typeof value === 'object' ? value as Partial<Progress> : {};
   const clean = emptyProgress();
@@ -21,7 +23,8 @@ export function normalizeProgress(value: unknown): Progress {
   clean.practiced = Array.isArray(data.practiced) ? [...new Set(data.practiced.filter(id => skills.some(skill => skill.id === id)))] : [];
   clean.retries = Number.isSafeInteger(data.retries) && data.retries! >= 0 ? data.retries! : 0;
   clean.played = Number.isSafeInteger(data.played) && data.played! >= 0 ? data.played! : 0;
-  clean.sound = data.sound === true; clean.coachMode = data.coachMode === 'after' ? 'after' : 'live';
+  clean.sound = data.sound === true; clean.coachMode = data.coachMode === 'after' || data.coachMode === 'live' ? data.coachMode : 'warn';
+  clean.opponentLevel = data.opponentLevel === 'club' || data.opponentLevel === 'challenge' ? data.opponentLevel : 'casual';
   clean.updatedAt = typeof data.updatedAt === 'number' && Number.isFinite(data.updatedAt) ? data.updatedAt : 0;
   if (data.removedLessons && typeof data.removedLessons === 'object') clean.removedLessons = Object.fromEntries(Object.entries(data.removedLessons).filter(([id,time]) => id.length <= 150 && typeof time === 'number' && Number.isFinite(time) && time >= 0).sort((a,b)=>b[1]-a[1]).slice(0,500));
   return clean;

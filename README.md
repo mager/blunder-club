@@ -8,8 +8,8 @@ Live: https://blunder-school.vercel.app
 
 The board is the main interface. Rook gives one short cue at a time. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
 
-- Play White against Stockfish Lite with no clock.
-- Choose live coaching or play first and review later. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
+- Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
+- Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings let you rethink or play anyway. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
 - Learn a six-move Italian Game line through center control, development, and castling. Repeat it without hints.
 - Explore a graph of six connected skills. Save mistake positions and practice them again.
 - Track recurring patterns with memorable names alongside their actual chess concepts.
@@ -27,7 +27,7 @@ npm run build
 npm run preview
 ```
 
-Svelte 5 + TypeScript + Vite. chess.js validates moves. Stockfish 19 Lite runs in a browser worker. The build copies its pinned npm assets to `public/engine`.
+Svelte 5 + TypeScript + Vite. chess.js validates moves. Stockfish 19 Lite runs in a browser worker and keeps full analysis strength for teaching at every opponent level. Casual and Club run in a separate worker so their search cannot block board input. The build copies its pinned npm assets to `public/engine`.
 
 ## Optional Jev decisions
 
@@ -67,6 +67,9 @@ The API has a bounded request cache and warm-instance request limits. These are 
 - `src/chess.ts`: move helpers and practice positions.
 - `src/learning.ts`: opening line and connected skill definitions.
 - `src/rules.ts`: ordered teaching decision table.
+- `src/coaching.ts`: isolated rehearsal boards and warning thresholds.
+- `src/opponent.ts`, `src/opponent.worker.ts`: bounded practice opponents.
+- `src/opponent-client.ts`: worker lifecycle, request IDs, and timeouts.
 - `server/coach.mjs`: validated Jev choice boundary and fallback.
 - `src/cloud.ts` and `src/progress.ts`: Google authentication, private progress sync, and migration.
 - `firestore.rules`: account ownership and revision checks.

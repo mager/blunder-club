@@ -1296,3 +1296,40 @@ summary {
 }
 
 .game-menu-links { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+/* Rehearsal stays on the board. The actual game is unchanged. */
+.replay-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.replay-strip > span { color: var(--warning); font-size: 12px; margin-right: auto; }
+.replay-strip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.replay-strip button:hover { background: var(--raised); color: var(--paper); }
+.replay-strip button.active { background: var(--acid-dark); color: var(--acid); }
+.board-wrap.rehearsing { outline: 1px solid var(--warning); outline-offset: 3px; }
+.game-setting { border: 0; margin: 0 0 24px; padding: 0; min-width: 0; }
+.game-setting legend { font-size: 14px; font-weight: 600; padding: 0; }
+.game-setting .mode-switch { margin: 10px 0 8px; }
+.game-setting .mode-switch button { padding: 8px; line-height: 1.35; }
+.game-setting .setting-note { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.replay-strip { border-bottom: 0; }
+.replay-strip .replay-menu { padding: 8px; min-width: 44px; }
+.coach-turn .rehearsal-note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+@media (max-width: 400px) {
+  .replay-strip { gap: 2px; }
+  .replay-strip button { padding-inline: 10px; }
+  .replay-strip > span { font-size: 11px; }
+}

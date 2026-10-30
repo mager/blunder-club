@@ -62,3 +62,14 @@ describe('progress conflict recovery',()=>{
   expect(mergeProgress(deletion,{...emptyProgress(),saved:[{...lesson,date:'2026-10-31'}]}).saved).toHaveLength(1);
  });
 });
+
+describe('play preferences',()=>{
+ it('defaults to a casual opponent and before-move warnings',()=>{
+  expect(normalizeProgress({})).toMatchObject({opponentLevel:'casual',coachMode:'warn'});
+ });
+ it('preserves earlier coaching choices and validates new opponent settings',()=>{
+  expect(normalizeProgress({coachMode:'after',opponentLevel:'club'})).toMatchObject({coachMode:'after',opponentLevel:'club'});
+  expect(normalizeProgress({coachMode:'live'}).coachMode).toBe('live');
+  expect(normalizeProgress({opponentLevel:'bad',coachMode:'bad'})).toMatchObject({opponentLevel:'casual',coachMode:'warn'});
+ });
+});
