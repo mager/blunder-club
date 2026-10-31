@@ -79,9 +79,6 @@ components:
   button-text:
     textColor: "{colors.muted}"
     padding: "8px 0"
-  question-input:
-    textColor: "{colors.paper}"
-    padding: "12px 0"
   mode-switch:
     backgroundColor: "{colors.ink}"
     rounded: "{rounded.switch}"
@@ -137,7 +134,7 @@ Charcoal ink is the page. Surface and raised provide quiet panel and hover layer
 
 DM Sans carries the wordmark, headings, controls, and coaching. Barlow Condensed carries selected chess notation only: replies, move choices, turning points, and saved positions. The move sheet uses DM Sans with tabular numbers.
 
-The headline and body tokens describe the desktop coach. The headline becomes 32px on large screens, 26px at the intermediate breakpoint, and 20px on phones and in short landscape windows. Phone headings use a 1.15 line height. Phone and short-landscape coach body text is 13px with a 1.4 line height. Dialog titles use the title token. The wordmark is 25px and weight 700, then 22px or 20px on phones. Labels range from 11–13px. Question inputs stay at 16px. Use small type for supporting state, not long teaching text.
+The headline and body tokens describe the desktop coach. The headline becomes 32px on large screens, 26px at the intermediate breakpoint, and 20px on phones and in short landscape windows. Phone headings use a 1.15 line height. Phone and short-landscape coach body text is 13px with a 1.4 line height. Dialog titles use the title token. The wordmark is 25px and weight 700, then 22px or 20px on phones. Labels range from 11–13px. Use small type for supporting state, not long teaching text.
 
 **The Plain Cue Rule.** Keep coaching in sentence case and plain type. Reserve condensed type for chess notation.
 
@@ -153,13 +150,13 @@ Short landscape windows use two columns when width is at least 640px and height 
 
 **The One Screen Rule.** Keep the board, guide, and main controls visible without page scrolling. Resize the board to fit the available space; do not clip page overflow to hide controls. Pause actions appear once in the guide, with no duplicate sticky action row.
 
-Dialogs are at most 460px wide, or 700px for practice and saved positions, with 14px minimum side clearance. Their headers stay visible while content scrolls. The learning map changes to two columns on phones.
+Dialogs are at most 460px wide, or 700px for practice and saved positions, with 14px minimum side clearance. Their headers stay visible while content scrolls. The journey dialog is at most 900px wide and 740px high, with 14px side clearance and 16px top and bottom clearance. Its connected map uses three columns and two rows. At widths of 600px or less, it uses two columns and three rows, with the selected detail below. At widths of at least 601px and heights of at most 520px, the map and a 250px detail column sit side by side. The summary spans both columns. Keep all six places, the selected detail, and its practice action visible together.
 
 ## Elevation & Depth
 
 Tonal layers and thin borders carry most depth. The coach sits directly on the page rather than in a card. Shadows ground the board, dialogs, and notification only. The exact shadow values live in the sidecar. Dialogs use a dark backdrop; there is no grain overlay.
 
-Buttons change background and text color over 150ms. A hint arrow draws over 320ms. Busy status breathes over 1s; the analysis line moves over 1.2s. Reduced-motion mode removes animations and transitions. Motion communicates state, not atmosphere.
+Buttons change background and text color over 150ms. A hint arrow draws over 320ms. Journey markers change background and border color over 180ms. Busy status breathes over 1s; the analysis line moves over 1.2s. Reduced-motion mode removes animations and transitions. Motion communicates state, not atmosphere.
 
 ## Shapes
 
@@ -171,13 +168,14 @@ The board has nearly square corners. Controls have a small curve; dialogs have a
 Primary actions use jade with dark text. Primary and secondary buttons have a 44px minimum height; secondary actions use a thin line border and raised hover fill. Text actions remain muted until hover. Disabled buttons use 0.4 opacity. Focus uses a 2px jade outline with a 4px offset. Icon controls are 42px square.
 
 ### Coach and move choices
-A small circular guide mark introduces one short cue and a brief explanation. Mistake review changes the guide mark and heading to warm warning. Retry and continue actions stay together. Longer move explanations open in a focused dialog through Why? or Why this move? Hints reveal an arrow and optional move choices; the selected choice has a deep-jade fill and a visible border. Play and Why? share a compact action row. Opening progress uses six bars. On phones, guide spacing is reduced: 4px below the identity row and heading, then 6px before actions. Primary actions retain their 44px minimum height; move choices use a 40px minimum height.
+A small circular guide mark introduces one short cue and a brief explanation. Show hint is the primary action when the board is ready and no hint is open. A hint reveals a board arrow and, outside the guided opening, selectable move choices. The selected choice has a deep-jade fill and a visible border. Play followed by the move notation is the primary action; Why? opens its explanation in a focused dialog. Opening progress uses six bars. On phones, guide spacing is reduced: 4px below the identity row and heading, then 6px before actions. Primary actions retain their 44px minimum height; move choices use a 40px minimum height.
 
-### Question input
-Ask Rook and What’s the threat? open the coach dialog. The optional question form stays in that dialog and uses an unfilled field with a bottom border, an adjacent send button, and an accessible label. Preserve the global focus outline and readable placeholder.
+Warnings use a warm guide mark and heading. The cue names the candidate move, the opponent’s concrete reply, and a better move to compare. Show a move returns to the original position and reveals a hint. Play anyway commits the candidate. Pause warnings returns to play and changes coaching to review after the game. Compare candidates from the same engine search when available; do not warn against the engine’s own first recommendation. Missed gains within an already large advantage do not create repeated warnings. After-move review retains Try again, See the reply, Play on, and Why? as appropriate.
+
+Ask Rook and its question form are removed. What’s the threat? opens a concise threat check in the same explanation dialog used by Why?. Keep this direct help beside the board.
 
 ### Header, toolbar, and modes
-The header contains the wordmark, session selector, and account access. Account text collapses to an accessible icon on phones. The board toolbar has three labeled controls. During a warning or review, Before, the candidate move, and Their reply replace the normal toolbar alongside More. These replay controls have a 44px minimum height; the Preview label is hidden on phones and in short landscape windows. Coaching modes use a dark segmented control with a raised, jade-text active segment and an `aria-pressed` state. Practice selection, saved positions, account, and move history open in dialogs. Personal practice runs on the main board.
+The header contains the wordmark, session selector, Journey control, and account access. Journey keeps an accessible map icon when its text is hidden on narrow screens. Account text collapses to an accessible icon on phones. The board toolbar has three labeled controls. During a warning or review, Before, the candidate move, and Their reply replace the normal toolbar alongside More. These replay controls have a 44px minimum height; the Preview label is hidden on phones and in short landscape windows. Before a mistake, After a mistake, and After the game use a dark segmented control with a raised, jade-text active segment and an `aria-pressed` state. Practice selection, saved positions, account, and move history open in dialogs. Personal practice runs on the main board.
 
 ### Chessboard
 The board is a square eight-column grid. SVG pieces occupy 81% of each square and have contrasting outlines and a small shadow. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark SVG arrow points from the hinted piece to its destination.
@@ -194,17 +192,27 @@ The player makes a legal move on the board. The engine checks the move and accep
 
 An accepted first attempt without a hint or coach help shows You found it. A solution after help or another attempt shows Now you see it. Both show the accepted move, a primary Next position action, and a secondary Why? action. The last position changes the primary action to Finish practice. Completion shows the number solved and the number solved without help, followed by one primary Back to game action. Use these results as practice evidence, with no rating or mastery claim.
 
-Back to game replaces Undo during the session; More also provides a return action, including during reply review. Return and refresh restore the original game, while saved attempt and solution evidence remains. Refresh does not resume the temporary practice board. Personal practice uses the existing colors, type, buttons, replay controls, and responsive board sizing; it adds no tokens or permanent panels. Keep the board, guide, and decisions within one viewport in answer, retry, and completion states.
+Back to game replaces Undo during the session; More also provides a return action, including during reply review. Back to game restores the original game while saved attempt and solution evidence remains. Refresh reopens the active URL position as a practice session; it does not resume the previous temporary queue. Back to game still returns to the saved original game. Personal practice uses the existing colors, type, buttons, replay controls, and responsive board sizing; it adds no tokens or permanent panels. Keep the board, guide, and decisions within one viewport in answer, retry, and completion states.
 
 ### Dialogs and saved rows
-Move explanations, coach questions, and full game review use the same dialog surface as secondary tasks. Dialogs use the surface color, a thin line border, a sticky header, and a close control. Practice choices and saved positions use separated rows rather than elevated cards. Promotion uses the same dialog material with four piece buttons. Notifications use the raised color and a dismiss action.
+Move explanations, threat checks, and full game review use the same dialog surface as secondary tasks. Dialogs use the surface color, a thin line border, a sticky header, and a close control. Practice choices and saved positions use separated rows rather than elevated cards. Promotion uses the same dialog material with four piece buttons. Notifications use the raised color and a dismiss action.
+
+### Connected journey
+The Journey control opens six connected places in the existing dialog material: Center square, Knight outpost, King’s keep, The lookout, Safe ground, and Fork road. `SkillMap.svelte` supplies the map and selected detail; `journey.ts` derives evidence from saved positions and practiced skills. Circular line icons replace the old skill cards. Neutral dashed paths show connections; solid jade paths touch the selected place. Selection uses a deep-jade marker with a jade border and an `aria-pressed` state. A small check marks a place with at least one position solved without help. All places remain available.
+
+The summary shows places explored and positions solved without help. A place is explored when its skill is in the saved practiced list or a saved position has a practice attempt; selecting a marker alone does not count. Each detail shows the original chess concept, a brief explanation, and counts for tried, solved, and without help. Counts measure distinct saved positions, not repeated attempts. Solved includes assisted and independent results; without help identifies independent results. Unsolved saved positions produce the to-revisit label. These are records of practice, not mastery or a rating.
+
+The selected detail offers Revisit my positions when matching saved positions exist. Otherwise, it offers the related practice idea or Italian opening. Personal practice returns to the original game. This map uses the existing color, type, focus, button, and dialog system; it adds no permanent panel to play.
+
+### Revisitable views
+`routes.ts` and `App.svelte` keep the current board and view in a hash URL. Routes cover free play, the Italian opening, practice lessons, and saved positions. Parameters retain legal move history, open panels, selected journey place, reports, review move and replay stage, pending candidates, and explanations. Hints include the exact legal UCI move, so refreshed analysis does not silently change the selected arrow or Play action. Copy link in More copies the current view. Browser navigation and refresh reopen these views; URLs exclude account identifiers and private learning records. Invalid links show a brief notice and keep the saved game available.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep the board, pieces, destinations, and hint arrow clear at phone size.
 - **Do** use jade for actions and current state, with labels or shapes for meaning.
-- **Do** keep the coach concise and put longer move explanations and questions in dialogs.
+- **Do** keep the coach concise and put longer move explanations and threat checks in dialogs.
 - **Do** fit the board, guide, and main controls in one window without page scrolling.
 - **Do** preserve keyboard focus, accessible labels, and reduced-motion support.
 

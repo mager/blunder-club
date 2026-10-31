@@ -571,46 +571,7 @@ summary {
 .opening-progress .current {
   background: var(--acid);
 }
-.coach-answer {
-  position: relative;
-  border-top: 1px solid var(--line);
-  margin-top: 16px;
-  padding: 16px 24px 0 0;
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--paper);
-}
-.close-answer {
-  position: absolute;
-  right: -9px;
-  top: 8px;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-}
-.coach-form {
-  display: flex;
-  border-bottom: 1px solid #65786a;
-  margin-top: 14px;
-  gap: 7px;
-}
-.coach-form input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  background: none;
-  padding: 12px 0;
-  font-size: 16px;
-  color: var(--paper);
-  outline-offset: 0;
-}
-.coach-form input::placeholder {
-  color: var(--muted);
-}
-.coach-form button {
-  width: 36px;
-}
+
 .moment-list {
   margin-top: 18px;
 }
@@ -848,117 +809,7 @@ summary {
   align-self: center;
   font-size: 12px;
 }
-.learning-map {
-  margin-top: 24px;
-}
-.learning-map > summary {
-  font-size: 14px;
-  color: var(--muted);
-}
-.skill-map-heading {
-  padding-top: 18px;
-}
-.skill-map-heading h2 {
-  font-size: 18px;
-  font-weight: 500;
-}
-.skill-map-heading p {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 8px;
-}
-.skill-network {
-  position: relative;
-  height: 270px;
-  margin: 16px 0;
-}
-.skill-network > svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.skill-network line {
-  stroke: var(--line);
-  stroke-width: 0.4;
-}
-.skill-network line.connected {
-  stroke: var(--acid);
-  stroke-width: 0.5;
-}
-.skill-node {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  transform: translate(-50%, -50%);
-  width: 145px;
-  min-height: 84px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-  padding: 12px 4px;
-}
-.skill-node.active {
-  border-color: var(--acid);
-  background: var(--acid-dark);
-}
-.skill-node > strong {
-  font-size: 11px;
-  font-weight: 500;
-}
-.skill-node > span:last-child {
-  font-size: 10px;
-  color: var(--muted);
-}
-.skill-node-symbol {
-  color: var(--acid);
-  height: 19px;
-}
-.skill-node.needs-work .skill-node-symbol {
-  color: var(--warning);
-}
-.skill-node-dot {
-  display: block;
-  width: 7px;
-  height: 7px;
-  background: var(--muted);
-  border-radius: 50%;
-  margin-top: 6px;
-}
-.skill-detail {
-  border-top: 1px solid var(--line);
-  padding: 20px 0 0;
-}
-.club-name {
-  font-size: 11px;
-  color: var(--acid);
-}
-.skill-detail h3 {
-  font-size: 20px;
-  font-weight: 500;
-  margin: 8px 0;
-}
-.skill-detail p {
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-.related-skills {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-  margin: 12px 0;
-}
-.skill-detail > .primary-button {
-  margin-top: 16px;
-}
+
 .promotion-picker {
   padding: 24px;
 }
@@ -1209,9 +1060,7 @@ summary {
   .explanation {
     margin-top: 8px;
   }
-  .coach-answer {
-    font-size: 13px;
-  }
+
   .dialog-header {
     padding: 16px 20px 8px;
   }
@@ -1221,30 +1070,7 @@ summary {
   .game-dialog {
     max-height: calc(100svh - 28px);
   }
-  .skill-network {
-    height: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 20px 0;
-  }
-  .skill-network > svg {
-    display: none;
-  }
-  .skill-node {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    width: 100%;
-    min-height: 92px;
-  }
-  .skill-node > strong {
-    font-size: 12px;
-  }
-  .skill-node > span:last-child {
-    font-size: 10px;
-  }
+
   .notification {
     bottom: 14px;
     width: calc(100vw - 28px);
@@ -1347,6 +1173,7 @@ summary {
 .guide-identity { margin-bottom: 12px; }
 .coach-actions { margin-top: 12px; }
 .hint-actions { display: flex; align-items: center; gap: 16px; }
+.opening-progress + .hint-actions { margin-top: 12px; }
 .hint-actions .primary-button { flex: 1; }
 .coach-turn .moment-list { margin-top: 8px; }
 .coach-turn .moment-list button { min-height: 44px; padding: 8px 0; }
@@ -1384,4 +1211,62 @@ summary {
   .coach-actions { margin-top: 6px; gap: 8px; }
   .player-strip { min-height: 26px; }
   .replay-strip > span { display: none; }
+}
+
+/* The journey is a connected place to explore; its evidence comes from saved play. */
+.journey-button { display:flex; align-items:center; gap:8px; min-height:44px; color:var(--acid); margin-left:auto; font-size:13px; }
+.journey-button + .account-button { margin-left:0; }
+.game-dialog.journey { width:min(900px,calc(100vw - 28px)); height:min(740px,calc(100dvh - 32px)); max-height:calc(100dvh - 32px); }
+.game-dialog.journey[open] { display:flex; flex-direction:column; }
+.game-dialog.journey .dialog-body { flex:1; min-height:0; display:flex; padding-bottom:20px; }
+.journey-world { display:flex; flex-direction:column; flex:1; min-height:0; }
+.journey-summary { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 16px; color:var(--muted); font-size:13px; line-height:1.5; }
+.journey-summary strong { color:var(--acid); font-weight:500; }
+.world-map { position:relative; flex:1; min-height:225px; margin:12px 0; }
+.world-paths { position:absolute; width:100%; height:100%; inset:0; pointer-events:none; }
+.world-paths.narrow { display:none; }
+.world-paths line { stroke:var(--line); stroke-width:1; vector-effect:non-scaling-stroke; stroke-dasharray:4 6; }
+.world-paths line.active { stroke:var(--acid); stroke-dasharray:none; }
+.world-stop { position:absolute; left:var(--x); top:var(--y); transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:4px; width:132px; padding:4px; }
+.world-marker { position:relative; display:grid; place-items:center; width:52px; height:52px; border:1px solid var(--line); border-radius:50%; background:var(--surface); color:var(--muted); transition:background 180ms ease-out,border-color 180ms ease-out; }
+.world-stop.chosen .world-marker { color:var(--acid); background:var(--acid-dark); border:2px solid var(--acid); }
+.world-stop.visited .world-marker { color:var(--acid); }
+.world-stop:hover .world-marker { border-color:var(--acid); }
+.world-stop strong,.world-stop small { background:var(--surface); padding:0 4px; }
+.world-stop strong { font-size:13px; font-weight:500; }
+.world-stop small { font-size:11px; color:var(--muted); }
+.world-check { position:absolute; right:-3px; bottom:-1px; width:17px; height:17px; display:grid; place-items:center; border-radius:50%; color:var(--action-ink); background:var(--acid); }
+.world-detail { display:grid; grid-template-columns:1fr auto; gap:20px; align-items:end; border-top:1px solid var(--line); padding-top:16px; }
+.world-detail h3 { font-size:20px; font-weight:500; margin-bottom:6px; }
+.world-detail p { font-size:14px; line-height:1.5; color:var(--muted); max-width:50ch; }
+.world-detail .world-evidence { margin-top:8px; font-size:12px; color:var(--acid); }
+@media(max-width:600px) {
+  .journey-button { min-width:32px; justify-content:center; margin-left:0; }
+  .journey-button > span { display:none; }
+  .game-dialog.journey .dialog-header { padding:12px 16px 8px; }
+  .game-dialog.journey .dialog-body { padding:0 16px 12px; }
+  .journey-summary { font-size:12px; }
+  .world-paths.wide { display:none; }
+  .world-paths.narrow { display:block; }
+  .world-stop { left:var(--mx); top:var(--my); width:120px; gap:2px; }
+  .world-marker { width:42px; height:42px; }
+  .world-stop strong { font-size:12px; }
+  .world-map { margin:8px 0; }
+  .world-detail { grid-template-columns:1fr; gap:10px; padding-top:12px; }
+  .world-detail h3 { font-size:18px; }
+  .world-detail p { font-size:13px; }
+  .world-detail .world-evidence { margin-top:6px; }
+}
+@media(min-width:601px) and (max-height:520px) {
+  .game-dialog.journey .dialog-header { padding:10px 20px 6px; }
+  .game-dialog.journey .dialog-body { padding:0 20px 14px; }
+  .journey-world { display:grid; grid-template-columns:minmax(0,1fr) 250px; grid-template-rows:auto minmax(0,1fr); gap:8px 20px; }
+  .journey-summary { grid-column:1 / -1; }
+  .world-map { min-height:0; margin:0; }
+  .world-marker { width:38px; height:38px; }
+  .world-stop { width:120px; gap:2px; }
+  .world-stop strong { font-size:12px; }
+  .world-detail { display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:12px; border-top:0; padding:0; }
+  .world-detail h3 { font-size:18px; }
+  .world-detail p { font-size:13px; }
 }

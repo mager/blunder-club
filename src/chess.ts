@@ -33,7 +33,11 @@ export function describeMove(fen: string, uci: string): { title: string; detail:
   if (move.piece === 'p' && ['d4', 'e4', 'd5', 'e5'].includes(move.to)) return { title: 'Claim the center', detail: `The pawn on ${move.to} controls nearby central squares and opens lines for your pieces.` };
   return { title: `Improve your ${pieceNames[move.piece]}`, detail: `Try ${move.san}. The engine prefers this placement after a short search.` };
 }
-export function mistakeLoss(before: Line, after: Line): number { return Math.max(0, before.score + after.score); }
+export function mistakeLoss(before: Line, after: Line): number {
+  // Mate distances are not material loss: preserving a forced win/loss is no new blunder.
+  if (before.mate !== undefined && after.mate !== undefined && Math.sign(before.mate) === -Math.sign(after.mate)) return 0;
+  return Math.max(0, before.score + after.score);
+}
 export function resultText(game: Chess): string | null {
   if (game.isCheckmate()) return game.turn() === 'b' ? 'Checkmate. You found it.' : 'Checkmate. A lesson to keep.';
   if (game.isStalemate()) return 'Stalemate. No legal moves.';

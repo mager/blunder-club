@@ -22,3 +22,7 @@ Playable games as White against Casual, Club, and Challenge opponents; pre-move 
 
 ## Product Principles
 Make a mistake safe to explore. Keep the board primary. Explain concrete consequences. Show honest analysis, not invented praise.
+
+## Journey and revisitable play
+
+The header opens a connected six-place journey. Saved practice evidence distinguishes exploration, assisted solutions, and positions solved without help. All places are available; no mastery claim or invented progression. Each selected place and meaningful board view has a bookmarkable hash URL. Ask Rook is removed; direct hints, threat checks, and optional move explanations remain.

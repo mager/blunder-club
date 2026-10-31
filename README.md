@@ -9,11 +9,15 @@ Live: https://blunder-school.vercel.app
 The board is the main interface. Board, guide, and controls fit the visible window without page scrolling. Rook gives one short cue at a time. Longer explanations and questions open in focused panels. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
 
 - Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
-- Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings let you rethink or play anyway. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
+- Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings show a concrete reply, a safer suggestion, and choices to play anyway or pause warnings. Winning positions are not interrupted for minor missed improvements. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
 - Learn a six-move Italian Game line through center control, development, and castling. Repeat it without hints.
-- Explore a graph of six connected skills. “Your second chance” brings back up to three distinct positions from your saved mistakes. Choose a move before seeing the answer, inspect a failed move’s reply, then retry. Sound alternatives pass; hints and retries are recorded separately from first-try solutions. Practice preserves the original game, including after a refresh. Finished games offer “Practice this” for the main turning point.
+- Open Journey from the header to explore six connected places. Each shows explored skills, saved positions to revisit, and independent solutions. Select any place to start a lesson or revisit your own positions. “Your second chance” brings back up to three distinct positions from your saved mistakes. Choose a move before seeing the answer, inspect a failed move’s reply, then retry. Sound alternatives pass; hints and retries are recorded separately from first-try solutions. Practice preserves the original game, including after a refresh. Finished games offer “Practice this” for the main turning point.
 - Track recurring patterns with memorable names alongside their actual chess concepts.
 - Jev chooses the next skill and teaching action from engine evidence. Authored explanations and Stockfish supply the chess content.
+
+## Revisit a view
+
+The address updates for games, lesson steps, hints, warnings, reviews, journey places, and panels. Bookmark it or use More → Copy link to this view. Links contain chess positions and moves, not account IDs or private progress records. Journey progress belongs to the viewer. Links use hash routes, so no hosting rewrite is required. Opening an old game link restores that board; continuing play makes it the current saved game.
 
 ## Development
 
@@ -56,7 +60,7 @@ A Google account owns `/users/{uid}/progress/current`. The document contains the
 
 Guest progress uses localStorage, separately for each browser and origin. Google login and cloud saves are enabled on the live site. `VITE_FIREBASE_AUTH_ENABLED` controls this feature for other deployments. No account is required for guest play. Localhost progress does not automatically transfer to the live URL until imported through the same Google account.
 
-Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire. Personal practice checks one decision at a time; passing a position is not proof of lasting mastery. A refresh ends the practice session and returns to the original game, while retaining completed attempt results.
+Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire. Personal practice checks one decision at a time; passing a position is not proof of lasting mastery. A refresh reopens the linked practice position; completed attempt results remain saved, and Back to game returns to the original board. The current practice queue and unsubmitted attempt are not stored in the URL.
 
 The API has a bounded request cache and warm-instance request limits. These are prototype controls, not a durable global spending cap. Before a broad public launch, add authenticated requests and a shared quota store.
 
@@ -67,6 +71,8 @@ The API has a bounded request cache and warm-instance request limits. These are 
 - `src/chess.ts`: move helpers and practice positions.
 - `src/fit-board.ts`: sizes the square board from the space left by its controls and guide.
 - `src/learning.ts`: opening line and connected skill definitions.
+- `src/journey.ts` and `src/SkillMap.svelte`: saved practice evidence and the connected journey.
+- `src/routes.ts`: validated, bookmarkable chess and view state; exact hint moves survive refresh.
 - `src/rules.ts`: ordered teaching decision table.
 - `src/coaching.ts`: isolated rehearsal boards and warning thresholds.
 - `src/practice.ts`: personal position queue, move assessment, practice records, and original-game preservation.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-30T20:47:02.688673Z",
+  "generatedAt": "2026-10-31T16:57:24.808099Z",
   "title": "Design System: Nextmove",
   "extensions": {
     "colorMeta": {
@@ -367,6 +367,11 @@
         "purpose": "Move the analysis indicator from translateX(0) to translateX(240%)."
       },
       {
+        "name": "journey-marker",
+        "value": "background 180ms ease-out, border-color 180ms ease-out",
+        "purpose": "Show hover and selection on connected journey markers."
+      },
+      {
         "name": "reduced-motion",
         "value": "animation: none !important; transition: none !important; scroll-behavior: auto !important",
         "purpose": "Applied to all elements and pseudo-elements when reduced motion is requested."
@@ -392,6 +397,14 @@
       {
         "name": "short-landscape",
         "value": "(min-width: 640px) and (max-height: 540px)"
+      },
+      {
+        "name": "journey-narrow",
+        "value": "(max-width: 600px)"
+      },
+      {
+        "name": "journey-short-landscape",
+        "value": "(min-width: 601px) and (max-height: 520px)"
       }
     ]
   },
@@ -400,8 +413,8 @@
       "name": "Primary button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "A clear game action.",
-      "html": "<button class=\"ds-primary\">Try again</button>",
+      "description": "The visible next decision: Show hint, Play followed by move notation, or the current practice action.",
+      "html": "<button class=\"ds-primary\">Show hint</button>",
       "css": ".ds-primary{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .15s ease,color .15s ease;background:var(--acid,#b8e3b0);color:#1d3223;border:0;border-radius:5px;min-height:44px;padding:12px 16px;font-size:13px;font-weight:600}.ds-primary:hover:not(:disabled){background:#d0f2c9;color:#15261a}.ds-primary:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-primary:disabled{opacity:.4;cursor:not-allowed}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
@@ -417,23 +430,15 @@
       "kind": "button",
       "refersTo": "button-text",
       "description": "A quiet supporting action.",
-      "html": "<button class=\"ds-text\">Play on \u2192</button>",
+      "html": "<button class=\"ds-text\">Play on →</button>",
       "css": ".ds-text{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .15s ease,color .15s ease;background:none;border:0;color:var(--muted,#aab5ad);font-size:13px;min-height:40px;padding:8px 0}.ds-text:hover{color:var(--acid,#b8e3b0)}.ds-text:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
-    },
-    {
-      "name": "Question input",
-      "kind": "input",
-      "refersTo": "question-input",
-      "description": "An optional question with a visible send control, shown in the Ask Rook dialog. Threat questions and answers use this dialog too.",
-      "html": "<div class=\"ds-question\"><input aria-label=\"Ask about moves, threats, or castling\" placeholder=\"Ask Rook\u2026\"><button aria-label=\"Send question\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"m22 2-7 20-4-9-9-4Z M22 2 11 13\"/></svg></button></div>",
-      "css": ".ds-question{display:flex;gap:7px;border-bottom:1px solid #65786a}.ds-question input{font:16px \"DM Sans\",sans-serif;color:var(--paper,#f0f0e9);background:none;border:0;padding:12px 0;min-width:0;width:100%;caret-color:var(--acid,#b8e3b0)}.ds-question input::placeholder{color:var(--muted,#aab5ad)}.ds-question button{background:none;border:0;color:var(--paper,#f0f0e9);width:36px;cursor:pointer}.ds-question button:hover{color:var(--acid,#b8e3b0)}.ds-question input:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-question button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
       "name": "Coaching modes",
       "kind": "nav",
       "refersTo": "mode-switch",
-      "description": "Two explicit coaching states.",
-      "html": "<div class=\"ds-modes\" aria-label=\"Coaching mode\"><button aria-pressed=\"true\">Coach as I play</button><button aria-pressed=\"false\">Review after</button></div>",
+      "description": "Three explicit coaching times: before a mistake, after a mistake, or after the game.",
+      "html": "<div class=\"ds-modes\" aria-label=\"Coaching mode\"><button aria-pressed=\"true\">Before a mistake</button><button aria-pressed=\"false\">After a mistake</button><button aria-pressed=\"false\">After the game</button></div>",
       "css": ".ds-modes{display:flex;padding:4px;background:var(--ink,#151918);border-radius:7px}.ds-modes button{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .15s ease,color .15s ease;background:none;border:0;min-height:42px;flex:1;font-size:12px;color:var(--muted,#aab5ad);border-radius:4px}.ds-modes button[aria-pressed=true]{background:var(--raised,#2b332e);color:var(--acid,#b8e3b0)}.ds-modes button:hover{color:var(--acid,#b8e3b0)}.ds-modes button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
@@ -448,25 +453,33 @@
       "name": "Decision coach",
       "kind": "custom",
       "refersTo": "coach-dock",
-      "description": "A compact cue and visible decisions beside the board, or below it on phones. Longer explanations open in a dialog. Completed games with a turning point make Practice this primary. Personal practice keeps answers hidden until help is requested, shows Try again and See the reply for an incorrect move, and distinguishes first-attempt solutions without help from assisted solutions. Next position becomes Finish practice on the last position; completion shows solved and independent counts with one primary Back to game action.",
-      "html": "<aside class=\"ds-coach\"><div class=\"ds-guide\">Rook \u00b7 Your guide</div><h1>Find your next move.</h1><p>Select a piece to see its legal moves.</p><div class=\"ds-coach-actions\"><button aria-haspopup=\"dialog\">Why this move?</button></div></aside>",
-      "css": ".ds-coach{font-family:\"DM Sans\",sans-serif;color:var(--paper,#f0f0e9);width:260px}.ds-guide{font-size:13px;color:var(--muted,#aab5ad);margin-bottom:12px}.ds-coach h1{font-weight:500;font-size:28px;line-height:1.16;letter-spacing:-.7px;margin:0 0 12px}.ds-coach p{font-size:14px;line-height:1.65;color:var(--muted,#aab5ad);margin:0}.ds-coach-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.ds-coach-actions button{font:12px \"DM Sans\",sans-serif;background:none;border:0;color:var(--muted,#aab5ad);padding:8px 0;min-height:40px;cursor:pointer;transition:color .15s ease}.ds-coach-actions button:hover{color:var(--acid,#b8e3b0)}.ds-coach-actions button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(min-width:1550px){.ds-coach h1{font-size:32px}}@media(max-width:1050px){.ds-coach h1{font-size:26px}}@media(max-width:760px){.ds-coach{width:100%;max-width:480px;padding:0 4px}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;line-height:1.15;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}.ds-coach-actions button{min-height:44px}}@media(min-width:640px) and (max-height:540px){.ds-coach{width:240px;padding:0}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}}@media(prefers-reduced-motion:reduce){.ds-coach-actions button{transition:none!important}}"
+      "description": "A compact cue and visible decisions beside the board, or below it on phones. Longer explanations open in a dialog. Completed games with a turning point make Practice this primary. Personal practice keeps answers hidden until help is requested, shows Try again and See the reply for an incorrect move, and distinguishes first-attempt solutions without help from assisted solutions. Next position becomes Finish practice on the last position; completion shows solved and independent counts with one primary Back to game action. Show hint is prominent before help; selected hints show Play with move notation and Why?. Concrete warnings offer Show a move, Play anyway, and Pause warnings. The first engine recommendation is not warned against. Ask Rook is removed; threat checks use the explanation dialog.",
+      "html": "<aside class=\"ds-coach\"><div class=\"ds-guide\">Rook · Your guide</div><h1>Try this idea.</h1><p>Follow the arrow. Or explore another move.</p><div class=\"ds-coach-actions\"><button class=\"ds-coach-primary\">Play Nf3 →</button><button aria-haspopup=\"dialog\">Why?</button></div></aside>",
+      "css": ".ds-coach{font-family:\"DM Sans\",sans-serif;color:var(--paper,#f0f0e9);width:260px}.ds-guide{font-size:13px;color:var(--muted,#aab5ad);margin-bottom:12px}.ds-coach h1{font-weight:500;font-size:28px;line-height:1.16;letter-spacing:-.7px;margin:0 0 12px}.ds-coach p{font-size:14px;line-height:1.65;color:var(--muted,#aab5ad);margin:0}.ds-coach-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.ds-coach-actions button{font:12px \"DM Sans\",sans-serif;background:none;border:0;color:var(--muted,#aab5ad);padding:8px 0;min-height:40px;cursor:pointer;transition:color .15s ease}.ds-coach-actions button:hover{color:var(--acid,#b8e3b0)}.ds-coach-actions button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(min-width:1550px){.ds-coach h1{font-size:32px}}@media(max-width:1050px){.ds-coach h1{font-size:26px}}@media(max-width:760px){.ds-coach{width:100%;max-width:480px;padding:0 4px}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;line-height:1.15;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}.ds-coach-actions button{min-height:44px}}@media(min-width:640px) and (max-height:540px){.ds-coach{width:240px;padding:0}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}}@media(prefers-reduced-motion:reduce){.ds-coach-actions button{transition:none!important}} .ds-coach-actions .ds-coach-primary{background:var(--acid,#b8e3b0);color:var(--action-ink,#1d3223);border-radius:5px;min-height:44px;padding:12px 16px;font-size:13px;font-weight:600;flex:1}.ds-coach-actions .ds-coach-primary:hover{background:var(--action-hover,#d0f2c9);color:var(--action-hover-ink,#15261a)}"
     },
     {
       "name": "Dialog surface",
       "kind": "card",
       "refersTo": "dialog",
-      "description": "A focused surface for secondary tasks, move explanations, coach questions, and full game review. Its header stays visible while content scrolls. Practice selection and saved positions open here; personal practice runs on the main board. Saved rows keep the original move and answer behind What happened? and show independent, assisted, or ready-to-practice status.",
-      "html": "<section class=\"ds-dialog\"><header><h2>Your game</h2><button aria-label=\"Close\">\u00d7</button></header><p>Practice and saved positions open here.</p></section>",
+      "description": "A focused surface for secondary tasks, move explanations, threat checks, and full game review. Its header stays visible while content scrolls. Practice selection and saved positions open here; personal practice runs on the main board. Saved rows keep the original move and answer behind What happened? and show independent, assisted, or ready-to-practice status. Game, lesson, report, panel, and selected journey views have revisitable hash URLs; hint URLs retain the exact legal UCI move. Account identifiers and private learning records stay out of URLs.",
+      "html": "<section class=\"ds-dialog\"><header><h2>Your game</h2><button aria-label=\"Close\">×</button></header><p>Practice and saved positions open here.</p></section>",
       "css": ".ds-dialog{font-family:\"DM Sans\",sans-serif;background:var(--surface,#1e2421);color:var(--paper,#f0f0e9);border:1px solid var(--line,#354139);border-radius:12px;box-shadow:0 24px 70px #0006;width:min(460px,100%)}.ds-dialog header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px}.ds-dialog h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.5px}.ds-dialog button{background:none;border:0;width:42px;height:42px;font-size:24px;color:var(--muted,#aab5ad);cursor:pointer;border-radius:5px}.ds-dialog button:hover{background:var(--raised,#2b332e);color:var(--acid,#b8e3b0)}.ds-dialog button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-dialog p{margin:8px 24px 24px;font-size:14px;line-height:1.7}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
       "name": "Board destinations",
       "kind": "custom",
       "refersTo": "chessboard",
-      "description": "A small board-state sample. In play, the shell fills 100dvh under a 56px header (48px on phones). ResizeObserver fits the board to the width and height left by controls and the guide, capped at 720px. Phones stack the guide below; short landscape windows use two columns. Personal practice uses this same board for up to three distinct saved positions, with progress in the opponent strip and reply controls after an incorrect move. Return and refresh restore the original game while retaining practice evidence.",
+      "description": "A small board-state sample. In play, the shell fills 100dvh under a 56px header (48px on phones). ResizeObserver fits the board to the width and height left by controls and the guide, capped at 720px. Phones stack the guide below; short landscape windows use two columns. Personal practice uses this same board for up to three distinct saved positions, with progress in the opponent strip and reply controls after an incorrect move. Back to game restores the original game while retaining practice evidence. Refresh reopens the active URL position as practice, with Back to game preserving the saved original game.",
       "html": "<div class=\"ds-board\" role=\"group\" aria-label=\"Board state sample\"><button aria-label=\"e4, empty, legal destination\"><span></span></button><button aria-label=\"f4, empty\"></button><button aria-label=\"e3, empty\"></button><button aria-label=\"f3, selected\" aria-pressed=\"true\"></button></div>",
       "css": ".ds-board{display:grid;grid-template-columns:repeat(2,1fr);width:160px;aspect-ratio:1;border-radius:3px;overflow:hidden;box-shadow:0 18px 45px #0003}.ds-board button{border:0;padding:0;background:var(--board-dark,#819284);display:grid;place-items:center;cursor:pointer}.ds-board button:first-child,.ds-board button:last-child{background:var(--board-light,#e7e5d7)}.ds-board button[aria-pressed=true]{background:#c7ef9dc4;box-shadow:inset 0 0 0 3px #364d30}.ds-board button:hover{background:#d4e8c966}.ds-board button:focus-visible{outline:3px solid #203728;outline-offset:-3px}.ds-board span{width:23%;height:23%;border-radius:50%;background:#20372850}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
+    },
+    {
+      "name": "Connected journey",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Six unlocked places connected by dashed paths and selected jade paths. Saved skills and practice attempts establish exploration; distinct saved positions establish tried, solved, and independent counts. A check marks independent evidence. The selected concept offers saved practice or a lesson. Wide maps use two rows and three columns; narrow maps use three rows and two columns; short landscape puts the detail beside the map. Selection has its own hash URL.",
+      "html": "<section class=\"ds-journey\" aria-label=\"Journey detail sample\"><button class=\"ds-stop\" aria-pressed=\"true\"><span class=\"ds-marker\"><svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/></svg></span><strong>Safe ground</strong><small>Unvisited</small></button><div class=\"ds-detail\"><h3>Keep your pieces</h3><p>Before moving, check whether the destination is attacked and whether the piece you leave behind is defended.</p><p class=\"ds-evidence\">0 tried · 0 solved · 0 without help</p><button class=\"ds-practise\">Practise this idea →</button></div></section>",
+      "css": ".ds-journey{font-family:\"DM Sans\",sans-serif;background:var(--surface,#1e2421);color:var(--paper,#f0f0e9);padding:20px;max-width:460px}.ds-stop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:0;background:none;color:var(--paper,#f0f0e9);cursor:pointer;margin:0 auto 16px}.ds-marker{display:grid;place-items:center;width:52px;height:52px;border:2px solid var(--acid,#b8e3b0);border-radius:50%;background:var(--acid-dark,#324c38);color:var(--acid,#b8e3b0);transition:background 180ms ease-out,border-color 180ms ease-out}.ds-stop strong{font-size:13px;font-weight:500}.ds-stop small{font-size:11px;color:var(--muted,#aab5ad)}.ds-stop:hover .ds-marker{background:var(--raised,#2b332e)}.ds-detail{border-top:1px solid var(--line,#354139);padding-top:16px}.ds-detail h3{font-size:20px;font-weight:500;margin:0 0 6px}.ds-detail p{font-size:14px;line-height:1.5;color:var(--muted,#aab5ad);margin:0}.ds-detail .ds-evidence{font-size:12px;color:var(--acid,#b8e3b0);margin:8px 0 12px}.ds-practise{font:600 13px \"DM Sans\",sans-serif;min-height:44px;padding:12px 16px;border:0;border-radius:5px;background:var(--acid,#b8e3b0);color:var(--action-ink,#1d3223);cursor:pointer;transition:background .15s ease,color .15s ease}.ds-practise:hover{background:var(--action-hover,#d0f2c9);color:var(--action-hover-ink,#15261a)}.ds-stop:focus-visible,.ds-practise:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(max-width:600px){.ds-marker{width:42px;height:42px}.ds-detail h3{font-size:18px}.ds-detail p{font-size:13px}}@media(prefers-reduced-motion:reduce){.ds-marker,.ds-practise{transition:none!important}}"
     }
   ],
   "narrative": {
@@ -498,7 +511,7 @@
     "dos": [
       "Do keep the board, pieces, destinations, and hint arrow clear at phone size.",
       "Do use jade for actions and current state, with labels or shapes for meaning.",
-      "Do keep the coach concise and put longer move explanations and questions in dialogs.",
+      "Do keep the coach concise and put longer move explanations and threat checks in dialogs.",
       "Do fit the board, guide, and main controls in one window without page scrolling.",
       "Do preserve keyboard focus, accessible labels, and reduced-motion support."
     ],
