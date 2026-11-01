@@ -14,8 +14,12 @@
   --acid: #b8e3b0;
   --acid-dark: #324c38;
   --warning: #e9b28c;
-  --board-light: #e7e5d7;
-  --board-dark: #819284;
+  --board-light: #edf3f8;
+  --board-dark: #7397ba;
+  --board-ink: #102a46;
+  --board-arrow: #173f6b;
+  --piece-dark: #26364c;
+  --piece-light: #ffffff;
   --display: "Barlow Condensed", sans-serif;
   color-scheme: dark;
   scrollbar-color: #526157 #151918;
@@ -186,23 +190,23 @@ button:hover:not(:disabled) {
   z-index: -1;
 }
 .square.last:before {
-  background: #cce89740;
+  background: #f6dc8d70;
 }
 .square.selected:before {
-  background: #c7ef9dc4;
-  box-shadow: inset 0 0 0 3px #364d30;
+  background: #f5d783cc;
+  box-shadow: inset 0 0 0 3px var(--board-ink);
 }
 .square.hinted:before {
-  background: #c7ef9d8c;
+  background: #f5d783a6;
 }
 .square.check:before {
-  background: #d27b67;
+  background: #df8f8b;
 }
 .square:hover:not([aria-disabled="true"]):before {
-  background: #d4e8c966;
+  background: #ffffff30;
 }
 .square:focus-visible {
-  outline: 3px solid #203728;
+  outline: 3px solid var(--board-ink);
   outline-offset: -3px;
   z-index: 2;
 }
@@ -213,28 +217,30 @@ button:hover:not(:disabled) {
   display: block;
   width: 81%;
   height: 81%;
-  color: #26342b;
-  --piece-outline: #eef0dc;
+  color: var(--piece-dark);
+  --piece-outline: #172638;
+  --piece-detail: #8b9caf;
   pointer-events: none;
-  filter: drop-shadow(0 2px 1px #0003);
+  filter: drop-shadow(0 1.5px 1px #11243a40);
 }
 .chess-piece.white {
-  color: #fffdf0;
-  --piece-outline: #354a3b;
+  color: var(--piece-light);
+  --piece-outline: #26364c;
+  --piece-detail: #526881;
 }
 .rank-label,
 .file-label {
   position: absolute;
   font-size: 11px;
   font-weight: 700;
-  color: #172d1e;
+  color: var(--board-ink);
   line-height: 1;
   pointer-events: none;
   z-index: 1;
 }
 .light .rank-label,
 .light .file-label {
-  color: #4a5c4d;
+  color: #3e6081;
 }
 .rank-label {
   top: 6px;
@@ -249,14 +255,14 @@ button:hover:not(:disabled) {
   width: 23%;
   height: 23%;
   border-radius: 50%;
-  background: #20372850;
+  background: var(--board-ink);
   pointer-events: none;
 }
 .capture:after {
   content: "";
   position: absolute;
   inset: 4%;
-  border: 5px solid #20372865;
+  border: 5px solid #17345299;
   border-radius: 50%;
   pointer-events: none;
 }
@@ -270,7 +276,7 @@ button:hover:not(:disabled) {
   overflow: visible;
 }
 .hint-arrow {
-  stroke: #234a32;
+  stroke: var(--board-arrow);
   stroke-width: 1.25;
   stroke-linecap: round;
   opacity: 0.86;
@@ -307,8 +313,9 @@ button:hover:not(:disabled) {
   filter: none;
 }
 .player-token.dark .chess-piece {
-  color: #8d9e90;
-  --piece-outline: #1b251e;
+  color: #8b9caf;
+  --piece-outline: #172638;
+  --piece-detail: #172638;
 }
 .turn-status {
   display: flex;
@@ -1292,3 +1299,7 @@ summary {
   .game-dialog.journey .dialog-body { padding-bottom:8px; }
   .world-detail { gap:8px; }
 }
+
+.board-session-tools { display: flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap; }
+.board-reset { min-height: 44px; padding-inline: 8px; color: var(--paper); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+.board-reset:hover { color: var(--acid); }

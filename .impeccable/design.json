@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-01T18:42:09.737985Z",
+  "generatedAt": "2026-11-01T18:57:23.890066Z",
   "title": "Design System: Nextmove",
   "extensions": {
     "colorMeta": {
@@ -146,30 +146,30 @@
       },
       "board-light": {
         "role": "neutral",
-        "displayName": "Warm stone",
+        "displayName": "Cool white square",
         "tonalRamp": [
-          "oklch(15% 0.0188 100.14)",
-          "oklch(26% 0.0188 100.14)",
-          "oklch(38% 0.0188 100.14)",
-          "oklch(49% 0.0188 100.14)",
-          "oklch(61% 0.0188 100.14)",
-          "oklch(72% 0.0188 100.14)",
-          "oklch(84% 0.0188 100.14)",
-          "oklch(95% 0.0188 100.14)"
+          "oklch(15% 0.0093 242.84)",
+          "oklch(26% 0.0093 242.84)",
+          "oklch(38% 0.0093 242.84)",
+          "oklch(49% 0.0093 242.84)",
+          "oklch(61% 0.0093 242.84)",
+          "oklch(72% 0.0093 242.84)",
+          "oklch(84% 0.0093 242.84)",
+          "oklch(95% 0.0093 242.84)"
         ]
       },
       "board-dark": {
         "role": "neutral",
-        "displayName": "Gray-green",
+        "displayName": "Blue square",
         "tonalRamp": [
-          "oklch(15% 0.0284 150.53)",
-          "oklch(26% 0.0284 150.53)",
-          "oklch(38% 0.0284 150.53)",
-          "oklch(49% 0.0284 150.53)",
-          "oklch(61% 0.0284 150.53)",
-          "oklch(72% 0.0284 150.53)",
-          "oklch(84% 0.0284 150.53)",
-          "oklch(95% 0.0284 150.53)"
+          "oklch(15% 0.0659 248.14)",
+          "oklch(26% 0.0659 248.14)",
+          "oklch(38% 0.0659 248.14)",
+          "oklch(49% 0.0659 248.14)",
+          "oklch(61% 0.0659 248.14)",
+          "oklch(72% 0.0659 248.14)",
+          "oklch(84% 0.0659 248.14)",
+          "oklch(95% 0.0659 248.14)"
         ]
       },
       "action-ink": {
@@ -216,100 +216,128 @@
       },
       "piece-light": {
         "role": "neutral",
-        "displayName": "Piece light",
+        "displayName": "White piece",
         "tonalRamp": [
-          "oklch(15% 0.0172 99.59)",
-          "oklch(26% 0.0172 99.59)",
-          "oklch(38% 0.0172 99.59)",
-          "oklch(49% 0.0172 99.59)",
-          "oklch(61% 0.0172 99.59)",
-          "oklch(72% 0.0172 99.59)",
-          "oklch(84% 0.0172 99.59)",
-          "oklch(95% 0.0172 99.59)"
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
         ]
       },
       "piece-dark": {
         "role": "neutral",
-        "displayName": "Piece dark",
+        "displayName": "Navy piece",
         "tonalRamp": [
-          "oklch(15% 0.0247 156.46)",
-          "oklch(26% 0.0247 156.46)",
-          "oklch(38% 0.0247 156.46)",
-          "oklch(49% 0.0247 156.46)",
-          "oklch(61% 0.0247 156.46)",
-          "oklch(72% 0.0247 156.46)",
-          "oklch(84% 0.0247 156.46)",
-          "oklch(95% 0.0247 156.46)"
+          "oklch(15% 0.0446 256.50)",
+          "oklch(26% 0.0446 256.50)",
+          "oklch(38% 0.0446 256.50)",
+          "oklch(49% 0.0446 256.50)",
+          "oklch(61% 0.0446 256.50)",
+          "oklch(72% 0.0446 256.50)",
+          "oklch(84% 0.0446 256.50)",
+          "oklch(95% 0.0446 256.50)"
         ]
       },
       "piece-light-outline": {
         "role": "neutral",
-        "displayName": "Piece light outline",
+        "displayName": "White piece outline",
         "tonalRamp": [
-          "oklch(15% 0.0365 153.39)",
-          "oklch(26% 0.0365 153.39)",
-          "oklch(38% 0.0365 153.39)",
-          "oklch(49% 0.0365 153.39)",
-          "oklch(61% 0.0365 153.39)",
-          "oklch(72% 0.0365 153.39)",
-          "oklch(84% 0.0365 153.39)",
-          "oklch(95% 0.0365 153.39)"
+          "oklch(15% 0.0446 256.50)",
+          "oklch(26% 0.0446 256.50)",
+          "oklch(38% 0.0446 256.50)",
+          "oklch(49% 0.0446 256.50)",
+          "oklch(61% 0.0446 256.50)",
+          "oklch(72% 0.0446 256.50)",
+          "oklch(84% 0.0446 256.50)",
+          "oklch(95% 0.0446 256.50)"
         ]
       },
       "piece-dark-outline": {
         "role": "neutral",
-        "displayName": "Piece dark outline",
+        "displayName": "Navy piece outline",
         "tonalRamp": [
-          "oklch(15% 0.0265 111.53)",
-          "oklch(26% 0.0265 111.53)",
-          "oklch(38% 0.0265 111.53)",
-          "oklch(49% 0.0265 111.53)",
-          "oklch(61% 0.0265 111.53)",
-          "oklch(72% 0.0265 111.53)",
-          "oklch(84% 0.0265 111.53)",
-          "oklch(95% 0.0265 111.53)"
+          "oklch(15% 0.0397 253.64)",
+          "oklch(26% 0.0397 253.64)",
+          "oklch(38% 0.0397 253.64)",
+          "oklch(49% 0.0397 253.64)",
+          "oklch(61% 0.0397 253.64)",
+          "oklch(72% 0.0397 253.64)",
+          "oklch(84% 0.0397 253.64)",
+          "oklch(95% 0.0397 253.64)"
         ]
       },
       "hint-arrow": {
         "role": "neutral",
-        "displayName": "Hint arrow",
+        "displayName": "Dark blue hint arrow",
         "tonalRamp": [
-          "oklch(15% 0.0611 155.00)",
-          "oklch(26% 0.0611 155.00)",
-          "oklch(38% 0.0611 155.00)",
-          "oklch(49% 0.0611 155.00)",
-          "oklch(61% 0.0611 155.00)",
-          "oklch(72% 0.0611 155.00)",
-          "oklch(84% 0.0611 155.00)",
-          "oklch(95% 0.0611 155.00)"
+          "oklch(15% 0.0883 253.23)",
+          "oklch(26% 0.0883 253.23)",
+          "oklch(38% 0.0883 253.23)",
+          "oklch(49% 0.0883 253.23)",
+          "oklch(61% 0.0883 253.23)",
+          "oklch(72% 0.0883 253.23)",
+          "oklch(84% 0.0883 253.23)",
+          "oklch(95% 0.0883 253.23)"
         ]
       },
       "check": {
         "role": "secondary",
-        "displayName": "Check",
+        "displayName": "Coral check",
         "tonalRamp": [
-          "oklch(15% 0.1131 33.84)",
-          "oklch(26% 0.1131 33.84)",
-          "oklch(38% 0.1131 33.84)",
-          "oklch(49% 0.1131 33.84)",
-          "oklch(61% 0.1131 33.84)",
-          "oklch(72% 0.1131 33.84)",
-          "oklch(84% 0.1131 33.84)",
-          "oklch(95% 0.1131 33.84)"
+          "oklch(15% 0.0981 22.86)",
+          "oklch(26% 0.0981 22.86)",
+          "oklch(38% 0.0981 22.86)",
+          "oklch(49% 0.0981 22.86)",
+          "oklch(61% 0.0981 22.86)",
+          "oklch(72% 0.0981 22.86)",
+          "oklch(84% 0.0981 22.86)",
+          "oklch(95% 0.0981 22.86)"
         ]
       },
       "board-focus": {
         "role": "neutral",
-        "displayName": "Board focus",
+        "displayName": "Deep navy board focus",
         "tonalRamp": [
-          "oklch(15% 0.0397 154.84)",
-          "oklch(26% 0.0397 154.84)",
-          "oklch(38% 0.0397 154.84)",
-          "oklch(49% 0.0397 154.84)",
-          "oklch(61% 0.0397 154.84)",
-          "oklch(72% 0.0397 154.84)",
-          "oklch(84% 0.0397 154.84)",
-          "oklch(95% 0.0397 154.84)"
+          "oklch(15% 0.0610 252.31)",
+          "oklch(26% 0.0610 252.31)",
+          "oklch(38% 0.0610 252.31)",
+          "oklch(49% 0.0610 252.31)",
+          "oklch(61% 0.0610 252.31)",
+          "oklch(72% 0.0610 252.31)",
+          "oklch(84% 0.0610 252.31)",
+          "oklch(95% 0.0610 252.31)"
+        ]
+      },
+      "piece-light-detail": {
+        "role": "neutral",
+        "displayName": "White piece detail",
+        "tonalRamp": [
+          "oklch(15% 0.0479 251.97)",
+          "oklch(26% 0.0479 251.97)",
+          "oklch(38% 0.0479 251.97)",
+          "oklch(49% 0.0479 251.97)",
+          "oklch(61% 0.0479 251.97)",
+          "oklch(72% 0.0479 251.97)",
+          "oklch(84% 0.0479 251.97)",
+          "oklch(95% 0.0479 251.97)"
+        ]
+      },
+      "piece-dark-detail": {
+        "role": "neutral",
+        "displayName": "Navy piece detail",
+        "tonalRamp": [
+          "oklch(15% 0.0341 251.24)",
+          "oklch(26% 0.0341 251.24)",
+          "oklch(38% 0.0341 251.24)",
+          "oklch(49% 0.0341 251.24)",
+          "oklch(61% 0.0341 251.24)",
+          "oklch(72% 0.0341 251.24)",
+          "oklch(84% 0.0341 251.24)",
+          "oklch(95% 0.0341 251.24)"
         ]
       }
     },
@@ -331,7 +359,7 @@
       },
       {
         "name": "piece",
-        "value": "drop-shadow(0 2px 1px #0003)",
+        "value": "drop-shadow(0 1.5px 1px #11243a40)",
         "purpose": "Separate SVG pieces from squares."
       },
       {
@@ -355,6 +383,11 @@
         "name": "hint",
         "value": "draw-hint 0.32s ease-out",
         "purpose": "Draw the hint arrow from stroke-dashoffset 100 to 0."
+      },
+      {
+        "name": "piece-move",
+        "value": "transform 240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Glide an adjacent legal move or undo, including the castling rook. Skip for loading, position jumps, flips, and reduced motion."
       },
       {
         "name": "busy",
@@ -434,7 +467,7 @@
       "kind": "button",
       "refersTo": "button-text",
       "description": "A quiet supporting action.",
-      "html": "<button class=\"ds-text\">Play on →</button>",
+      "html": "<button class=\"ds-text\">Play on \u2192</button>",
       "css": ".ds-text{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .15s ease,color .15s ease;background:none;border:0;color:var(--muted,#aab5ad);font-size:13px;min-height:40px;padding:8px 0}.ds-text:hover{color:var(--acid,#b8e3b0)}.ds-text:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
@@ -458,31 +491,31 @@
       "kind": "custom",
       "refersTo": "coach-dock",
       "description": "A compact cue and visible decisions beside the board, or below it on phones. Longer explanations open in a dialog. Completed games with a turning point make Practice this primary. Personal practice keeps answers hidden until help is requested, shows Try again and See the reply for an incorrect move, and distinguishes first-attempt solutions without help from assisted solutions. Next position becomes Finish practice on the last position; completion shows solved and independent counts with one primary Back to game action. Show hint is prominent before help; selected hints show Play with move notation and Why?. Concrete warnings offer Show a move, Play anyway, and Pause warnings. The first engine recommendation is not warned against. Ask Rook is removed; threat checks use the explanation dialog. Authored lessons show one short task, one progress bar per player move, scripted replies, and a retry after an incorrect move. Completion distinguishes assisted and independent runs. Next lesson is primary; Try without hints repeats, and Play from here is available only on nonterminal boards.",
-      "html": "<aside class=\"ds-coach\"><div class=\"ds-guide\">Rook · Your guide</div><h1>Try this idea.</h1><p>Follow the arrow. Or explore another move.</p><div class=\"ds-coach-actions\"><button class=\"ds-coach-primary\">Play Nf3 →</button><button aria-haspopup=\"dialog\">Why?</button></div></aside>",
+      "html": "<aside class=\"ds-coach\"><div class=\"ds-guide\">Rook \u00b7 Your guide</div><h1>Try this idea.</h1><p>Follow the arrow. Or explore another move.</p><div class=\"ds-coach-actions\"><button class=\"ds-coach-primary\">Play Nf3 \u2192</button><button aria-haspopup=\"dialog\">Why?</button></div></aside>",
       "css": ".ds-coach{font-family:\"DM Sans\",sans-serif;color:var(--paper,#f0f0e9);width:260px}.ds-guide{font-size:13px;color:var(--muted,#aab5ad);margin-bottom:12px}.ds-coach h1{font-weight:500;font-size:28px;line-height:1.16;letter-spacing:-.7px;margin:0 0 12px}.ds-coach p{font-size:14px;line-height:1.65;color:var(--muted,#aab5ad);margin:0}.ds-coach-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}.ds-coach-actions button{font:12px \"DM Sans\",sans-serif;background:none;border:0;color:var(--muted,#aab5ad);padding:8px 0;min-height:40px;cursor:pointer;transition:color .15s ease}.ds-coach-actions button:hover{color:var(--acid,#b8e3b0)}.ds-coach-actions button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(min-width:1550px){.ds-coach h1{font-size:32px}}@media(max-width:1050px){.ds-coach h1{font-size:26px}}@media(max-width:760px){.ds-coach{width:100%;max-width:480px;padding:0 4px}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;line-height:1.15;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}.ds-coach-actions button{min-height:44px}}@media(min-width:640px) and (max-height:540px){.ds-coach{width:240px;padding:0}.ds-guide{margin-bottom:4px}.ds-coach h1{font-size:20px;margin-bottom:4px}.ds-coach p{font-size:13px;line-height:1.4}.ds-coach-actions{margin-top:6px;gap:8px}}@media(prefers-reduced-motion:reduce){.ds-coach-actions button{transition:none!important}} .ds-coach-actions .ds-coach-primary{background:var(--acid,#b8e3b0);color:var(--action-ink,#1d3223);border-radius:5px;min-height:44px;padding:12px 16px;font-size:13px;font-weight:600;flex:1}.ds-coach-actions .ds-coach-primary:hover{background:var(--action-hover,#d0f2c9);color:var(--action-hover-ink,#15261a)}"
     },
     {
       "name": "Dialog surface",
       "kind": "card",
       "refersTo": "dialog",
-      "description": "A focused surface for secondary tasks, move explanations, threat checks, and full game review. Its header stays visible while content scrolls. Practice selection and saved positions open here; personal practice runs on the main board. Saved rows keep the original move and answer behind What happened? and show independent, assisted, or ready-to-practice status. Game, lesson, report, panel, and selected journey views have revisitable hash URLs; hint URLs retain the exact legal UCI move. Account identifiers and private learning records stay out of URLs. The skill-filtered picker contains three openings and 22 challenges in separate compact row groups. Its select and count wrap on narrow screens. Each lesson has a stable learn or practice URL, and the picker retains its selected skill in the URL.",
-      "html": "<section class=\"ds-dialog\"><header><h2>Your game</h2><button aria-label=\"Close\">×</button></header><p>Practice and saved positions open here.</p></section>",
+      "description": "A focused surface for secondary tasks, move explanations, threat checks, and full game review. Its header stays visible while content scrolls. Practice selection and saved positions open here; personal practice runs on the main board. Saved rows keep the original move and answer behind What happened? and show independent, assisted, or ready-to-practice status. Game, lesson, report, panel, and selected journey views have revisitable hash URLs; hint URLs retain the exact legal UCI move. Account identifiers and private learning records stay out of URLs. The skill-filtered picker contains three openings and 22 challenges in separate compact row groups. Its select and count wrap on narrow screens. Each lesson has a stable learn or practice URL, and the picker retains its selected skill in the URL. New game and Start over open this surface before replacing the board. The lesson confirmation includes Start over with the current lesson title. Keep playing, close, and Escape cancel. The notice confirms that learning progress and saved positions stay.",
+      "html": "<section class=\"ds-dialog\"><header><h2>Your game</h2><button aria-label=\"Close\">\u00d7</button></header><p>Practice and saved positions open here.</p></section>",
       "css": ".ds-dialog{font-family:\"DM Sans\",sans-serif;background:var(--surface,#1e2421);color:var(--paper,#f0f0e9);border:1px solid var(--line,#354139);border-radius:12px;box-shadow:0 24px 70px #0006;width:min(460px,100%)}.ds-dialog header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px}.ds-dialog h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.5px}.ds-dialog button{background:none;border:0;width:42px;height:42px;font-size:24px;color:var(--muted,#aab5ad);cursor:pointer;border-radius:5px}.ds-dialog button:hover{background:var(--raised,#2b332e);color:var(--acid,#b8e3b0)}.ds-dialog button:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-dialog p{margin:8px 24px 24px;font-size:14px;line-height:1.7}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
     },
     {
       "name": "Board destinations",
       "kind": "custom",
       "refersTo": "chessboard",
-      "description": "A small board-state sample. In play, the shell fills 100dvh under a 56px header (48px on phones). ResizeObserver fits the board to the width and height left by controls and the guide, capped at 720px. Phones stack the guide below; short landscape windows use two columns. Personal practice uses this same board for up to three distinct saved positions, with progress in the opponent strip and reply controls after an incorrect move. Back to game restores the original game while retaining practice evidence. Refresh reopens the active URL position as practice, with Back to game preserving the saved original game.",
-      "html": "<div class=\"ds-board\" role=\"group\" aria-label=\"Board state sample\"><button aria-label=\"e4, empty, legal destination\"><span></span></button><button aria-label=\"f4, empty\"></button><button aria-label=\"e3, empty\"></button><button aria-label=\"f3, selected\" aria-pressed=\"true\"></button></div>",
-      "css": ".ds-board{display:grid;grid-template-columns:repeat(2,1fr);width:160px;aspect-ratio:1;border-radius:3px;overflow:hidden;box-shadow:0 18px 45px #0003}.ds-board button{border:0;padding:0;background:var(--board-dark,#819284);display:grid;place-items:center;cursor:pointer}.ds-board button:first-child,.ds-board button:last-child{background:var(--board-light,#e7e5d7)}.ds-board button[aria-pressed=true]{background:#c7ef9dc4;box-shadow:inset 0 0 0 3px #364d30}.ds-board button:hover{background:#d4e8c966}.ds-board button:focus-visible{outline:3px solid #203728;outline-offset:-3px}.ds-board span{width:23%;height:23%;border-radius:50%;background:#20372850}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}"
+      "description": "Blue and cool white squares with original white and navy Staunton pieces, gold state overlays, deep navy legal destinations, and a dark blue hint arrow. A small board-state sample. In play, the shell fills 100dvh under a 56px header (48px on phones). ResizeObserver fits the board to the width and height left by controls and the guide, capped at 720px. Phones stack the guide below; short landscape windows use two columns. Personal practice uses this same board for up to three distinct saved positions, with progress in the opponent strip and reply controls after an incorrect move. Back to game restores the original game while retaining practice evidence. Refresh reopens the active URL position as practice, with Back to game preserving the saved original game. New game remains visible above free play; Start over appears above an authored lesson. Both open the confirmation dialog before the board changes. Personal practice shows its position count in that space.",
+      "html": "<div class=\"ds-board-sample\"><div class=\"ds-board-tools\"><button class=\"ds-reset\" aria-haspopup=\"dialog\">New game</button></div><div class=\"ds-board\" role=\"group\" aria-label=\"Board state sample\"><button aria-label=\"e4, empty, legal destination\"><span class=\"ds-move-dot\"></span></button><button aria-label=\"f4, black pawn\"><svg class=\"ds-piece\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><g fill=\"currentColor\" stroke=\"var(--piece-outline)\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"24\" cy=\"12\" r=\"6.5\"/><path d=\"M19 19h10c-2 6-1 10 4 15H15c5-5 6-9 4-15Z\"/><path d=\"M15 34h18l3 5v3H12v-3Z\"/><path d=\"M16 38h16\" stroke=\"var(--piece-detail)\"/></g></svg></button><button aria-label=\"e3, white pawn\"><svg class=\"ds-piece ds-white\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><g fill=\"currentColor\" stroke=\"var(--piece-outline)\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"24\" cy=\"12\" r=\"6.5\"/><path d=\"M19 19h10c-2 6-1 10 4 15H15c5-5 6-9 4-15Z\"/><path d=\"M15 34h18l3 5v3H12v-3Z\"/><path d=\"M16 38h16\" stroke=\"var(--piece-detail)\"/></g></svg></button><button aria-label=\"f3, selected\" aria-pressed=\"true\"></button></div></div>",
+      "css": ".ds-board-sample{width:160px}.ds-board-tools{display:flex;justify-content:flex-end}.ds-reset{font:12px \"DM Sans\",sans-serif;background:none;border:0;min-height:44px;padding-inline:8px;color:var(--paper,#f0f0e9);text-decoration:underline;text-underline-offset:4px;cursor:pointer;transition:color .15s ease}.ds-reset:hover{color:var(--acid,#b8e3b0)}.ds-reset:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-board{display:grid;grid-template-columns:repeat(2,1fr);width:160px;aspect-ratio:1;border-radius:3px;overflow:hidden;box-shadow:0 18px 45px #0003}.ds-board button{position:relative;isolation:isolate;border:0;padding:0;background:var(--board-dark,#7397ba);display:grid;place-items:center;cursor:pointer}.ds-board button:first-child,.ds-board button:last-child{background:var(--board-light,#edf3f8)}.ds-board button:before{content:\"\";position:absolute;inset:0;z-index:-1}.ds-board button[aria-pressed=true]:before{background:#f5d783cc;box-shadow:inset 0 0 0 3px var(--board-ink,#102a46)}.ds-board button:hover:not([aria-disabled=true]):before{background:#ffffff30}.ds-board button:focus-visible{outline:3px solid var(--board-ink,#102a46);outline-offset:-3px;z-index:2}.ds-move-dot{width:23%;height:23%;border-radius:50%;background:var(--board-ink,#102a46)}.ds-piece{display:block;width:81%;height:81%;color:var(--piece-dark,#26364c);--piece-outline:#172638;--piece-detail:#8b9caf;pointer-events:none;filter:drop-shadow(0 1.5px 1px #11243a40)}.ds-piece.ds-white{color:var(--piece-light,#ffffff);--piece-outline:#26364c;--piece-detail:#526881}@media(prefers-reduced-motion:reduce){.ds-reset{transition:none!important}}"
     },
     {
       "name": "Connected journey",
       "kind": "custom",
       "refersTo": "dialog",
       "description": "Six available places connected by dashed paths and selected jade paths. Saved practice and authored lesson results establish exploration. Each selected detail shows a short cue, completed lessons out of the matching curriculum, and independent lesson completions. Explore lessons is primary; Revisit my positions is a secondary text action when saved positions exist. Independent evidence uses an ink check on jade. Selection has its own hash URL. Wide maps use two rows and three columns; narrow maps use three rows and two columns. Short landscape places the detail beside the map. At widths up to 600px and heights up to 620px, the dialog height is calc(100dvh - 16px), with 8px header top and body bottom padding.",
-      "html": "<section class=\"ds-journey\" aria-label=\"Journey detail sample\"><button class=\"ds-stop\" aria-pressed=\"true\"><span class=\"ds-marker\"><svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/></svg></span><strong>Safe ground</strong><small>Unvisited</small></button><div class=\"ds-detail\"><h3>Keep your pieces</h3><p>Check whether your next square is safe.</p><p class=\"ds-evidence\">0 / 5 lessons · 0 without help</p><div class=\"ds-journey-actions\"><button class=\"ds-practise\">Explore lessons →</button><button class=\"ds-revisit\">Revisit my positions →</button></div></div></section>",
+      "html": "<section class=\"ds-journey\" aria-label=\"Journey detail sample\"><button class=\"ds-stop\" aria-pressed=\"true\"><span class=\"ds-marker\"><svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z\"/></svg></span><strong>Safe ground</strong><small>Unvisited</small></button><div class=\"ds-detail\"><h3>Keep your pieces</h3><p>Check whether your next square is safe.</p><p class=\"ds-evidence\">0 / 5 lessons \u00b7 0 without help</p><div class=\"ds-journey-actions\"><button class=\"ds-practise\">Explore lessons \u2192</button><button class=\"ds-revisit\">Revisit my positions \u2192</button></div></div></section>",
       "css": ".ds-journey{font-family:\"DM Sans\",sans-serif;background:var(--surface,#1e2421);color:var(--paper,#f0f0e9);padding:20px;max-width:460px}.ds-stop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:0;background:none;color:var(--paper,#f0f0e9);cursor:pointer;margin:0 auto 16px}.ds-marker{display:grid;place-items:center;width:52px;height:52px;border:2px solid var(--acid,#b8e3b0);border-radius:50%;background:var(--acid-dark,#324c38);color:var(--acid,#b8e3b0);transition:background 180ms ease-out,border-color 180ms ease-out}.ds-stop strong{font-size:13px;font-weight:500}.ds-stop small{font-size:11px;color:var(--muted,#aab5ad)}.ds-stop:hover .ds-marker{background:var(--raised,#2b332e)}.ds-detail{border-top:1px solid var(--line,#354139);padding-top:16px}.ds-detail h3{font-size:20px;font-weight:500;margin:0 0 6px}.ds-detail p{font-size:14px;line-height:1.5;color:var(--muted,#aab5ad);margin:0}.ds-detail .ds-evidence{font-size:12px;color:var(--acid,#b8e3b0);margin:8px 0 12px}.ds-practise{font:600 13px \"DM Sans\",sans-serif;min-height:44px;padding:12px 16px;border:0;border-radius:5px;background:var(--acid,#b8e3b0);color:var(--action-ink,#1d3223);cursor:pointer;transition:background .15s ease,color .15s ease}.ds-practise:hover{background:var(--action-hover,#d0f2c9);color:var(--action-hover-ink,#15261a)}.ds-stop:focus-visible,.ds-practise:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}@media(max-width:600px){.ds-marker{width:42px;height:42px}.ds-detail h3{font-size:18px}.ds-detail p{font-size:13px}}@media(prefers-reduced-motion:reduce){.ds-marker,.ds-practise{transition:none!important}}.ds-journey-actions{display:grid;gap:6px}.ds-revisit{font:13px \"DM Sans\",sans-serif;color:var(--muted,#aab5ad);background:none;border:0;min-height:40px;padding:8px 0;cursor:pointer}.ds-revisit:hover{color:var(--acid,#b8e3b0)}.ds-revisit:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}"
     },
     {
@@ -490,13 +523,13 @@
       "kind": "custom",
       "refersTo": "dialog",
       "description": "A native skill filter and compact lesson rows in the existing secondary dialog. Openings and Challenges stay separate. Rows show move count, level, and assisted or independent completion. Starting a lesson opens a new board; the note tells players to bookmark their game.",
-      "html": "<section class=\"ds-library\"><div class=\"ds-filter\"><label for=\"ds-lesson-topic\">Explore<select id=\"ds-lesson-topic\"><option>All skills</option><option>Keep your pieces</option></select></label><span>25 lessons</span></div><h3>Challenges</h3><button class=\"ds-lesson-row\"><span><strong>The loose queen</strong><small>1 move · Start · Solved without help</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></button><p class=\"ds-library-note\">Lessons start a new board. Bookmark your game to return to it.</p></section>",
+      "html": "<section class=\"ds-library\"><div class=\"ds-filter\"><label for=\"ds-lesson-topic\">Explore<select id=\"ds-lesson-topic\"><option>All skills</option><option>Keep your pieces</option></select></label><span>25 lessons</span></div><h3>Challenges</h3><button class=\"ds-lesson-row\"><span><strong>The loose queen</strong><small>1 move \u00b7 Start \u00b7 Solved without help</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></button><p class=\"ds-library-note\">Lessons start a new board. Bookmark your game to return to it.</p></section>",
       "css": ".ds-library{font-family:\"DM Sans\",sans-serif;color:var(--paper,#f0f0e9);background:var(--surface,#1e2421);padding:20px;max-width:660px}.ds-filter{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:8px 16px;padding:4px 0 20px}.ds-filter label{min-width:0;flex:1 1 200px;display:grid;gap:6px;color:var(--muted,#aab5ad);font-size:12px}.ds-filter select{box-sizing:border-box;width:100%;max-width:100%;min-height:44px;padding:8px 32px 8px 12px;border:1px solid var(--line,#354139);border-radius:5px;color:var(--paper,#f0f0e9);background:var(--ink,#151918);font:14px \"DM Sans\",sans-serif}.ds-filter>span{white-space:nowrap;color:var(--muted,#aab5ad);font-size:12px;padding-bottom:12px}.ds-library h3{font-size:16px;font-weight:500;margin:0 0 8px}.ds-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:14px 0;border:0;border-bottom:1px solid var(--line,#354139);text-align:left;background:none;color:inherit;cursor:pointer;font-family:inherit;transition:color .15s ease}.ds-lesson-row span{display:grid;gap:5px}.ds-lesson-row strong{font-size:16px;font-weight:500}.ds-lesson-row small{font-size:12px;color:var(--muted,#aab5ad)}.ds-lesson-row svg{color:var(--acid,#b8e3b0);flex-shrink:0}.ds-lesson-row:hover{color:var(--acid,#b8e3b0)}.ds-lesson-row:focus-visible,.ds-filter select:focus-visible{outline:2px solid var(--acid,#b8e3b0);outline-offset:4px}.ds-library-note{margin:20px 0 0;font-size:12px;color:var(--muted,#aab5ad);line-height:1.5}@media(prefers-reduced-motion:reduce){.ds-lesson-row{transition:none!important}}"
     }
   ],
   "narrative": {
     "northStar": "The late-night strategy game",
-    "overview": "Nextmove uses a quiet, late-night strategy-game frame. Charcoal surfaces surround warm stone squares, ivory pieces, and jade move marks. The board carries the action; short, plain coaching appears when a decision needs support.\n\nThe interface uses code, SVG pieces, and line icons. It has no raster texture or decorative image layer. Type, color, and motion help the player read the next move.",
+    "overview": "Nextmove uses a quiet, late-night strategy-game frame. Charcoal surfaces surround blue and cool white squares, original white and navy Staunton pieces, and gold move marks. The board carries the action; short, plain coaching appears when a decision needs support.\n\nThe interface uses code, SVG pieces, and line icons. It has no raster texture or decorative image layer. Type, color, and motion help the player read the next move.",
     "keyCharacteristics": [
       "A large, clear board within a quiet charcoal frame.",
       "Jade actions and warm warning states.",

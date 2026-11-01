@@ -27,5 +27,11 @@ Make a mistake safe to explore. Keep the board primary. Explain concrete consequ
 
 The header opens a connected six-place journey. Saved practice evidence distinguishes exploration, assisted solutions, and positions solved without help. All places are available; no mastery claim or invented progression. Each selected place and meaningful board view has a bookmarkable hash URL. Ask Rook is removed; direct hints, threat checks, and optional move explanations remain.
 
+## Board appearance
+The board uses blue and cool white squares with original white and navy SVG pieces. The user requested a familiar chess.com-like chess surface; the surrounding graphite shell and jade controls remain.
+
 ## Authored lesson extension
 A compact lesson picker opens from Practice or a journey place. It filters by chess skill and separates openings from challenges. The board keeps one short task at a time. Scripted replies support multi-move tactics and openings. Completion offers a next lesson, a repeat without hints, or continued play from a nonterminal board. Saved results distinguish assisted and independent completion; they do not imply mastery. All lessons have stable URLs.
+
+### Starting again
+New game is visible above a normal game board. Authored lessons show Start over in the same place. A dialog confirms the reset and offers Keep playing. Resetting retains learning results and saved practice positions. Personal practice retains Back to game.

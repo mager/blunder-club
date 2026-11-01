@@ -1,0 +1,27 @@
+schema: spec-driven
+context: |
+  Nextmove teaches a beginner around rating 350 through chess decisions and retries.
+  The board, guide, and main controls must fit one viewport without page scrolling.
+  Secondary lesson lists and long explanations may scroll inside a focused dialog.
+  Use Svelte 5 and TypeScript; the user rejected React. Preserve existing saved games.
+  Keep cues short. Do not restore Ask Rook, invented Elo ratings, or mastery claims.
+  Use hardcoded typed lessons for now. Firebase stores private progress; Jev is optional.
+  Follow AGENTS.md, PRODUCT.md, DESIGN.md, and the matching baseline specs.
+  HANDOFF.md records session status and candidates for later work, not new authorization.
+rules:
+  proposal:
+    - State the player problem, the intended behavior, and what is out of scope.
+  specs:
+    - Use observable chess and learning behavior with WHEN/THEN scenarios.
+    - Distinguish authored lesson acceptance from engine-based free-play assessment.
+  design:
+    - Cover save migration, stable URLs, and narrow-screen behavior when affected.
+  tasks:
+    - Include targeted tests and a session handoff update.
+operations:
+  apply:
+    guidance:
+      - Preserve user changes and use the pinned local CLI through npm run openspec.
+  archive:
+    guidance:
+      - Validate specs and record actual tests and release state in HANDOFF.md.

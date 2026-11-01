@@ -36,3 +36,6 @@ Short landscape windows put the selected detail beside the six-place map. Verifi
 
 ## Expanded curriculum
 Keep the board-first design. Add a skill-filtered lesson picker inside the existing secondary dialog, with compact rows and clear completion evidence. Three openings and 22 scenarios share typed steps, short cues, optional arrow hints, specific retry states, and a completion state. Multi-move tactics require the follow-up capture. The journey shows completed lessons and independent solutions beside personal practice evidence; all topics remain available. No new raster assets or palette.
+
+## Blue-and-white board refinement
+The user now requests the familiar blue-and-white chess.com feel for the board and pieces. This supersedes the stone/sage board palette only. Preserve the graphite shell and jade actions. Use original SVG silhouettes, white and navy pieces, blue/cool-white squares, dark board ink, warm move highlights, and coral check. Keep all six types distinct at small sizes; retain keyboard labels, reduced motion, promotions, hints, and viewport sizing. No third-party raster or piece assets.

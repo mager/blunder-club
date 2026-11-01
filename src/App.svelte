@@ -563,7 +563,7 @@
 
   <main class="game-stage" use:fitBoard inert={saveStatus === 'loading'}>
     <section class="board-column" aria-label="Your chess game">
-      <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>{practice ? 'Your second chance' : study ? (study.kind==='opening' ? 'Opening lesson' : 'Practice challenge') : opponents.find(item=>item.id === opponentLevel)?.name}</strong></span><span>{practice ? `${practice.index+1} / ${practice.queue.length}` : study ? `${Math.min(openingIndex+1,study.steps.length)} / ${study.steps.length}` : 'No clock'}</span></div>
+      <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>{practice ? 'Your second chance' : study ? (study.kind==='opening' ? 'Opening' : 'Practice') : opponents.find(item=>item.id === opponentLevel)?.name}</strong></span><span class="board-session-tools">{#if practice}<span>{practice.index+1} / {practice.queue.length}</span>{:else}{#if study}<span>{Math.min(openingIndex+1,study.steps.length)} / {study.steps.length}</span>{/if}<button class="board-reset" onclick={() => panel='new'}>{study ? 'Start over' : 'New game'}</button>{/if}</span></div>
       <div class="board-wrap" class:rehearsing={!!warning || !!review}>
         <Board game={boardGame} {selected} {destinations} lastMove={boardLastMove} hint={(warning || review) && lessonStage === 0 ? `${(warning || review)!.move.from}${(warning || review)!.move.to}` : hint} {flipped} disabled={phase !== 'ready' || !!promotion || !!(study && openingDone)} {onSquare}/>
       </div>
@@ -637,8 +637,8 @@
 </div>
 
 {#if panel}
-  <dialog class="game-dialog" class:journey={panel === 'journey'} class:wide={panel === 'practice' || panel === 'journal'} use:openPanel oncancel={() => panel = null} aria-label={panel === 'account' ? 'Account' : panel === 'practice' ? 'Practice' : panel === 'journal' ? 'Saved positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? 'New game' : panel === 'journey' ? 'Your journey' : panel === 'explanation' ? 'Move explanation' : panel === 'report' ? 'Game review' : 'Game menu'}>
-    <div class="dialog-header"><h2>{panel === 'account' ? 'Your progress' : panel === 'practice' ? 'Choose your next challenge.' : panel === 'journal' ? 'Your positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? 'A fresh board.' : panel === 'journey' ? 'Your journey' : panel === 'explanation' ? 'Why this move?' : panel === 'report' ? 'Your turning points' : 'Your game'}</h2><button class="icon-button" aria-label="Back to board" onclick={() => panel = null}><X size={22}/></button></div>
+  <dialog class="game-dialog" class:journey={panel === 'journey'} class:wide={panel === 'practice' || panel === 'journal'} use:openPanel oncancel={() => panel = null} aria-label={panel === 'account' ? 'Account' : panel === 'practice' ? 'Practice' : panel === 'journal' ? 'Saved positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? (study ? 'Start over' : 'New game') : panel === 'journey' ? 'Your journey' : panel === 'explanation' ? 'Move explanation' : panel === 'report' ? 'Game review' : 'Game menu'}>
+    <div class="dialog-header"><h2>{panel === 'account' ? 'Your progress' : panel === 'practice' ? 'Choose your next challenge.' : panel === 'journal' ? 'Your positions' : panel === 'moves' ? 'Move sheet' : panel === 'new' ? (study ? 'Start this lesson over?' : 'Start a new game?') : panel === 'journey' ? 'Your journey' : panel === 'explanation' ? 'Why this move?' : panel === 'report' ? 'Your turning points' : 'Your game'}</h2><button class="icon-button" aria-label="Back to board" onclick={() => panel = null}><X size={22}/></button></div>
     <div class="dialog-body">
       {#if panel === 'journey'}
         <SkillMap {saved} {practiced} {studyResults} onExplore={(id) => {journeySkill=id;panel='practice';}} bind:selected={journeySkill} onPractice={(items) => beginPractice(practiceQueue(items))}/>
@@ -667,8 +667,9 @@
       {:else if panel === 'moves'}
         {#if moves.length}<div class="move-sheet">{#each moves as move, i}{#if i % 2 === 0}<span>{Math.floor(i / 2)+1}.</span>{/if}<b>{move}</b>{/each}</div>{:else}<p>No moves yet.</p>{/if}
       {:else if panel === 'new'}
-        {#if moves.length}<p class="quiet">This replaces the current game. Saved positions stay.</p>{/if}
-        <button class="start-choice" onclick={() => start(lessons[0])}><span><strong>Just play</strong><small>You, the board, and Rook.</small></span><ArrowRight size={23}/></button><button class="start-choice" onclick={() => start(italian)}><span><strong>Learn an opening</strong><small>The Italian Game · 6 moves</small></span><ArrowRight size={23}/></button><button class="text-button" onclick={() => {journeySkill='';panel='practice';}}>Browse all lessons <ChevronRight size={16}/></button>
+        <p class="quiet">{study ? 'Restart this lesson from its first position.' : 'Replace this board with a new game.'} Your learning progress and saved positions stay.</p>
+        {#if study}<button class="start-choice" onclick={() => {if(study) start(study);}}><span><strong>Start over</strong><small>{study.title}</small></span><RotateCcw size={23}/></button>{/if}
+        <button class="start-choice" onclick={() => start(lessons[0])}><span><strong>New game</strong><small>Start from the full board.</small></span><ArrowRight size={23}/></button><button class="start-choice" onclick={() => start(italian)}><span><strong>Learn an opening</strong><small>The Italian Game · 6 moves</small></span><ArrowRight size={23}/></button><button class="text-button" onclick={() => {journeySkill='';panel='practice';}}>Browse all lessons <ChevronRight size={16}/></button><button class="secondary-button" onclick={() => panel=null}>Keep playing</button>
       {:else if panel === 'practice'}
         {#if nextPractice.length}<button class="start-choice" onclick={() => beginPractice()}><span><strong>Your second chance</strong><small>{nextPractice.length} {nextPractice.length === 1 ? 'position' : 'positions'} from your games. Your game stays saved.</small></span><ArrowRight size={20}/></button>{/if}
         <LessonLibrary {studyResults} bind:skill={journeySkill} onStart={startById}/>

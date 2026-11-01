@@ -3,19 +3,36 @@
   let { type, color, small = false }: { type: PieceSymbol; color: Color; small?: boolean } = $props();
 </script>
 <svg class:small class="chess-piece" class:white={color === 'w'} viewBox="0 0 48 48" aria-hidden="true">
-  <g fill="currentColor" stroke="var(--piece-outline)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="currentColor" stroke="var(--piece-outline)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
     {#if type === 'p'}
-      <circle cx="24" cy="13" r="6"/><path d="M19 20h10l-1 10 6 6H14l6-6z"/><path d="M14 36h20l2 5H12z"/>
+      <circle cx="24" cy="12" r="6.5"/>
+      <path d="M19 19h10c-2 6-1 10 4 15H15c5-5 6-9 4-15Z"/>
+      <path d="M15 34h18l3 5v3H12v-3Z"/>
+      <path d="M16 38h16" stroke="var(--piece-detail)"/>
     {:else if type === 'r'}
-      <path d="M12 8h6v6h4V8h4v6h4V8h6v12l-5 4v10l4 4H13l4-4V24l-5-4z"/><path d="M12 38h24v4H12zM17 24h14M17 34h14"/>
+      <path d="M11 7h7v6h4V7h4v6h4V7h7v13l-6 4v10l5 5v3H12v-3l5-5V24l-6-4Z"/>
+      <path d="M13 20h22M17 25h14M16 34h16M16 38h16" fill="none" stroke="var(--piece-detail)"/>
     {:else if type === 'n'}
-      <path d="M13 36c0-8 4-13 11-17l-7 4-7-4 8-11 9-2 8 9 2 21z"/><path d="m18 8 1-5 5 4M13 36h24l2 6H10z"/><circle cx="24" cy="13" r="1.7" fill="var(--piece-outline)" stroke="none"/><path d="m29 17 4 13" fill="none"/>
+      <path d="m18 10 1-6 7 5c10 1 13 11 11 26H14c0-6 3-10 9-15l-8 4-6-4 9-10Z"/>
+      <path d="M26 13c7 4 7 11 6 16" fill="none" stroke="var(--piece-detail)"/>
+      <circle cx="21.5" cy="14.5" r="1.6" fill="var(--piece-detail)" stroke="none"/>
+      <path d="M14 35h23l2 4v3H10v-3Z"/><path d="M15 38.5h19" stroke="var(--piece-detail)"/>
     {:else if type === 'b'}
-      <circle cx="24" cy="6" r="3"/><path d="M24 9c-9 7-12 13-5 19l-3 7h16l-3-7c7-6 4-12-5-19z"/><path d="m26 14-5 7M18 29h12M13 36h22l3 6H10z"/>
+      <circle cx="24" cy="6" r="2.5"/>
+      <path d="M24 9c-4 4-10 9-10 14 0 4 4 6 10 6s10-2 10-6c0-5-6-10-10-14Z"/>
+      <path d="m26 13-6 8" fill="none" stroke="var(--piece-detail)" stroke-width="2.5"/>
+      <path d="M19 29h10l2 6H17ZM14 35h20l4 5v2H10v-2Z"/>
+      <path d="M16 38.5h16" stroke="var(--piece-detail)"/>
     {:else if type === 'q'}
-      <path d="m12 15 5 17h14l5-17-8 7-4-12-4 12zM16 32h16v4H16zM13 36h22l3 6H10z"/><circle cx="11" cy="12" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="37" cy="12" r="3"/>
+      <path d="m9 14 6 17h18l6-17-9 8-6-12-6 12Z"/>
+      <circle cx="9" cy="11" r="2.7"/><circle cx="24" cy="7" r="2.7"/><circle cx="39" cy="11" r="2.7"/>
+      <path d="M16 31h16v4H16ZM14 35h20l4 5v2H10v-2Z"/>
+      <path d="M17 28h14M16 38.5h16" stroke="var(--piece-detail)"/>
     {:else}
-      <path d="M24 4v9M20 8h8" fill="none" stroke-width="3"/><path d="M24 29c-18-6-14-21-4-16l4 5 4-5c10-5 14 10-4 16zM18 29h12l3 7H15zM13 36h22l3 6H10z"/>
+      <path d="M22 3h4v4h4v4h-4v5h-4v-5h-4V7h4Z"/>
+      <path d="M15 16c3-3 6-2 9 1 3-3 6-4 9-1 5 5 0 10-3 15H18c-3-5-8-10-3-15Z"/>
+      <path d="M18 31h12l2 4H16ZM14 35h20l4 5v2H10v-2Z"/>
+      <path d="M24 19v8M16 38.5h16" fill="none" stroke="var(--piece-detail)"/>
     {/if}
   </g>
 </svg>

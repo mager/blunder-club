@@ -12,18 +12,20 @@ colors:
   acid: "#b8e3b0"
   acid-dark: "#324c38"
   warning: "#e9b28c"
-  board-light: "#e7e5d7"
-  board-dark: "#819284"
+  board-light: "#edf3f8"
+  board-dark: "#7397ba"
   action-ink: "#1d3223"
   action-hover: "#d0f2c9"
   action-hover-ink: "#15261a"
-  piece-light: "#fffdf0"
-  piece-dark: "#26342b"
-  piece-light-outline: "#354a3b"
-  piece-dark-outline: "#eef0dc"
-  hint-arrow: "#234a32"
-  check: "#d27b67"
-  board-focus: "#203728"
+  piece-light: "#ffffff"
+  piece-dark: "#26364c"
+  piece-light-outline: "#26364c"
+  piece-dark-outline: "#172638"
+  piece-light-detail: "#526881"
+  piece-dark-detail: "#8b9caf"
+  hint-arrow: "#173f6b"
+  check: "#df8f8b"
+  board-focus: "#102a46"
 typography:
   headline:
     fontFamily: "DM Sans, sans-serif"
@@ -107,7 +109,7 @@ components:
 
 **Creative North Star: "The late-night strategy game"**
 
-Nextmove uses a quiet, late-night strategy-game frame. Charcoal surfaces surround warm stone squares, ivory pieces, and jade move marks. The board carries the action; short, plain coaching appears when a decision needs support.
+Nextmove uses a quiet, late-night strategy-game frame. Charcoal surfaces surround blue and cool white squares, original white and navy Staunton pieces, and gold move marks. The board carries the action; short, plain coaching appears when a decision needs support.
 
 The interface uses code, SVG pieces, and line icons. It has no raster texture or decorative image layer. Type, color, and motion help the player read the next move.
 
@@ -120,13 +122,13 @@ The interface uses code, SVG pieces, and line icons. It has no raster texture or
 ## Colors
 
 ### Primary
-Jade (`acid` in CSS) marks primary actions, turn status, focus, and current progress. Deep jade (`acid-dark`) supports selected move options. The legacy variable names remain; their old yellow values do not.
+Jade (`acid` in CSS) marks primary actions, turn status, control focus, and current progress. Deep jade (`acid-dark`) supports selected move options. The legacy variable names remain; their old yellow values do not.
 
 ### Secondary
 Warm warning identifies a mistake or a move under review. Check uses its own coral board state. Pair these colors with text, position, or shape.
 
 ### Neutral
-Charcoal ink is the page. Surface and raised provide quiet panel and hover layers. Paper is primary text; muted and faint currently share the same readable value. Line separates controls and rows. Warm stone and gray-green form the board. Light and dark pieces each have a contrasting outline.
+Charcoal ink is the page. Surface and raised provide quiet panel and hover layers. Paper is primary text; muted and faint currently share the same readable value. Line separates controls and rows. Blue and cool white form the board. White pieces use navy outlines and muted blue details. Navy pieces use deep navy outlines and lighter blue details. Board focus and legal-move dots use deep navy; the hint arrow uses dark blue. Gold overlays mark selection, the last move, and hint endpoints.
 
 **The State Rule.** Use color to reinforce a visible state, not as its only signal.
 
@@ -158,7 +160,7 @@ The lesson picker uses the existing wide secondary dialog. Its skill selector an
 
 Tonal layers and thin borders carry most depth. The coach sits directly on the page rather than in a card. Shadows ground the board, dialogs, and notification only. The exact shadow values live in the sidecar. Dialogs use a dark backdrop; there is no grain overlay.
 
-Buttons change background and text color over 150ms. A hint arrow draws over 320ms. Journey markers change background and border color over 180ms. Busy status breathes over 1s; the analysis line moves over 1.2s. Reduced-motion mode removes animations and transitions. Motion communicates state, not atmosphere.
+Buttons change background and text color over 150ms. A hint arrow draws over 320ms. An adjacent legal move or undo glides over 240ms, including the rook when castling. Loading, position jumps, and board flips remain immediate; reduced-motion mode skips the glide. Journey markers change background and border color over 180ms. Busy status breathes over 1s; the analysis line moves over 1.2s. Reduced-motion mode removes animations and transitions. Motion communicates state, not atmosphere.
 
 ## Shapes
 
@@ -179,10 +181,12 @@ Ask Rook and its question form are removed. What’s the threat? opens a concise
 ### Header, toolbar, and modes
 The header contains the wordmark, session selector, Journey control, and account access. Journey keeps an accessible map icon when its text is hidden on narrow screens. Account text collapses to an accessible icon on phones. The board toolbar has three labeled controls. During a warning or review, Before, the candidate move, and Their reply replace the normal toolbar alongside More. These replay controls have a 44px minimum height; the Preview label is hidden on phones and in short landscape windows. Before a mistake, After a mistake, and After the game use a dark segmented control with a raised, jade-text active segment and an `aria-pressed` state. Practice selection, saved positions, account, and move history open in dialogs. Personal practice runs on the main board.
 
-### Chessboard
-The board is a square eight-column grid. SVG pieces occupy 81% of each square and have contrasting outlines and a small shadow. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark SVG arrow points from the hinted piece to its destination.
+The opponent strip keeps New game visible above a free-play board and Start over above an authored lesson. This underlined text action uses a 44px minimum height and the existing paper, jade-hover, and jade-focus colors. Personal practice shows its position count in this space. The action opens a confirmation dialog before the board changes. Start over repeats the current lesson; New game starts a full board. Keep playing, the close control, and Escape leave the board in place. The dialog states that learning progress and saved positions stay.
 
-Each square has an accessible piece-and-square label. Arrow keys move focus; Enter selects a piece or destination; Escape clears selection. The focused square uses a dark inset outline. Retain disabled and pressed semantics while play pauses.
+### Chessboard
+The board is a square eight-column grid. Original Staunton-style SVG pieces occupy 81% of each square. White and navy fills, separate outlines, and internal detail strokes keep all six piece types distinct. A small blue-gray shadow separates the pieces from the squares. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark blue SVG arrow points from the hinted piece to its destination.
+
+Each square has an accessible piece-and-square label. Arrow keys move focus; Enter selects a piece or destination; Escape clears selection. The focused square uses a deep navy inset outline. Retain disabled and pressed semantics while play pauses.
 
 ### Game summary
 The guide shows one main turning point. A paused game offers Keep playing. A completed game with a turning point makes Practice this the primary action; a game without one offers Play again. Full review opens all turning points and Practice my mistakes in a dialog when saved positions are available. Selecting a turning point closes the dialog and starts its board review.

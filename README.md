@@ -6,7 +6,7 @@ Live: https://blunder-school.vercel.app
 
 ## Play and learn
 
-The board is the main interface. Board, guide, and controls fit the visible window without page scrolling. Rook gives one short cue at a time. Longer explanations and questions open in focused panels. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
+The blue-and-white board uses original white and navy SVG pieces. The board is the main interface. Board, guide, and controls fit the visible window without page scrolling. Rook gives one short cue at a time. Longer explanations and questions open in focused panels. Hints draw move arrows; explanations open on request. Practice, saved positions, settings, and the move sheet live in the game menu.
 
 - Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
 - Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings show a concrete reply, a safer suggestion, and choices to play anyway or pause warnings. Winning positions are not interrupted for minor missed improvements. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
@@ -15,9 +15,20 @@ The board is the main interface. Board, guide, and controls fit the visible wind
 - Track recurring patterns with memorable names alongside their actual chess concepts.
 - Jev chooses the next skill and teaching action from engine evidence. Authored explanations and Stockfish supply the chess content.
 
+New game is visible above the board. In an authored lesson, Start over restarts that lesson. The confirmation panel keeps learning progress and saved positions; Keep playing returns to the current board.
+
 ## Revisit a view
 
 The address updates for games, lesson steps, hints, warnings, reviews, journey places, and panels. Bookmark it or use More → Copy link to this view. Links contain chess positions and moves, not account IDs or private progress records. Journey progress belongs to the viewer. Links use hash routes, so no hosting rewrite is required. Opening an old game link restores that board; continuing play makes it the current saved game.
+
+## Continue development
+
+Read [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md) at the start of a new session. [OpenSpec](openspec/README.md) holds the current behavior specs and change history. The local CLI and Codex skills are versioned with this repo.
+
+```sh
+npm run openspec -- list
+npm run spec:check
+```
 
 ## Development
 
