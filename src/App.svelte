@@ -95,8 +95,8 @@
   let audio: AudioContext | null = null;
   let status = $derived(study && openingDone ? 'Lesson complete' : phase === 'practice' ? (practiceComplete ? 'Practice complete' : practiceResult?.accepted ? 'Move found' : 'Try this again') : phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Loading…' : phase === 'warning' ? 'Move not played' : phase === 'thinking' ? (checkingMove ? 'Checking your move…' : 'Thinking…') : phase === 'review' ? 'Your second chance' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
 
-  let cueTitle = $derived(practice && phase === 'thinking' && !checkingMove ? 'Getting your position.' : practice && phase === 'ready' && !showIdeas ? 'Find a better move.' : step ? (recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? (checkingMove ? 'One moment.' : 'Their move.') : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
-  let cueText = $derived(practice && phase === 'thinking' && !checkingMove ? 'Look for checks, captures, and threats.' : practice && phase === 'ready' && !showIdeas ? 'Same position. A fresh decision. Check their threats.' : step ? (recall ? 'Find the next move without a hint.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? (checkingMove ? `Checking ${checkingMove} before Black replies.` : 'Watch what Black changes.') : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
+  let cueTitle = $derived(practice && phase === 'thinking' && !checkingMove ? 'Getting your position.' : practice && phase === 'ready' && !showIdeas ? 'Find a better move.' : step ? (hint ? 'Try this move.' : recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? (checkingMove ? 'One moment.' : 'Their move.') : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
+  let cueText = $derived(practice && phase === 'thinking' && !checkingMove ? 'Look for checks, captures, and threats.' : practice && phase === 'ready' && !showIdeas ? 'Same position. A fresh decision. Check their threats.' : step ? (hint ? step.hint : recall ? 'Find the next move without a hint.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? (checkingMove ? `Checking ${checkingMove} before Black replies.` : 'Watch what Black changes.') : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
   function toggleHint() {
     if (showIdeas || hint) { showIdeas = false; hint = null; option = null; return; }
     if (step) openingHint(); else preview(0);
@@ -378,11 +378,17 @@
   }
   function preview(index: number) { if (practice) practice.helped = true; if(studyRun) studyRun.helped=true; if (phase !== 'ready') return; if (!lines[index]) return; showIdeas = true; option = index; hint = lines[index].move; selected = null; }
   function playOption() { if (option === null) return; const uci = lines[option].move; void play(uci.slice(0, 2) as Square, uci.slice(2, 4) as Square, uci[4] as PieceSymbol | undefined); }
-  function retry() {
-    if (practice) { review=null; practiceResult=null; moves=[]; retries++; persist(); void prepare(); return; }
-    if (openingReview) { moves = openingReview.before; openingReview = null; retries++; persist(); void prepare(); return; }
+  async function retry() {
+    if (practice) { review=null; practiceResult=null; moves=[]; retries++; persist(); await prepare(); return; }
+    if (openingReview) { moves = openingReview.before; openingReview = null; retries++; persist(); await prepare(); return; }
     if (!review) return;
-    const before = review.before; review = null; reviewingReport = false; reportMoves = null; moments = moments.filter(m => m.before.length < before.length); for (const ply of assessed) if (ply >= before.length) assessed.delete(ply); moves = before; retries++; persist(); void prepare();
+    const before = review.before; review = null; reviewingReport = false; reportMoves = null; moments = moments.filter(m => m.before.length < before.length); for (const ply of assessed) if (ply >= before.length) assessed.delete(ply); moves = before; retries++; persist(); await prepare();
+  }
+  async function retryWithHint() {
+    const pending = retry();
+    const id = request;
+    await pending;
+    if (id === request && phase === 'ready') { if (step) openingHint(); else preview(0); }
   }
   function showConsequence() {
     if (!review) return;
@@ -598,18 +604,18 @@
         {:else if practiceResult}
           <h1>{practiceResult.accepted ? (practiceResult.independent ? 'You found it.' : 'Now you see it.') : 'Look one move further.'}</h1>
           <p>{practiceResult.accepted ? `${practiceResult.move.san} works here.` : practiceResult.detail.split('. ')[0] + '.'}</p>
-          <div class="coach-actions">{#if practiceResult.accepted}<button class="primary-button" onclick={nextPracticePosition}>{practice && practice.index+1 < practice.queue.length ? 'Next position' : 'Finish practice'} <ArrowRight size={16}/></button><button class="text-button" onclick={() => {if(practiceResult) explain(practiceResult.detail);}}>Why?</button>{:else}<button class="primary-button" onclick={retry}>Try again <RotateCcw size={16}/></button>{#if review}<button class="text-button" onclick={showConsequence}>See the reply <ArrowRight size={16}/></button>{/if}{/if}</div>
+          <div class="coach-actions">{#if practiceResult.accepted}<button class="primary-button" onclick={nextPracticePosition}>{practice && practice.index+1 < practice.queue.length ? 'Next position' : 'Finish practice'} <ArrowRight size={16}/></button><button class="text-button" onclick={() => {if(practiceResult) explain(practiceResult.detail);}}>Why?</button>{:else}<button class="primary-button" onclick={retryWithHint}>Show hint <Lightbulb size={16}/></button><button class="text-button" onclick={retry}>Try again</button>{#if review}<button class="text-button" onclick={showConsequence}>See the reply <ArrowRight size={16}/></button>{/if}{/if}</div>
         {:else if warning}
           <h1>Before you play {warning.move.san}.</h1><p>{warningText(warning)}</p>
           <div class="coach-actions"><button class="primary-button" onclick={showWarningHint}>Show a move <Lightbulb size={16}/></button><button class="text-button" onclick={acceptWarning}>Play anyway <ArrowRight size={16}/></button><button class="text-button" onclick={pauseWarnings}>Pause warnings</button></div>
 
         {:else if openingReview}
-          <h1>{game.isStalemate() ? 'That is stalemate.' : 'Try the lesson’s idea.'}</h1><p>{#if game.isStalemate()}Black has no legal move and is not in check. That is a draw. Try a different move.{:else}{openingReview.move.san} is legal. {step?.question}{/if}</p><div class="coach-actions"><button class="primary-button" onclick={retry}>Try again <RotateCcw size={16}/></button><button class="text-button" onclick={() => {retry();openingHint();}}>Show hint <Lightbulb size={16}/></button></div>
+          <h1>{game.isStalemate() ? 'That is stalemate.' : 'Try another move.'}</h1><p>{game.isStalemate() ? 'No legal moves, but no check. That’s a draw.' : step?.hint}</p><div class="coach-actions"><button class="primary-button" onclick={retryWithHint}>Show hint <Lightbulb size={16}/></button><button class="text-button" onclick={retry}>Try again <RotateCcw size={16}/></button></div>
         {:else if phase === 'review' && review}
           {@const pattern = classifyMistake(review.move, review.reply, review.best)}
           <h1>{pattern.name}.</h1><p>{pattern.explanation.split('. ')[0]}.</p>
 
-          <div class="coach-actions"><button class="primary-button" onclick={review.shown ? retry : showConsequence}>{review.shown ? 'Try again' : 'See the reply'} {#if review.shown}<RotateCcw size={16}/>{:else}<ArrowRight size={16}/>{/if}</button><button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to review' : 'Play on'}</button><button class="text-button" onclick={() => {if(review) explain(reviewText(review));}}>Why?</button></div>
+          <div class="coach-actions"><button class="primary-button" onclick={review.shown ? retry : showConsequence}>{review.shown ? 'Try again' : 'See the reply'} {#if review.shown}<RotateCcw size={16}/>{:else}<ArrowRight size={16}/>{/if}</button><button class="text-button" onclick={retryWithHint}>Show hint <Lightbulb size={16}/></button><button class="text-button" onclick={continueGame}>{reviewingReport ? 'Back to review' : 'Play on'}</button><button class="text-button" onclick={() => {if(review) explain(reviewText(review));}}>Why?</button></div>
 
         {:else if phase === 'over'}
           <h1>{game.isCheckmate() ? (game.turn() === 'w' ? 'Let’s run it back.' : 'That’s checkmate.') : game.isDraw() ? 'A draw.' : 'The turning points.'}</h1>{#if game.isGameOver()}<p>{resultText(game)}</p>{/if}

@@ -35,3 +35,6 @@ A compact lesson picker opens from Practice or a journey place. It filters by ch
 
 ### Starting again
 New game is visible above a normal game board. Authored lessons show Start over in the same place. A dialog confirms the reset and offers Keep playing. Resetting retains learning results and saved practice positions. Personal practice retains Back to game.
+
+### Help when stuck
+After a wrong authored attempt, show one short position-specific cue with Show hint and Try again. Show hint restores the board and reveals an arrow plus Play. Full reasons stay behind Why. Personal practice also offers direct hint recovery. Avoid generic hints and extra paragraphs.
