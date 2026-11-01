@@ -1,16 +1,18 @@
 import { lessons, makeGame, playUci } from './chess';
-import { italian, skills } from './learning';
+import { skills } from './learning';
+import { allLessons, openings, findStudy } from './curriculum';
+import { studyPosition } from './study';
 export const panels = ['game','account','practice','journal','moves','new','journey','explanation','report'] as const;
 export type Panel = typeof panels[number];
 export type GameRoute = { lessonId:string; fen?:string; moves:string[]; position?:boolean; panel?:Panel; hint?:boolean; hintMove?:string; recall?:boolean; report?:boolean; review?:number; stage?:0|1|2; candidate?:string; explanation?:string; skill?:string };
 export function routeHash(route:GameRoute):string {
-  const path=route.position || route.lessonId === 'saved' ? '/position' : route.lessonId === 'italian' ? '/learn/italian' : route.lessonId === 'free' ? '/play' : `/practice/${route.lessonId}`;
+  const path=route.position || route.lessonId === 'saved' ? '/position' : openings.some(l=>l.id===route.lessonId) ? `/learn/${route.lessonId}` : route.lessonId === 'free' ? '/play' : `/practice/${route.lessonId}`;
   const params=new URLSearchParams();
   if (route.fen) params.set('fen',route.fen);
   if (route.moves.length && !route.position) params.set('moves',route.moves.join(','));
   if (route.lessonId === 'saved' && !route.position) params.set('mode','play');
   if (route.panel) params.set('panel',route.panel);
-  if (route.skill && route.panel === 'journey') params.set('skill',route.skill);
+  if (route.skill && (route.panel === 'journey' || route.panel === 'practice')) params.set('skill',route.skill);
   if (route.hint) params.set('hint','1');
   if (route.hint && route.hintMove) params.set('hintMove',route.hintMove);
   if (route.recall) params.set('recall','1');
@@ -28,15 +30,18 @@ export function readRoute(hash:string):GameRoute|null {
   const url=new URL(hash.slice(1),'https://nextmove.invalid');
   const params=url.searchParams; let lessonId:string;
   if (url.pathname === '/play') lessonId='free';
-  else if (url.pathname === '/learn/italian') lessonId='italian';
+  else if (openings.some(l=>url.pathname===`/learn/${l.id}`)) lessonId=openings.find(l=>url.pathname===`/learn/${l.id}`)!.id;
   else if (url.pathname === '/position') lessonId='saved';
   else { const lesson=lessons.find(l=>l.id !== 'free' && url.pathname === `/practice/${l.id}`); if (!lesson) throw new Error('That lesson link was not found. Your saved game is still here.'); lessonId=lesson.id; }
-  const fen=lessonId === 'saved' ? params.get('fen') || '' : [italian,...lessons].find(l=>l.id === lessonId)!.fen;
+  const fen=lessonId === 'saved' ? params.get('fen') || '' : allLessons.find(l=>l.id === lessonId)!.fen;
   const moves=params.get('moves')?.split(',') || [];
   if (!fen) throw new Error('That position link is incomplete.');
   if (fen.length > 200 || moves.length > 2000 || moves.some(m=>!m || m.length > 15)) throw new Error('That game link is too long or incomplete.');
   const game=makeGame(fen,moves);
-  const position=lessonId === 'saved' && params.get('mode') !== 'play';
+  const study=findStudy(lessonId);
+  const continuedLesson=!!study && !studyPosition(study,moves).valid;
+  if(continuedLesson) lessonId='saved';
+  const position=!continuedLesson && lessonId === 'saved' && params.get('mode') !== 'play';
   if (position && (moves.length || game.turn() !== 'w' || game.isGameOver())) throw new Error('That practice link needs a position where White can move.');
   const panel=params.get('panel'); if (panel && !panels.includes(panel as Panel)) throw new Error('That view is not available.');
   const rawReview=params.get('review'); const review=rawReview === null ? undefined : Number(rawReview);

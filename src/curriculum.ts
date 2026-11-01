@@ -1,0 +1,10 @@
+import { DEFAULT_POSITION } from 'chess.js';
+import { openings } from './openings';
+import { scenarios } from './scenarios';
+import type { BoardLesson, StudyLesson } from './lesson-types';
+export { openings, scenarios };
+export const freePlay:BoardLesson={id:'free',title:'Open play',detail:'A fresh board. Learn one move at a time.',fen:DEFAULT_POSITION,focus:'Own the center',tip:'Start with a center pawn or develop a knight. Give your pieces room to work.'};
+export const studies:StudyLesson[]=[...openings,...scenarios];
+export const lessons:BoardLesson[]=[freePlay,...scenarios];
+export const allLessons:BoardLesson[]=[freePlay,...studies];
+export const findStudy=(id:string)=>studies.find(lesson=>lesson.id===id);

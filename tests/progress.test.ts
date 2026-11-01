@@ -73,3 +73,18 @@ describe('play preferences',()=>{
   expect(normalizeProgress({opponentLevel:'bad',coachMode:'bad'})).toMatchObject({opponentLevel:'casual',coachMode:'warn'});
  });
 });
+
+describe('authored study saves',()=>{
+ it('preserves help and failed attempts when resuming a lesson',()=>{
+  const studyRun={lessonId:'london',moves:['d4','d5'],helped:true,mistakes:2,recorded:false};
+  expect(normalizeProgress({...emptyProgress(),lessonId:'london',moves:studyRun.moves,studyRun}).studyRun).toEqual(studyRun);
+ });
+ it('rejects a run attached to a different board without deleting results',()=>{
+  const data={...emptyProgress(),lessonId:'london',moves:['d4','d5'],studyRun:{lessonId:'italian',moves:['e4','e5'],helped:false,mistakes:0,recorded:false},studyResults:{mate:{solved:2,independent:1,lastSolved:1793556000000}}};
+  const clean=normalizeProgress(data);expect(clean.studyRun).toBeUndefined();expect(clean.studyResults).toEqual(data.studyResults);
+ });
+ it('keeps completion recorded after a refresh',()=>{
+  const studyRun={lessonId:'mate',moves:['Re8#'],helped:false,mistakes:0,recorded:true};
+  expect(normalizeProgress({...emptyProgress(),lessonId:'mate',moves:studyRun.moves,studyRun}).studyRun?.recorded).toBe(true);
+ });
+});

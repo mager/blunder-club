@@ -1,14 +1,9 @@
-import { Chess, DEFAULT_POSITION } from 'chess.js';
+import { Chess } from 'chess.js';
 import type { Move, PieceSymbol, Square } from 'chess.js';
 import type { Line } from './engine';
 
 export const pieceNames: Record<PieceSymbol, string> = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
-export const lessons = [
-  { id: 'free', title: 'Open play', detail: 'A fresh board. Learn one move at a time.', fen: DEFAULT_POSITION, focus: 'Own the center', tip: 'Start with a center pawn or develop a knight. Give your pieces room to work.' },
-  { id: 'hanging', title: 'The loose queen', detail: 'Spot a piece your opponent left unprotected.', fen: '6k1/5ppp/8/3q4/8/4N3/5PPP/6K1 w - - 0 1', focus: 'Look for captures', tip: 'Their queen has no defender. Can your knight reach it? Check every capture before you move.' },
-  { id: 'mate', title: 'Close the door', detail: 'Find the checkmate in one move.', fen: '6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', focus: 'Find the back-rank mate', tip: 'The black king is boxed in by its own pawns. Can your rook reach the back rank?' },
-  { id: 'fork', title: 'Double trouble', detail: 'Attack two pieces with one knight.', fen: '3r3k/6pp/8/4N3/8/8/6PP/6K1 w - - 0 1', focus: 'Find the fork', tip: 'A knight can attack two pieces at once. Look for a checking move that also attacks the rook.' },
-];
+export { lessons } from './curriculum';
 export function makeGame(fen: string, moves: string[] = []) { const game = new Chess(fen); for (const move of moves) game.move(move); return game; }
 export function playUci(game: Chess, uci: string): Move {
   return game.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), ...(uci[4] ? { promotion: uci[4] } : {}) });

@@ -32,6 +32,6 @@ export function recordPractice(previous: PracticeRecord | undefined, solved: boo
 }
 /** Practice is a detour: save evidence, but keep the player's real game across refreshes. */
 export function preserveGameDuringPractice(current: Progress, original: Progress): Progress {
-  const { customFen: _customFen, ...progress } = current;
-  return { ...progress, lessonId:original.lessonId, moves:[...original.moves], ...(original.customFen ? {customFen:original.customFen} : {}), updatedAt:original.updatedAt };
+  const { customFen: _customFen, studyRun: _studyRun, ...progress } = current;
+  return { ...progress, lessonId:original.lessonId, moves:[...original.moves], ...(original.customFen ? {customFen:original.customFen} : {}), updatedAt:original.updatedAt, ...(original.studyRun ? {studyRun:original.studyRun} : {}) };
 }

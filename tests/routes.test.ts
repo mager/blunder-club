@@ -44,3 +44,9 @@ describe('revisitable game URLs',()=>{
   expect(readRoute(routeHash(route))).toMatchObject(route);
  });
 });
+
+it('keeps an old practice link playable after the authored lesson ends',()=>{
+ const route=readRoute('#/practice/hanging?moves=Nxd5,Kf8');
+ expect(route).toMatchObject({lessonId:'saved',position:false,moves:['Nxd5','Kf8']});
+ expect(readRoute(routeHash(route!))).toMatchObject({lessonId:'saved',position:false,moves:['Nxd5','Kf8']});
+});

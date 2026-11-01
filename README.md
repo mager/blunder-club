@@ -10,7 +10,7 @@ The board is the main interface. Board, guide, and controls fit the visible wind
 
 - Play White with no clock against Casual, Club, or Challenge. Casual uses a shallow position score; Club checks one reply across a bounded set of candidates; Challenge uses Stockfish’s strongest line. These are difficulty choices, not Elo ratings.
 - Choose warnings before a move, a pause after a mistake, or a review after the game. Warnings show a concrete reply, a safer suggestion, and choices to play anyway or pause warnings. Winning positions are not interrupted for minor missed improvements. Step through Before / Your move / Their reply on the board; previews do not enter the move sheet or save. Review the largest evaluation changes, see the opponent's reply, retry the position, or continue a paused game.
-- Learn a six-move Italian Game line through center control, development, and castling. Repeat it without hints.
+- Play 25 authored lessons: the Italian Game, London setup, Queen’s Gambit, and 22 challenges covering forks, pinned defenders, loose pieces, check escapes, mates, castling, promotion, stalemate, and en passant. Multi-move lessons include scripted replies. Repeat any lesson without hints, or continue its final board against the computer.
 - Open Journey from the header to explore six connected places. Each shows explored skills, saved positions to revisit, and independent solutions. Select any place to start a lesson or revisit your own positions. “Your second chance” brings back up to three distinct positions from your saved mistakes. Choose a move before seeing the answer, inspect a failed move’s reply, then retry. Sound alternatives pass; hints and retries are recorded separately from first-try solutions. Practice preserves the original game, including after a refresh. Finished games offer “Practice this” for the main turning point.
 - Track recurring patterns with memorable names alongside their actual chess concepts.
 - Jev chooses the next skill and teaching action from engine evidence. Authored explanations and Stockfish supply the chess content.
@@ -60,7 +60,7 @@ A Google account owns `/users/{uid}/progress/current`. The document contains the
 
 Guest progress uses localStorage, separately for each browser and origin. Google login and cloud saves are enabled on the live site. `VITE_FIREBASE_AUTH_ENABLED` controls this feature for other deployments. No account is required for guest play. Localhost progress does not automatically transfer to the live URL until imported through the same Google account.
 
-Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. The guided opening is one practice line, not a complete opening repertoire. Personal practice checks one decision at a time; passing a position is not proof of lasting mastery. A refresh reopens the linked practice position; completed attempt results remain saved, and Back to game returns to the original board. The current practice queue and unsubmitted attempt are not stored in the URL.
+Engine searches are short and can miss deeper tactics. The review identifies evaluation drops, not a definitive single cause of defeat. Only White is supported. Each opening teaches one practice line, not a complete repertoire. Authored challenges accept the stated move, listed safe alternatives, or any checkmate when mate is the goal. Other legal moves get a lesson retry, not an engine blunder label. Personal practice checks one decision at a time; passing a position is not proof of lasting mastery. A refresh reopens the linked practice position; completed attempt results remain saved, and Back to game returns to the original board. The current practice queue and unsubmitted attempt are not stored in the URL.
 
 The API has a bounded request cache and warm-instance request limits. These are prototype controls, not a durable global spending cap. Before a broad public launch, add authenticated requests and a shared quota store.
 
@@ -68,7 +68,10 @@ The API has a bounded request cache and warm-instance request limits. These are 
 
 - `src/App.svelte`: game, coaching, report, and local progress state.
 - `src/engine.ts`: worker lifecycle, UCI messages, and analysis queue.
-- `src/chess.ts`: move helpers and practice positions.
+- `src/chess.ts`: move helpers.
+- `src/curriculum.ts`, `src/openings.ts`, `src/scenarios.ts`: typed, hardcoded lesson catalog.
+- `src/study.ts`: lesson validation, resume state, and assisted/independent completion evidence.
+- `src/LessonLibrary.svelte`: skill-filtered lessons and saved completion status.
 - `src/fit-board.ts`: sizes the square board from the space left by its controls and guide.
 - `src/learning.ts`: opening line and connected skill definitions.
 - `src/journey.ts` and `src/SkillMap.svelte`: saved practice evidence and the connected journey.
@@ -83,3 +86,5 @@ The API has a bounded request cache and warm-instance request limits. These are 
 - `firestore.rules`: account ownership and revision checks.
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for engine source and licenses.
+
+Authored lesson results record completions, solutions without help, and the latest completion time. Hints, threat checks, retries, and undo prevent independent credit for that attempt. An in-progress run retains this evidence across refresh. Completion counters use maximum values on merge, so simultaneous device runs are not additive. Old practice links remain playable after the catalog expansion.
