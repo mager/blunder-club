@@ -7,7 +7,9 @@ Updated 2026-11-01. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 - Repository: https://github.com/mager/blunder-club, branch `main`.
 - Live app: https://blunder-school.vercel.app/.
 - Previous shipped curriculum commit: `750de04` (after `34eed54`). This session adds the blue board, reset controls, and OpenSpec.
-- Blue board/reset/OpenSpec commit `5cfc1d0` is pushed and deployed. A final concise-hints follow-up is being verified; record its final release below before closing.
+- Shipped code commits: `5cfc1d0` (blue board/reset/OpenSpec) and `e45fffe` (concise hints), both pushed to `origin/main`.
+- Verified release: https://blunder-school-flsgjkefu-mager1s-projects.vercel.app/ aliased to https://blunder-school.vercel.app/. The live page loads `main-BeHshzs8.js`, matching the local production build. Verified blue board tokens, visible New game, and ready play without changing the saved live game.
+- All three OpenSpec changes are archived; no active changes remain. This handoff-only follow-up does not alter app code.
 - Svelte 5 + TypeScript + Vite; chess.js validates moves, Stockfish 19 Lite supplies local analysis, Firebase Google login saves private progress. Jev is optional and server-only.
 - 25 authored lessons: 3 openings and 22 challenges. Typed lesson data includes scripted replies and accepted alternatives. Authored practice, personal mistake practice, journey progress, and validated view URLs are implemented.
 - Original SVG Staunton pieces now use white and navy on a blue/cool-white board. The graphite shell and jade controls remain.
