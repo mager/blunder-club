@@ -1,15 +1,29 @@
 # Nextmove session handoff
 
-Updated 2026-11-01. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+Updated 2026-11-03. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+
+## Latest session: game import and profile plan
+
+- Branch: `codex/imported-games-and-profile`, based on `7469989` on `main`.
+- The user wants to paste chess games, learn from their own style, and show favorite games on a profile.
+- Created `openspec/changes/imported-games-and-profile/` with proposal, design, four capability deltas, and 19 unchecked implementation tasks. All four planning artifacts are complete. No app code, database rules, or shipped product/design behavior changed.
+- The local `openspec-propose` skill requires a separate follow-up request before implementation. Resume with the apply skill when requested. Do not mark the feature shipped or archive this active change.
+- Plan: validated single-PGN import; independent private library/replay; selected-side move facts and transparent lesson suggestions; private favorites; explicit publication of a small public profile with anonymous visitor replay. Guest/account isolation and the original playable game must remain intact.
+- The supplied game was checked with installed chess.js: 71 legal half-moves, 36 White moves, 10 checks including mate, 9 White captures, castling on move 9, and checkmate with `36. h4#`. The plan includes `examples/pawn-mate.pgn` with anonymous player names. It is a test example, not a seeded or published user game.
+- Verification: `npm run spec:check` passed all 8 items (7 baseline specs and the new change). Node assertions passed for the planning PGN. App tests/build/browser checks were not rerun because this session changed planning documents only; prior app checks below remain historical.
+- Release: no app deployment or Firebase rules deployment in this session. The previously verified release below remains the last verified live version. Planning work is recorded on this branch; see its Git history for the planning commit and remote tracking state.
+- Next work: apply the change, implement and test each task, verify privacy rules and three viewport sizes, then archive and release only when checks pass.
+
+Paste into the next session: “Apply `imported-games-and-profile` in `/Users/mager/Code/blunder-club`. Read HANDOFF.md and the change artifacts first. Keep the current game safe. Implement PGN import, private style notes, and favorite games on a public profile, then run the stated checks.”
 
 ## Current state
 
-- Repository: https://github.com/mager/blunder-club, branch `main`.
+- Repository: https://github.com/mager/blunder-club. Shipped code is on `main`; the current planning branch is listed above.
 - Live app: https://blunder-school.vercel.app/.
 - Previous shipped curriculum commit: `750de04` (after `34eed54`). This session adds the blue board, reset controls, and OpenSpec.
 - Shipped code commits: `5cfc1d0` (blue board/reset/OpenSpec) and `e45fffe` (concise hints), both pushed to `origin/main`.
 - Verified release: https://blunder-school-flsgjkefu-mager1s-projects.vercel.app/ aliased to https://blunder-school.vercel.app/. The live page loads `main-BeHshzs8.js`, matching the local production build. Verified blue board tokens, visible New game, and ready play without changing the saved live game.
-- All three OpenSpec changes are archived; no active changes remain. This handoff-only follow-up does not alter app code.
+- The three earlier OpenSpec changes are archived. `imported-games-and-profile` is now active and planning-complete; implementation is pending.
 - Svelte 5 + TypeScript + Vite; chess.js validates moves, Stockfish 19 Lite supplies local analysis, Firebase Google login saves private progress. Jev is optional and server-only.
 - 25 authored lessons: 3 openings and 22 challenges. Typed lesson data includes scripted replies and accepted alternatives. Authored practice, personal mistake practice, journey progress, and validated view URLs are implemented.
 - Original SVG Staunton pieces now use white and navy on a blue/cool-white board. The graphite shell and jade controls remain.
@@ -28,7 +42,7 @@ npm run openspec -- list --specs
 npm run spec:check
 ```
 
-Seven baseline capabilities cover play/coaching, authored lessons, personal practice, progress sync, journey/routes, coach decisions, and board presentation. This session records `blue-white-chessboard`, `visible-game-restart`, and `concise-retry-hints`; completed changes are archived through the CLI. Check the list command for the actual active state before starting new work.
+Seven baseline capabilities cover play/coaching, authored lessons, personal practice, progress sync, journey/routes, coach decisions, and board presentation. Earlier work records `blue-white-chessboard`, `visible-game-restart`, and `concise-retry-hints`; completed changes are archived through the CLI. The active `imported-games-and-profile` plan adds two capabilities and extends save/route behavior when implemented. Check the list command for the actual active state before starting new work.
 
 Use a proposal, design, delta specs, and tasks for feature work. Keep observable requirements current when archiving. Project scripts disable OpenSpec telemetry.
 

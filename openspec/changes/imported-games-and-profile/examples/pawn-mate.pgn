@@ -1,0 +1,7 @@
+[White "Player"]
+[Black "Opponent"]
+[Result "1-0"]
+[WhiteElo "360"]
+[BlackElo "372"]
+
+1. d4 d5 2. c4 c5 3. Bf4 $6 Bf5 $6 4. f3 $6 f6 $2 5. e4 dxc4 $9 6. Bxc4 $6 Bd7 7. Nc3 $6 Nc6 $6 8. Nge2 Nb4 $2 9. O-O $2 cxd4 10. Nxd4 $2 e5 $1 11. Bg3 $2 exd4 12. Qxd4 Bb5 $4 13. Bxb5+ $1 Ke7 $2 14. Qc5+ $6 Kf7 15. Qc4+ Kg6 16. Rad1 Rc8 $2 17. Qe2 Qb6+ 18. Rf2 $6 a6 19. Bd3 $6 Bc5 20. Nd5 Nxd5 21. exd5+ Kf7 22. Bf4 $2 Ne7 $6 23. Be3 $4 Nxd5 $9 24. Bxc5 $1 Qxc5 25. b4 Qxb4 26. Be4 Rce8 $4 27. Rxd5 $1 f5 $2 28. Rxf5+ Kg6 $2 29. g4 $9 Rhf8 $2 30. Rb5+ $9 Qxe4 $6 31. fxe4 Re7 $2 32. Rb6+ Kg5 33. Rg2 Rfe8 $2 34. Qe3+ Kh4 35. Qg3+ Kg5 36. h4# 1-0
