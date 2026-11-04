@@ -39,7 +39,7 @@ Read `PRODUCT.md`, `DESIGN.md`, the matching `.impeccable/surfaces/` brief, and 
 - Repository: https://github.com/mager/blunder-club.
 - Production: https://blunder-school.vercel.app/ (Vercel project `blunder-school`).
 - Firebase project: `blunder-school-513120`. Deploy additive Firestore rules before the app.
-- Prior planning commits `a292db6` and `02eb381` are pushed. Current implementation and docs are not yet committed at this checkpoint.
+- Implementation commit `27a995f` is pushed to `origin/codex/imported-games-and-profile`. Planning commits `a292db6` and `02eb381` are also pushed. A handoff-only follow-up records this result. The working tree was clean before this handoff update.
 - Archived as `openspec/changes/archive/2026-11-04-imported-games-and-profile/`; the CLI merged all four deltas into baseline specs.
 - `firebase deploy --only firestore:rules --project blunder-school-513120 --non-interactive` failed with HTTP 401 while checking the Firestore API. No rules or app deployment succeeded. The user must run `firebase login --reauth`, then the rules deployment can be retried before releasing the app. Do not deploy this app before its rules.
 - No merge to main or Vercel production deploy was attempted. The previous verified live release remains `e45fffe`, deployment `blunder-school-flsgjkefu-mager1s-projects.vercel.app`.
