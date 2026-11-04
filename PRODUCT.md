@@ -38,3 +38,11 @@ New game is visible above a normal game board. Authored lessons show Start over 
 
 ### Help when stuck
 After a wrong authored attempt, show one short position-specific cue with Show hint and Try again. Show hint restores the board and reveals an arrow plus Play. Full reasons stay behind Why. Personal practice also offers direct hint recovery. Avoid generic hints and extra paragraphs.
+
+## Imported games and favorite profiles
+
+My games opens from the game menu; Profile and Paste a game also open from the account panel. Players can paste one standard-chess PGN, check its main line, choose White or Black, and save it in a private library. Comments, variations, and imported grading marks do not become Nextmove analysis. The library supports titles, favorites, removal, and isolated replay from either side. Open finish jumps to the final board. Replay and refresh keep the original playable game and lesson assistance evidence safe.
+
+Private style notes count the chosen side's first moves, checks, captures, and castling, with source-game links and sample sizes. After at least three eligible games, stated pattern rules can suggest an existing castling, Italian, or Queen's Gambit lesson. Notes do not measure strength or claim a fixed style. Imports grant no lesson credit.
+
+Guests keep up to 100 games on their device. Google accounts sync private game records separately from progress, with revision conflicts, deletion records, and retryable transfers. Public sharing requires a chosen public name and an explicit preview/publish action. A profile can feature up to eight selected favorites. Visitors can replay those games without signing in. Public copies contain only the chosen name, titles, player names, sides, results, starting positions, and moves. Style notes and Google identity stay private. Unpublish removes the public page; removing a featured game removes its public copy when cloud sync succeeds.

@@ -156,6 +156,10 @@ Dialogs are at most 460px wide, or 700px for practice and saved positions, with 
 
 The lesson picker uses the existing wide secondary dialog. Its skill selector and lesson count wrap onto separate lines when needed. The selector fills the available width and keeps a 44px minimum height. Openings and Challenges use separate row groups with a 24px gap; the page itself does not become a lesson catalog.
 
+Game libraries and profile galleries use a centered secondary page, at most 900px wide. Page padding is 36px above, 28px at each side, and 64px below; phones use 24px, 18px, and 40px. These pages and their dialogs may scroll. Game rows pair a final-position board with text and actions, separated by a thin line. The board preview is 128px wide, or 88px at widths of 500px or less. Titles and player names wrap; action groups wrap onto another line when needed.
+
+Imported-game replay retains the one-screen board and guide layout. Its control row is at least 280px wide even when the board becomes smaller in short landscape windows. The board and player strips remain centered above it. Keep the move selector, four navigation buttons, position status, Flip board, and Back to games visible together. Secondary pages do not change the play surface's one-screen rule.
+
 ## Elevation & Depth
 
 Tonal layers and thin borders carry most depth. The coach sits directly on the page rather than in a card. Shadows ground the board, dialogs, and notification only. The exact shadow values live in the sidecar. Dialogs use a dark backdrop; there is no grain overlay.
@@ -209,6 +213,17 @@ Completion uses You found it for a recorded run without help or mistakes, and No
 
 ### Dialogs and saved rows
 Move explanations, threat checks, and full game review use the same dialog surface as secondary tasks. Dialogs use the surface color, a thin line border, a sticky header, and a close control. Practice choices and saved positions use separated rows rather than elevated cards. Promotion uses the same dialog material with four piece buttons. Notifications use the raised color and a dismiss action.
+
+### Game library, profile, and replay
+These secondary views reuse the graphite frame, jade actions, blue and cool-white board, and original white and navy SVG pieces. They add no palette or type family. Page headings use DM Sans at 32px and weight 500, reduced to 27px on phones. Row headings use 20px, then 17px on phones and 16px below 371px. Supporting text is muted. Thin separators group saved games, private style notes, and sharing controls.
+
+My games and Profile remain labeled header links. Jade text and `aria-current` identify the current page. The wordmark and Back to game can become icons on phones; both retain accessible names. Game previews are decorative within an accessible Open finish link or button. Each row provides Open finish and Replay. Private rows also have a labeled, pressed-state favorite control and secondary edit and remove actions. A miniature board shows the final position from the selected side.
+
+Paste a game uses the existing dialog material, with a labeled PGN field and a primary Check game action. A checked game shows its final board, players, result, move count, and a required White or Black choice before saving. Edit and removal use focused dialogs. Inputs use the ink surface, a line border, readable labels, jade focus, and a 44px minimum height. Errors use warning text; save notices use jade text. Keep loading, sync, and conflict messages beside the affected controls.
+
+Private style notes use a disclosure with a sample count and a Private label. Facts link to the source games. Public sharing follows the owner's favorites and private notes: choose a public name, select up to eight favorite games, then open the exact public preview. The preview uses the same gallery as the published page. Publish profile or Update public profile is a separate primary action inside that dialog. Copy public link, View public profile, and Unpublish profile appear after publication. Private notes do not appear in the public gallery.
+
+Replay uses the existing board with play disabled. First, previous, next, and last move controls surround a native move selector. Buttons and the selector retain a 44px minimum height. The focused toolbar accepts Left, Right, Home, and End. The guide shows the game title, current move or terminal state, selected side, result, Flip board, and Back to games. The current move has a polite live announcement. Invalid or unavailable links use a short message and a return link. Private and public replay share this layout and preserve the original playable game.
 
 ### Connected journey
 The Journey control opens six connected places in the existing dialog material: Center square, Knight outpost, King’s keep, The lookout, Safe ground, and Fork road. `SkillMap.svelte` supplies the map and selected detail; `journey.ts` derives evidence from saved positions, practiced skills, and authored lesson results. Circular line icons replace the old skill cards. Neutral dashed paths show connections; solid jade paths touch the selected place. Selection uses a deep-jade marker with a jade border and an `aria-pressed` state. A small check marks independent saved-position or lesson evidence. The check uses ink on jade. All places remain available.

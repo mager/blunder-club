@@ -3,6 +3,7 @@
   import { ArrowUpRight, ArrowRight, RotateCcw, RefreshCw, Lightbulb, X, ChevronRight, ChevronDown, Map, Volume2, VolumeX, Zap, Bookmark, MoveUpRight, Target, Ellipsis, UserRound, SlidersHorizontal, AudioLines, ListOrdered, Plus, Link } from '@lucide/svelte';
   import type { Square, PieceSymbol, Move } from 'chess.js';
   import { routeHash, readRoute, type GameRoute, type Panel } from './routes';
+  import { isLibraryHash } from './library-routes';
   import Board from './Board.svelte';
   import LessonLibrary from './LessonLibrary.svelte';
   import {allLessons, studies, findStudy, freePlay} from './curriculum';
@@ -108,6 +109,11 @@
     explain(game.isCheck() ? 'Capture, block, or move your king out of check.' : targets.length ? `Black attacks your ${targets.join(', your ')}. Check defenders before you move.` : 'None of your pieces are directly attacked. Look for checks, captures, and threats.');
   }
   function explain(text:string) { explanationText = text; panel = 'explanation'; }
+  function openLibrary(view: 'games' | 'me') {
+    persist();
+    try { sessionStorage.setItem('nextmove-return-game', location.hash); } catch { /* The saved board remains available. */ }
+    location.hash = `#/${view}`;
+  }
   function openPanel(node: HTMLDialogElement) {
     const previous = document.activeElement as HTMLElement | null;
     node.showModal();
@@ -115,7 +121,7 @@
   }
 
   $effect(() => {
-    if (!urlReady || navigating || saveStatus === 'loading') return;
+    if (!urlReady || navigating || saveStatus === 'loading' || isLibraryHash(location.hash)) return;
     const route:GameRoute={lessonId:activeLesson.id,moves:practice ? [] : reportMoves || openingReview?.before || review?.before || moves,
       ...(activeLesson.id === 'saved' ? {fen:activeLesson.fen} : {}),position:!!practice,panel:panel || undefined,
       hint:phase === 'ready' && !!hint,hintMove:phase === 'ready' ? hint || undefined : undefined,recall,report:!practice && (phase === 'over' || phase === 'report'),
@@ -184,6 +190,7 @@
     let initial=true;let initialRoute:GameRoute|null=null;
     try {initialRoute=readRoute(location.hash);} catch {notification='That link is not valid. Your saved game is still here.';}
     const onNavigate=()=>{
+      if (isLibraryHash(location.hash)) return;
       if (!urlReady || location.hash === lastUrl) return;
       try {const route=readRoute(location.hash);lastUrl=location.hash;if(route) void visitRoute(route);}
       catch {notification='That link is not valid. Your current game is still here.';history.replaceState(null,'',lastUrl);}
@@ -655,6 +662,8 @@
         {#if nextPractice.length}<button class="primary-button" onclick={() => beginPractice()}>Practice my mistakes <ArrowRight size={16}/></button>{/if}
         {#if recommendation}<button class="text-button" onclick={() => {panel=null;followRecommendation();}}>Practice {skills.find(s => s.id === recommendation?.skill)?.name.toLowerCase()} <ArrowUpRight size={14}/></button>{/if}
       {:else if panel === 'game'}
+        <button class="menu-row" onclick={() => openLibrary('games')}>My games · Paste a PGN <Bookmark size={19}/></button>
+        <button class="menu-row" onclick={() => openLibrary('me')}>My profile <UserRound size={19}/></button>
         <fieldset class="game-setting" disabled={!!practice || !(['ready','over'].includes(phase))}><legend>When should Rook step in?</legend>
           <div class="mode-switch">{#each [{id:'warn',label:'Before a mistake'},{id:'live',label:'After a mistake'},{id:'after',label:'After the game'}] as mode}<button class:active={coachMode === mode.id} aria-pressed={coachMode === mode.id} onclick={() => {coachMode=mode.id as CoachMode;persist();}}>{mode.label}</button>{/each}</div>
           <p class="setting-note">{coachMode === 'warn' ? 'See a warning. Decide whether to play it.' : coachMode === 'live' ? 'Play your move. Pause to learn from a mistake.' : 'Play a full game. Rook reviews it at the end.'}</p>
@@ -669,6 +678,8 @@
         <button class="menu-row separated" onclick={() => panel='new'}>New game <Plus size={19}/></button>
         <div class="game-menu-links"><a class="license-link" href="/about/">About Nextmove <ArrowUpRight size={12}/></a><a class="license-link" href="/engine/SOURCE-AND-NOTICES.txt" target="_blank" rel="noreferrer">Engine & licenses <ArrowUpRight size={12}/></a></div>
       {:else if panel === 'account'}
+        <button class="menu-row" onclick={() => openLibrary('me')}>My profile and favorite games <UserRound size={19}/></button>
+        <button class="menu-row" onclick={() => openLibrary('games')}>Paste a game <Plus size={19}/></button>
         {#if account}<p class="account-name">{account.displayName || 'Signed in'}</p><p class="quiet" role="status">{saveStatus === 'saved' ? 'Progress saved' : saveStatus === 'saving' ? 'Saving…' : saveStatus === 'loading' ? 'Loading progress…' : 'Saved on this device'}</p>{#if saveStatus === 'offline' || saveStatus === 'conflict'}<button class="primary-button" onclick={() => sync.retry()}>Retry cloud save</button>{/if}<button class="secondary-button" disabled={authBusy || saveStatus === 'loading'} onclick={signOutAccount}>Sign out</button>{:else}<p>Keep your positions and progress across devices.</p>{#if cloudConfigured}<button class="primary-button" disabled={authBusy || saveStatus === 'loading'} onclick={signIn}>{authBusy ? 'Opening Google…' : 'Continue with Google'}<ArrowUpRight size={18}/></button>{/if}<p class="quiet">Guest progress stays on this device.</p>{/if}
       {:else if panel === 'moves'}
         {#if moves.length}<div class="move-sheet">{#each moves as move, i}{#if i % 2 === 0}<span>{Math.floor(i / 2)+1}.</span>{/if}<b>{move}</b>{/each}</div>{:else}<p>No moves yet.</p>{/if}

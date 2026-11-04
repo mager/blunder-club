@@ -5,6 +5,6 @@ import '@fontsource/dm-sans/latin-400.css';
 import '@fontsource/dm-sans/latin-500.css';
 import '@fontsource/dm-sans/latin-600.css';
 import '@fontsource/dm-sans/latin-700.css';
-import App from './App.svelte';
+import App from './Root.svelte';
 import './styles.css';
 mount(App, { target: document.getElementById('root')! });

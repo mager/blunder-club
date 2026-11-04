@@ -1,6 +1,83 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedOwner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function publicId(id) { return id is string && id.matches('^[a-f0-9]{32}$'); }
+    function settingsPath(uid) { return /databases/$(database)/documents/users/$(uid)/profile/settings; }
+    function ownsProfile(id) {
+      return request.auth != null && get(/databases/$(database)/documents/profileOwners/$(id)).data.uid == request.auth.uid;
+    }
+    function ownsProfileAfter(id) {
+      return request.auth != null && getAfter(/databases/$(database)/documents/profileOwners/$(id)).data.uid == request.auth.uid;
+    }
+    function shortText(value, max) { return value is string && value.size() > 0 && value.size() <= max; }
+    function validPublicGame(g) {
+      return g is map && g.keys().hasOnly(['id','title','white','black','side','result','fen','moves'])
+        && publicId(g.id) && shortText(g.title,80) && shortText(g.white,80) && shortText(g.black,80)
+        && g.side in ['w','b'] && g.result in ['1-0','0-1','1/2-1/2','*']
+        && shortText(g.fen,200) && shortText(g.moves,6000)
+        && g.moves.matches('^[a-h][1-8][a-h][1-8][qrbn]?( [a-h][1-8][a-h][1-8][qrbn]?)*$');
+    }
+    function validSlot(games, featured, i) {
+      return games.size() <= i || (validPublicGame(games[i]) && games[i].id == featured[i]);
+    }
+    function validProfile(id) {
+      let d = request.resource.data;
+      let s = getAfter(settingsPath(request.auth.uid)).data;
+      return d.keys().hasOnly(['version','revision','name','games']) && d.version == 1
+        && d.revision is int && d.revision == s.revision && s.publicId == id && s.published == true
+        && shortText(d.name,40) && d.games is list && d.games.size() <= 8 && d.games.size() == s.featured.size()
+        && validSlot(d.games,s.featured,0) && validSlot(d.games,s.featured,1)
+        && validSlot(d.games,s.featured,2) && validSlot(d.games,s.featured,3)
+        && validSlot(d.games,s.featured,4) && validSlot(d.games,s.featured,5)
+        && validSlot(d.games,s.featured,6) && validSlot(d.games,s.featured,7);
+    }
+    match /users/{uid}/games/{gameId} {
+      function validGame() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['schemaVersion','revision','payload','publicId','favorite','deleted','updatedAt'])
+          && gameId.matches('^[a-f0-9]{64}$') && d.schemaVersion == 1 && d.revision is int
+          && d.payload is string && d.payload.size() <= 40960 && publicId(d.publicId)
+          && d.favorite is bool && d.deleted is bool && d.updatedAt == request.time;
+      }
+      function removedPublic() {
+        return (request.resource.data.favorite && !request.resource.data.deleted)
+          || !existsAfter(settingsPath(uid))
+          || !getAfter(settingsPath(uid)).data.featured.hasAny([request.resource.data.publicId]);
+      }
+      allow read: if signedOwner(uid);
+      allow create: if signedOwner(uid) && validGame() && request.resource.data.revision == 1 && removedPublic();
+      allow update: if signedOwner(uid) && validGame() && request.resource.data.revision == resource.data.revision + 1
+        && request.resource.data.publicId == resource.data.publicId && removedPublic();
+    }
+    match /profileOwners/{id} {
+      allow get: if signedOwner(resource.data.uid);
+      allow create: if request.auth != null && publicId(id) && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(settingsPath(request.auth.uid)).data.publicId == id;
+    }
+    match /users/{uid}/profile/settings {
+      function validSettings() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['publicId','revision','featured','published']) && publicId(d.publicId)
+          && d.revision is int && d.featured is list && d.featured.size() <= 8
+          && d.featured.toSet().size() == d.featured.size() && d.published is bool
+          && ownsProfileAfter(d.publicId)
+          && (d.published ? getAfter(/databases/$(database)/documents/profiles/$(d.publicId)).data.revision == d.revision
+            : d.featured.size() == 0 && !existsAfter(/databases/$(database)/documents/profiles/$(d.publicId)));
+      }
+      allow get: if signedOwner(uid);
+      allow create: if signedOwner(uid) && validSettings() && request.resource.data.revision == 1;
+      allow update: if signedOwner(uid) && validSettings() && request.resource.data.revision == resource.data.revision + 1
+        && request.resource.data.publicId == resource.data.publicId;
+    }
+    match /profiles/{id} {
+      allow get: if true;
+      allow create: if ownsProfileAfter(id) && validProfile(id);
+      allow update: if ownsProfile(id) && validProfile(id) && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if ownsProfile(id) && getAfter(settingsPath(request.auth.uid)).data.published == false
+        && getAfter(settingsPath(request.auth.uid)).data.revision == resource.data.revision + 1;
+    }
     match /users/{userId}/progress/current {
       function owner() {
         return request.auth != null && request.auth.uid == userId;

@@ -1,0 +1,83 @@
+.library-shell { height: 100dvh; }
+.library-header { flex-shrink: 0; gap: 24px; }
+.library-header nav { display: flex; align-items: center; gap: 20px; }
+.library-header nav a { min-height: 44px; display: flex; align-items: center; text-decoration: none; color: var(--muted); font-size: 13px; }
+.library-header nav a[aria-current="page"] { color: var(--acid); }
+.library-return { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; text-decoration: none; min-height: 44px; }
+.library-page { width: min(900px,100%); margin: 0 auto; padding: 36px 28px 64px; }
+.library-page h1, .profile-gallery h1 { font-size: 32px; font-weight: 500; line-height: 1.2; letter-spacing: -.6px; overflow-wrap: anywhere; }
+.library-page h2, .profile-gallery h2 { font-size: 20px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+.library-page p, .library-dialog p { line-height: 1.55; font-size: 14px; }
+.library-muted { color: var(--muted); }
+.library-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.library-heading p { margin-top: 10px; max-width: 45ch; }
+.library-heading > button { flex-shrink: 0; }
+.library-save { color: var(--muted); display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px; margin: 20px 0 8px; font-size: 12px; }
+.library-save .text-button { font-size: 12px; }
+.library-game-row { display: flex; align-items: center; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+.library-game-copy { flex: 1; min-width: 0; }
+.library-game-copy h2 { font-size: 20px; margin: 0 0 5px; }
+.library-game-copy p { overflow-wrap: anywhere; margin: 3px 0; }
+.board-preview-button { display: block; flex-shrink: 0; padding: 0; border-radius: 3px; }
+.library-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.library-actions > a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; }
+.library-actions .text-button { min-height: 44px; }
+.library-edit-actions { margin-top: 0; gap: 4px 16px; }
+.library-edit-actions .text-button { font-size: 12px; padding: 0; min-height: 36px; }
+.library-empty { padding: 48px 0; max-width: 50ch; }
+.library-empty > svg { color: var(--acid); margin-bottom: 18px; }
+.library-empty h2 { margin-bottom: 12px; }
+.library-empty p { margin-bottom: 12px; }
+.library-empty a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.library-error { color: var(--warning); padding: 14px 0; overflow-wrap: anywhere; }
+.library-notice { color: var(--acid); padding: 14px 0; overflow-wrap: anywhere; }
+.library-conflict { border-block: 1px solid var(--warning); padding: 18px 0; margin: 12px 0; }
+.library-conflict p { margin-top: 8px; }
+.style-notes { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); }
+.style-notes summary { cursor: pointer; font-size: 18px; min-height: 44px; }
+.style-notes summary span { display: block; font-size: 12px; color: var(--muted); margin: 7px 0 16px; }
+.style-notes p { margin: 8px 0; }
+.style-source { display: flex; flex-direction: column; gap: 6px; text-decoration: none; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.style-source strong { font-size: 14px; font-weight: 500; }
+.style-source span { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.style-source:hover strong { text-decoration: underline; }
+.style-suggestion { margin-top: 20px; }
+.style-suggestion a { text-decoration: none; display: inline-flex; }
+.profile-sharing { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+.profile-sharing > p { max-width: 65ch; margin: 12px 0 20px; }
+.library-field { display: flex; flex-direction: column; gap: 9px; font-size: 13px; margin: 18px 0; }
+.library-field input, .library-field textarea, .library-field select { width: 100%; background: var(--ink); color: var(--paper); font: inherit; border: 1px solid var(--line); border-radius: 5px; padding: 12px; min-height: 44px; caret-color: var(--acid); }
+.library-field textarea { font-size: 14px; line-height: 1.6; resize: vertical; min-height: 150px; }
+.library-field input::placeholder, .library-field textarea::placeholder { color: var(--muted); opacity: 1; }
+.library-field input:focus-visible, .library-field textarea:focus-visible, .library-field select:focus-visible, .replay-select select:focus-visible { outline: 2px solid var(--acid); outline-offset: 3px; }
+.profile-picks, .side-choice { border: 0; padding: 0; margin: 24px 0; }
+.profile-picks legend, .side-choice legend { font-size: 14px; margin-bottom: 12px; }
+.profile-picks label { display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 14px; }
+.profile-picks label span { overflow-wrap: anywhere; min-width: 0; }
+.profile-picks input, .side-choice input { accent-color: var(--acid); width: 18px; height: 18px; flex-shrink: 0; }
+.side-choice label { display: inline-flex; align-items: center; gap: 10px; margin-right: 22px; min-height: 44px; }
+.import-preview { display: flex; align-items: center; gap: 18px; }
+.import-preview h3 { font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.import-preview p { margin-top: 8px; }
+.library-dialog form > .primary-button { margin-top: 20px; }
+.library-dialog .dialog-body > .text-button { display: flex; margin-top: 12px; }
+.library-dialog .dialog-body > .secondary-button { margin-top: 10px; }
+.library-dialog .profile-gallery { margin: 28px 0; }
+.profile-gallery > .library-muted { margin-top: 10px; }
+.library-empty-copy { padding: 30px 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (max-width: 760px) {
+  .library-header { padding-inline: 14px; gap: 18px; }
+  .library-header nav { gap: 14px; }
+  .library-return span { display: none; }
+  .library-return { min-width: 36px; justify-content: center; }
+  .library-page { padding: 24px 18px 40px; }
+  .library-heading { flex-direction: column; gap: 18px; }
+  .library-page h1, .profile-gallery h1 { font-size: 27px; }
+  .library-game-row { gap: 16px; align-items: flex-start; }
+  .library-game-copy h2 { font-size: 17px; }
+  .library-game-copy p { font-size: 12px; }
+  .library-actions { column-gap: 14px; }
+  .library-empty { padding: 32px 0; }
+}
+@media (max-width: 370px) { .library-header .wordmark span { display: none; } .library-header nav { gap: 18px; } .library-game-row { gap: 12px; } .library-game-copy h2 { font-size: 16px; } }

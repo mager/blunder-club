@@ -1,20 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth';
-import { getFirestore, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth';
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { cloudServices } from './firebase-client';
+export { cloudConfigured } from './firebase-client';
 import { emptyProgress, mergeProgress, normalizeProgress, type Progress } from './progress';
 export type SaveStatus = 'guest' | 'loading' | 'saving' | 'saved' | 'offline' | 'conflict';
-const config = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
-export const cloudConfigured = import.meta.env.VITE_FIREBASE_AUTH_ENABLED === 'true' && Object.values(config).every(Boolean);
 const GUEST = 'blunder-club-v1';
 export function createProgressSync(callbacks: { apply: (data: Progress) => void; account: (user: User | null) => void; status: (status: SaveStatus) => void; error: (message: string) => void }) {
-  const app = cloudConfigured ? initializeApp(config) : null;
-  const auth = app ? getAuth(app) : null;
-  const db = app ? getFirestore(app) : null;
+  const services = cloudServices();
+  const auth = services?.auth ?? null;
+  const db = services?.db ?? null;
   let user: User | null = null; let ready = false; let revision = 0; let generation = 0;
   let latest: Progress | null = null; let timer: ReturnType<typeof setTimeout> | undefined;
   let writing: Promise<void> = Promise.resolve(); let unsubscribe = () => {};

@@ -19,6 +19,8 @@ New game is visible above the board. In an authored lesson, Start over restarts 
 
 ## Revisit a view
 
+Use More → My games to paste a PGN, choose your side, and replay it. Private style notes count your moves and can suggest a lesson after three eligible games. Mark favorites, then open Profile to choose the games and name to publish. Preview shows exactly what a visitor will see. See [Game library](docs/game-library.md) for limits, privacy, and emulator tests.
+
 The address updates for games, lesson steps, hints, warnings, reviews, journey places, and panels. Bookmark it or use More → Copy link to this view. Links contain chess positions and moves, not account IDs or private progress records. Journey progress belongs to the viewer. Links use hash routes, so no hosting rewrite is required. Opening an old game link restores that board; continuing play makes it the current saved game.
 
 ## Continue development
@@ -65,7 +67,7 @@ Firebase project: `blunder-school-513120`. Firestore is in `us-central1` on its 
 
 A Google account owns `/users/{uid}/progress/current`. The document contains the current board, saved lessons, practice topics, and counters; it does not contain email or display name. Guest lessons are imported only after a successful transaction. Account caches use separate browser keys; signing out returns to guest state. Cloud write failures retain a local copy. Revision checks stop silent overwrites from concurrent devices; sign out/in or retry sync combines lessons and chooses the newer board. Board timestamps change only when the board changes. Lesson deletion timestamps prevent an older device copy from restoring removed lessons. Practice evidence uses the latest attempt record per saved position when device copies merge. Counters merge with the maximum value to avoid counting the same imported history twice; they are not additive across simultaneous device sessions.
 
-`firestore.rules` denies all other document paths. The eight rule cases in `tests/firestore-rules.json` were checked against the deployed rules through Firebase's Rules API. `tests/cloud.test.ts` checks migration, account isolation, offline import, and revision conflicts. After setup, sign in through Google and check for “Progress saved.” Then open the app on a second device with the same Google account to verify your lessons.
+Private imported games and profile settings use separate owner-only documents. Public profile snapshots allow direct reads, with no collection listing. All other document paths are denied. `tests/cloud.test.ts` checks progress migration, account isolation, offline import, and revision conflicts. `npm run test:rules` checks game and profile transactions against Firestore rules. After setup, sign in through Google and check for “Progress saved.” Then open the app on a second device with the same Google account to verify your lessons.
 
 ## Prototype limits
 
@@ -78,6 +80,9 @@ The API has a bounded request cache and warm-instance request limits. These are 
 ## Source map
 
 - `src/App.svelte`: game, coaching, report, and local progress state.
+- `src/Root.svelte`, `src/GameLibraryView.svelte`, `src/GameReplay.svelte`: private library, public profile, and isolated replay views.
+- `src/imported-games.ts`, `src/library-store.ts`, `src/library-cloud.ts`: PGN validation, account storage, and game sync.
+- `src/playing-style.ts`, `src/profile.ts`, `src/library-routes.ts`: move evidence, public projections, and validated library links.
 - `src/engine.ts`: worker lifecycle, UCI messages, and analysis queue.
 - `src/chess.ts`: move helpers.
 - `src/curriculum.ts`, `src/openings.ts`, `src/scenarios.ts`: typed, hardcoded lesson catalog.
