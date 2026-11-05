@@ -1,10 +1,10 @@
 # Nextmove session handoff
 
-Updated 2026-11-04. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+Updated 2026-11-05. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 
 ## Latest session: game imports and public favorites
 
-The user approved implementation of `imported-games-and-profile`. The feature is complete locally on `codex/imported-games-and-profile`, based on `7469989` on main. Implementation release is blocked by an expired Firebase login; production is unchanged.
+The user approved implementation of `imported-games-and-profile`. The feature is live. Source is on `codex/imported-games-and-profile`, based on `7469989` on main. The user restored Firebase CLI access on November 5; rules and app deployment then succeeded.
 
 - Paste a single annotated PGN, validate every main-line move with chess.js, choose White or Black, and save in a separate private game library. Comments and variations are not analysis. Limits: 128 KiB input, 1,000 half-moves, 100 active records, 40 KiB per record.
 - Replay saved games from either side, use move keys or controls, open the finish, and retain the selected move through reload/history. Live game and lesson evidence stay separate. Leaving play disposes its engine/opponent workers.
@@ -41,8 +41,11 @@ Read `PRODUCT.md`, `DESIGN.md`, the matching `.impeccable/surfaces/` brief, and 
 - Firebase project: `blunder-school-513120`. Deploy additive Firestore rules before the app.
 - Implementation commit `27a995f` is pushed to `origin/codex/imported-games-and-profile`. Planning commits `a292db6` and `02eb381` are also pushed. A handoff-only follow-up records this result. The working tree was clean before this handoff update.
 - Archived as `openspec/changes/archive/2026-11-04-imported-games-and-profile/`; the CLI merged all four deltas into baseline specs.
-- `firebase deploy --only firestore:rules --project blunder-school-513120 --non-interactive` failed with HTTP 401 while checking the Firestore API. No rules or app deployment succeeded. The user must run `firebase login --reauth`, then the rules deployment can be retried before releasing the app. Do not deploy this app before its rules.
-- No merge to main or Vercel production deploy was attempted. The previous verified live release remains `e45fffe`, deployment `blunder-school-flsgjkefu-mager1s-projects.vercel.app`.
+- On November 5, `firebase deploy --only firestore:rules --project blunder-school-513120 --non-interactive` compiled and released the rules successfully. The previous HTTP 401 blocker is resolved.
+- Then `vercel --prod --yes` deployed source commit `fb036db` (implementation `27a995f`) to https://blunder-school-6wcsu83sd-mager1s-projects.vercel.app and aliased https://blunder-school.vercel.app/. Remote build: zero Svelte errors/warnings; the known 527 KiB chunk advisory remains.
+- Production `main-sP8HZe5q.js` matches the tested local file byte-for-byte (SHA-256 comparison). A fresh, agent-owned guest browser passed PGN import, selected-side facts, Open finish at h4 mate, selected-move reload, previous move, and unavailable public profile. No page errors. Only local guest storage was written; no real account games or public profiles were created.
+- Live anonymous Firestore checks: missing public profile 404, private game 403, private progress 403, profile collection listing 403. Authenticated publication and removal were verified in the prior emulator suite, not repeated against a real production account.
+- No merge to main was made. The feature branch contains the shipped source and the release handoff. Push the handoff-only follow-up before ending; no other implementation work remains.
 
 ## Remaining limits
 
@@ -50,4 +53,4 @@ Live play is White-only; imported replay supports either side. Style notes use a
 
 ## Resume prompt
 
-“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Check Git status and OpenSpec. After `firebase login --reauth`, deploy Firestore rules, deploy the tested app with Vercel, verify production, and record the release. Preserve the private library, explicit profile publication, saved game, and board-first layout.”
+“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Check Git status and OpenSpec. The November 5 release is verified live; source is on `codex/imported-games-and-profile`. Continue from the saved release state. Preserve the private library, explicit profile publication, saved game, and board-first layout.”
