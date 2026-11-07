@@ -23,7 +23,13 @@ The user asked for visible opening names during games and an explicit learning-s
 
 ### Opening-name release state
 
-Implementation checks are complete. OpenSpec archived the change as `2026-11-07-show-game-opening` and updated the board-presentation baseline. All nine baseline specs pass strict validation; no active change remains. Commit/push and production verification are pending for this implementation commit and will be recorded in a release follow-up. No merge to main is planned. The prior release notes below are historical.
+Implementation checks are complete. OpenSpec archived the change as `2026-11-07-show-game-opening` and updated the board-presentation baseline. All nine baseline specs pass strict validation; no active change remains. Implementation commit `8ce1bee` is pushed to `origin/codex/game-opening-names`. No merge to main was made. The prior release notes below are historical.
+
+- `vercel --prod --yes` succeeded and aliased https://blunder-school.vercel.app/ to https://blunder-school-hrkf2yfxt-mager1s-projects.vercel.app. Remote build had zero Svelte errors/warnings and the known chunk-size advisory.
+- Live `main-BN2nQdH4.js` and `opening-index-D96MYYOh.js` match the tested local build byte-for-byte by SHA-256.
+- A fresh, agent-owned production guest context passed the supplied Ware Defense game at all three viewport sizes, reload, undo to Queen's Pawn Game, Italian lesson completion at compact sizes, and unknown custom-FEN promotion. No page errors. No real account data or public profiles were modified.
+- No implementation tasks or active OpenSpec change remain. This handoff-only follow-up is committed and pushed after the verified implementation; no app redeployment is needed for it. The main bundle advisory and old Impeccable design sidecar/config drift remain optional separate maintenance.
+
 
 ### Resume prompt
 
