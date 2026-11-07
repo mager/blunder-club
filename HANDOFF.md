@@ -14,7 +14,12 @@ Implemented on `codex/subtle-hint-options`, based on `811044a`.
 
 ### Release state
 
-Active change: `subtle-hint-options`. Checks are complete. Commit, push, deployment, live verification, and archive are pending at this checkpoint. No merge to main.
+Implementation commit `6e33eb6` is pushed to `origin/codex/subtle-hint-options`. `vercel --prod --yes` succeeded and aliased https://blunder-school.vercel.app/ to https://blunder-school-qnk6ysbs2-mager1s-projects.vercel.app. No merge to main.
+
+- Live `main-BN-MoCiq.js`, the shared style loader, and both page stylesheets match the tested local build byte-for-byte by SHA-256. Main bundle hash: `1eb6391410794af1c5216c1a631d4048a905ded94569ce55b4a1f3c3cb0c9196`.
+- All eight hint browser tests pass on production in fresh agent-owned guest sessions. This includes multiple free-play choices, keyboard preview without playing, selected-move reload, authored alternative completion, opt-out, recall, promotion, check, and warning restoration. No real account data changed.
+- OpenSpec archived the completed change as `2026-11-07-subtle-hint-options` and updated three baseline specs. All nine baselines pass strict validation. No active change or unfinished implementation task remains.
+- This documentation/archive follow-up is committed and pushed after the verified app release. It needs no app redeployment. Agent-owned local test services are stopped. The existing bundle advisory and design-sidecar drift remain optional maintenance.
 
 ### Resume prompt
 
