@@ -2,6 +2,7 @@
   import { ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from '@lucide/svelte';
   import type { Color } from 'chess.js';
   import Board from './Board.svelte';
+  import OpeningLabel from './OpeningLabel.svelte';
   import { forcedResult, replayGame, type GameDraft } from './imported-games';
   import { fitBoard } from './fit-board';
   let { game, side, title, ply, onPly, back }: { game: GameDraft; side: Color; title: string; ply?: number; onPly: (ply: number) => void; back: string } = $props();
@@ -26,6 +27,7 @@
   <main class="game-stage replay-stage" use:fitBoard>
     <section class="board-column" aria-label="Game replay">
       <div class="player-strip"><span>{flipped ? game.white : game.black}</span><span>{game.result}</span></div>
+      <div class="replay-opening"><OpeningLabel game={board}/></div>
       <div class="board-wrap"><Board game={board} selected={null} destinations={[]} {lastMove} hint={null} {flipped} disabled={true} onSquare={() => {}}/></div>
       <div class="player-strip"><span>{flipped ? game.black : game.white}</span><span>{index} / {full.length}</span></div>
       <div class="replay-controls" role="toolbar" tabindex="0" aria-label="Replay moves" onkeydown={moveKeys}>
@@ -48,7 +50,7 @@
 <style>
   .replay-stage { grid-template-columns: max(var(--board-size), 280px) 260px; }
   .board-column { width: max(var(--board-size), 280px); display: flex; flex-direction: column; align-items: center; }
-  .board-wrap, .player-strip { width: var(--board-size); }
+  .board-wrap, .player-strip, .replay-opening { width: var(--board-size); }
   .replay-guide h1 { font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; }
   .replay-position { font-size: 20px; color: var(--acid); margin: 12px 0 6px; }
   .replay-controls { display: flex; width: 100%; align-items: center; justify-content: center; gap: 4px; }

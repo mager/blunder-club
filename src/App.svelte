@@ -5,6 +5,7 @@
   import { routeHash, readRoute, type GameRoute, type Panel } from './routes';
   import { isLibraryHash } from './library-routes';
   import Board from './Board.svelte';
+  import OpeningLabel from './OpeningLabel.svelte';
   import LessonLibrary from './LessonLibrary.svelte';
   import {allLessons, studies, findStudy, freePlay} from './curriculum';
   import {acceptsStep, studyPosition, completeStudy, type StudyResults, type StudyRun} from './study';
@@ -60,6 +61,7 @@
   let lessonStage = $state<0|1|2>(1);
   let checkingMove = $state<string | null>(null);
   let boardGame = $derived(warning ? rehearsal(warning,lessonStage) : review ? rehearsal(review,lessonStage) : game);
+  let openingGame = $derived(warning || review ? makeGame(activeLesson.fen, [...(warning || review)!.before, ...boardGame.history()]) : game);
   let boardLastMove = $derived(warning || review ? boardGame.history({verbose:true}).at(-1) ?? null : lastMove);
   let promotion = $state<{ from: Square; to: Square } | null>(null);
   let error = $state('');
@@ -577,6 +579,7 @@
   <main class="game-stage" use:fitBoard inert={saveStatus === 'loading'}>
     <section class="board-column" aria-label="Your chess game">
       <div class="player-strip opponent"><span class="player-id"><span class="player-token dark"><Piece type="k" color="b"/></span><strong>{practice ? 'Your second chance' : study ? (study.kind==='opening' ? 'Opening' : 'Practice') : opponents.find(item=>item.id === opponentLevel)?.name}</strong></span><span class="board-session-tools">{#if practice}<span>{practice.index+1} / {practice.queue.length}</span>{:else}{#if study}<span>{Math.min(openingIndex+1,study.steps.length)} / {study.steps.length}</span>{/if}<button class="board-reset" onclick={() => panel='new'}>{study ? 'Start over' : 'New game'}</button>{/if}</span></div>
+      <OpeningLabel game={openingGame}/>
       <div class="board-wrap" class:rehearsing={!!warning || !!review}>
         <Board game={boardGame} {selected} {destinations} lastMove={boardLastMove} hint={(warning || review) && lessonStage === 0 ? `${(warning || review)!.move.from}${(warning || review)!.move.to}` : hint} {flipped} disabled={phase !== 'ready' || !!promotion || !!(study && openingDone)} {onSquare}/>
       </div>

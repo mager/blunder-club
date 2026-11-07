@@ -6,7 +6,7 @@
 web
 
 ## Product Purpose
-Nextmove teaches chess through play. A coach stays beside the board, offers options, explains mistakes, and lets the player retry.
+Nextmove is a learning site that teaches chess through play. A coach stays beside the board, offers options, explains mistakes, and lets the player retry.
 
 ## Users
 People who want to learn chess by playing. V1 is designed for a beginner around rating 350 who repeats mistakes and wants to understand openings and strategy.
@@ -46,3 +46,7 @@ My games opens from the game menu; Profile and Paste a game also open from the a
 Private style notes count the chosen side's first moves, checks, captures, and castling, with source-game links and sample sizes. After at least three eligible games, stated pattern rules can suggest an existing castling, Italian, or Queen's Gambit lesson. Notes do not measure strength or claim a fixed style. Imports grant no lesson credit.
 
 Guests keep up to 100 games on their device. Google accounts sync private game records separately from progress, with revision conflicts, deletion records, and retryable transfers. Public sharing requires a chosen public name and an explicit preview/publish action. A profile can feature up to eight selected favorites. Visitors can replay those games without signing in. Public copies contain only the chosen name, titles, player names, sides, results, starting positions, and moves. Style notes and Google identity stay private. Unpublish removes the public page; removing a featured game removes its public copy when cloud sync succeeds.
+
+## Opening names during play
+
+Live games, lessons, and saved or public replay show the latest recognized opening family above the board. Names come from a bundled opening reference and follow the displayed move history, including undo, rehearsal, and reload. The label retains the last known name as play continues. A standard starting board says Play the first move; an unrecognized position says Not identified. This context gives no lesson credit and does not infer missing history from a custom board.

@@ -2,7 +2,7 @@
 
 ## Start here
 
-This repository is Nextmove, the chess learning game. Its folder and GitHub name are still `blunder-club`. Do not work in the unrelated `magerblog` repository.
+This repository is Nextmove, a chess learning site. Every game page must help the player learn through play, including a visible opening name when it can be identified. Its folder and GitHub name are still `blunder-club`. Do not work in the unrelated `magerblog` repository.
 
 1. Read `HANDOFF.md` for the last verified state and remaining work.
 2. Read `PRODUCT.md`, `DESIGN.md`, and the relevant `openspec/specs/*/spec.md`.
@@ -13,7 +13,7 @@ Use simple, direct English. End user-facing final responses with a brief **Next 
 
 ## Product boundaries
 
-- Nextmove teaches through play, a concrete consequence, and another attempt.
+- Nextmove is a learning site. Teach through play, a concrete consequence, and another attempt. Keep useful learning context, such as the opening name, visible during games. Never invent a name or claim when the evidence is missing.
 - Keep the board central. Board, guide, and main controls fit one viewport. Secondary dialogs may scroll.
 - Keep on-board text short. Hints and their Play action must be easy to find.
 - Do not restore Ask Rook or add a chat panel, dashboard, streak pressure, fake Elo, or mastery claims.

@@ -187,6 +187,9 @@ The header contains the wordmark, session selector, Journey control, and account
 
 The opponent strip keeps New game visible above a free-play board and Start over above an authored lesson. This underlined text action uses a 44px minimum height and the existing paper, jade-hover, and jade-focus colors. Personal practice shows its position count in this space. The action opens a confirmation dialog before the board changes. Start over repeats the current lesson; New game starts a full board. Keep playing, the close control, and Escape leave the board in place. The dialog states that learning progress and saved positions stay.
 
+### Opening name
+A quiet text row sits between the opponent strip and board in live play and game replay. The muted Opening label precedes a paper-colored opening family name in DM Sans, 13px on desktop and 12px on phones or short landscape. Full names wrap; no tooltip, badge, new panel, or ellipsis is required. The existing board sizing includes this row. A polite live region announces name changes. Starting, unknown, loading, and unavailable states use the same row.
+
 ### Chessboard
 The board is a square eight-column grid. Original Staunton-style SVG pieces occupy 81% of each square. White and navy fills, separate outlines, and internal detail strokes keep all six piece types distinct. A small blue-gray shadow separates the pieces from the squares. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark blue SVG arrow points from the hinted piece to its destination.
 

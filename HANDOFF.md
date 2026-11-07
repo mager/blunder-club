@@ -1,8 +1,35 @@
 # Nextmove session handoff
 
-Updated 2026-11-05. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+Updated 2026-11-07. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 
-## Latest session: game imports and public favorites
+## Latest session: opening names during play (November 7)
+
+The user asked for visible opening names during games and an explicit learning-site purpose in AGENTS.md. Implemented on `codex/game-opening-names`, based on shipped commit `858f0bc` from `codex/imported-games-and-profile`.
+
+- A compact Opening row sits above the board in live play, lessons, and private/public game replay. It uses the existing palette and wraps full family names.
+- The bundled Lichess CC0 reference covers 3,865 legal positions and 149 opening families. Recognition uses board state, turn, castling, and legal en passant rights. It supports transpositions and keeps the latest known name after later moves leave theory. The supplied d4/a5/e4/Nc6 position is Ware Defense.
+- Undo, reload, replay selection, and rehearsal use only displayed history. Custom FENs do not invent earlier moves. Initial, unknown, loading, and failed-load states are explicit. Imported metadata is not trusted.
+- The data is a separate lazy chunk (259.48 kB, 35.29 kB gzip). No external opening service, save migration, new curriculum, or account change. Source, license, rebuild instructions, and limits are in `docs/opening-names.md`.
+- AGENTS.md now explicitly calls Nextmove a chess learning site and requires useful learning context during games. PRODUCT.md and DESIGN.md describe the new row.
+
+### Opening-name verification
+
+- `npm test`: 153 passed, four unrelated Firestore emulator tests skipped.
+- `npm run build`: zero Svelte errors or warnings. The existing main-chunk advisory remains (528.21 kB, 170.53 kB gzip).
+- Strict specs passed all nine baselines plus the active change before archive.
+- All seven browser checks passed on fresh guest contexts at `127.0.0.1:5176`: game naming, undo, reload, hints, reset, keyboard lesson play, ignored PGN opening metadata, replay navigation/reload, failed data load, longest-family wrapping, arbitrary FENs, and rehearsal stages. Existing guest import/game preservation and lesson-assistance/custom-promotion replay checks also pass.
+- Desktop 1440×900, phone 320×568, and landscape 844×390 fit checks and screenshots pass. A separate code reviewer found no actionable defect and confirmed screenshot readability. Screenshots are in ignored `.impeccable/review/opening-*.png`.
+- Impeccable detector reported only type-size advisories against its old sidecar. All sizes are documented in DESIGN.md; no new style defect. The existing sidecar/config drift was not expanded into this task.
+
+### Opening-name release state
+
+Implementation checks are complete. OpenSpec archived the change as `2026-11-07-show-game-opening` and updated the board-presentation baseline. All nine baseline specs pass strict validation; no active change remains. Commit/push and production verification are pending for this implementation commit and will be recorded in a release follow-up. No merge to main is planned. The prior release notes below are historical.
+
+### Resume prompt
+
+“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Continue from `codex/game-opening-names`. Preserve the visible opening label, learning-site purpose, saved games, and one-screen board layout. Check the release state before making changes.”
+
+## Previous session: game imports and public favorites
 
 The user approved implementation of `imported-games-and-profile`. The feature is live. Source is on `codex/imported-games-and-profile`, based on `7469989` on main. The user restored Firebase CLI access on November 5; rules and app deployment then succeeded.
 
