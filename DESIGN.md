@@ -191,7 +191,7 @@ The opponent strip keeps New game visible above a free-play board and Start over
 A quiet text row sits between the opponent strip and board in live play and game replay. The muted Opening label precedes a paper-colored opening family name in DM Sans, 13px on desktop and 12px on phones or short landscape. Full names wrap; no tooltip, badge, new panel, or ellipsis is required. The existing board sizing includes this row. A polite live region announces name changes. Starting, unknown, loading, and unavailable states use the same row.
 
 ### Chessboard
-The board is a square eight-column grid. Original Staunton-style SVG pieces occupy 81% of each square. White and navy fills, separate outlines, and internal detail strokes keep all six piece types distinct. A small blue-gray shadow separates the pieces from the squares. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark blue SVG arrow points from the hinted piece to its destination.
+The board is a square eight-column grid. Original Staunton-style SVG pieces occupy 81% of each square. White and navy fills, separate outlines, and internal detail strokes keep all six piece types distinct. The king is the tallest silhouette: its wide cross, full body, and broad base separate it from the lower, pointed queen crown and narrow bishop. Pawns are shorter, rooks have square battlements, and knights have a clear muzzle. All views share these original paths. A small blue-gray shadow separates the pieces from the squares. Rank and file labels sit inside the outer squares. Selection has a filled square and inset outline; legal destinations use dots; captures use rings. Last move, hint, and check have separate fills. A dark blue SVG arrow points from the hinted piece to its destination.
 
 Each square has an accessible piece-and-square label. Arrow keys move focus; Enter selects a piece or destination; Escape clears selection. The focused square uses a deep navy inset outline. Retain disabled and pressed semantics while play pauses.
 
@@ -252,3 +252,7 @@ Explore lessons is the primary action for each selected place. Revisit my positi
 - **Don't** add a welcome hero, slogans, or a permanent lesson dashboard to play.
 - **Don't** use condensed type for headings or teaching prose.
 - **Don't** rely on color alone to explain legal moves, check, or selection.
+
+### Automatic hint setting
+
+Coach settings places Move hints before the coaching mode. A full-width button uses switch semantics, the label Automatic hints, and visible On/Off text. The existing menu-row, setting-note, and fieldset styles apply. Default-on hints reuse the board arrow, short cue, and Play action; no extra play panel is added. Hide hint and square selection hide the current suggestion. Recall and after-game coaching suppress automatic hints. Assistance is saved when the answer is shown.

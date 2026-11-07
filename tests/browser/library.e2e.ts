@@ -140,7 +140,7 @@ test('replay and profile controls fit desktop, narrow phone and short landscape'
 
 test('lesson assistance survives a library detour; imported custom promotion replays', async ({ page }) => {
   await page.goto('/#/learn/italian');
-  await page.getByRole('button', { name: 'Show hint', exact: true }).click();
+  await expect(page.locator('.hint-arrow')).toHaveCount(1);
   await expect.poll(async () => JSON.parse(await page.evaluate(() => localStorage.getItem('blunder-club-v1')) || '{}').studyRun?.helped).toBe(true);
   await page.getByRole('button', { name: 'Sign in and save progress', exact: true }).click();
   await page.getByRole('button', { name: 'Paste a game', exact: true }).click();

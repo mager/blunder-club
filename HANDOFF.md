@@ -2,7 +2,25 @@
 
 Updated 2026-11-07. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 
-## Latest session: opening names during play (November 7)
+## Latest session: clear pieces and automatic hints (November 7)
+
+Implemented on `codex/clear-pieces-auto-hints`, based on `3a24cb8`. The user selected classic pieces with a clear king.
+
+- Original SVG pieces have clearer classic silhouettes. The king has a larger cross, broader body/base, and greater height. All board, replay, miniature, and promotion views share the designs. Existing colors and viewport layout remain.
+- Automatic hints default on, with a saved On/Off switch in Coach settings. Hint arrows and Play reuse existing controls. Hide hint or selecting a piece hides the current suggestion; a prepared new turn shows a new one. After-game free play and Try without hints suppress automatic hints. Manual hints remain available.
+- Shown hints persist assistance evidence. Starting a repeat without hints sets recall before preparing the first position. Leaving recall clears it; restored warnings clear the prior hint.
+- Test-origin guest sessions and demo Firebase emulators protect real account/game data. Unit tests: 154 pass, four unrelated rules tests skipped. Build: zero Svelte errors/warnings; existing 529 kB main-bundle advisory remains. Strict specs: all nine baselines plus the active change pass. All 15 browser checks pass, including desktop 1440x900, phone 320x568, and landscape 844x390; keyboard, hint toggle/reload, assisted/independent completion, promotion, check, warning restoration, library, profile, and account flows.
+- Impeccable detector returned no findings. Rendered screenshots reviewed at all three sizes; no clipping. A separate code reviewer found two transition issues; both have regression tests and are fixed. Review found no remaining actionable issue. Evidence: ignored `.impeccable/review/pieces-hints-*.png` and `hint-settings-*.png`.
+
+### Release state
+
+Implementation checks complete. Active OpenSpec change: `clear-pieces-auto-hints`. Commit, push, deployment, live verification, and archive are pending at this checkpoint. No merge to main.
+
+### Resume prompt
+
+“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Continue `codex/clear-pieces-auto-hints`. Check release status before work. Preserve the classic pieces, automatic hint preference, honest assistance evidence, opening labels, and one-screen board.”
+
+## Previous session: opening names during play (November 7)
 
 The user asked for visible opening names during games and an explicit learning-site purpose in AGENTS.md. Implemented on `codex/game-opening-names`, based on shipped commit `858f0bc` from `codex/imported-games-and-profile`.
 

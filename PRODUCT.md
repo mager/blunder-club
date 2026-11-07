@@ -28,7 +28,7 @@ Make a mistake safe to explore. Keep the board primary. Explain concrete consequ
 The header opens a connected six-place journey. Saved practice evidence distinguishes exploration, assisted solutions, and positions solved without help. All places are available; no mastery claim or invented progression. Each selected place and meaningful board view has a bookmarkable hash URL. Ask Rook is removed; direct hints, threat checks, and optional move explanations remain.
 
 ## Board appearance
-The board uses blue and cool white squares with original white and navy SVG pieces. The user requested a familiar chess.com-like chess surface; the surrounding graphite shell and jade controls remain.
+The board uses blue and cool white squares with original white and navy SVG pieces. Classic silhouettes distinguish each piece, with a taller, broader king and a large cross. The user requested a familiar chess.com-like chess surface; the surrounding graphite shell and jade controls remain.
 
 ## Authored lesson extension
 A compact lesson picker opens from Practice or a journey place. It filters by chess skill and separates openings from challenges. The board keeps one short task at a time. Scripted replies support multi-move tactics and openings. Completion offers a next lesson, a repeat without hints, or continued play from a nonterminal board. Saved results distinguish assisted and independent completion; they do not imply mastery. All lessons have stable URLs.
@@ -50,3 +50,7 @@ Guests keep up to 100 games on their device. Google accounts sync private game r
 ## Opening names during play
 
 Live games, lessons, and saved or public replay show the latest recognized opening family above the board. Names come from a bundled opening reference and follow the displayed move history, including undo, rehearsal, and reload. The label retains the last known name as play continues. A standard starting board says Play the first move; an unrecognized position says Not identified. This context gives no lesson credit and does not infer missing history from a custom board.
+
+## Automatic hints
+
+Move hints start on. A ready player turn shows a suggested move with its arrow and Play action. Coach settings has a saved Automatic hints switch. Hide hint or selecting a piece hides it for that turn; the next prepared position can show a new hint. Manual hints remain available. Automatic hints stay off during an attempt started with Try without hints and during free play with After the game coaching. Displayed automatic hints count as help, and lesson assistance survives reload. Hints never play a move automatically.

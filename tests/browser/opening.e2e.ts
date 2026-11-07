@@ -1,6 +1,13 @@
 import { mkdirSync, readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
+// These checks exercise manual hint requests; automatic hints have their own suite.
+test.beforeEach(async ({page}) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('blunder-club-v1')) localStorage.setItem('blunder-club-v1', JSON.stringify({autoHints:false}));
+  });
+});
+
 const route = (moves: string) => '/#/play?moves=' + encodeURIComponent(moves);
 const label = (page: Page) => page.locator('.opening-label');
 async function fits(page: Page) {

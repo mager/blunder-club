@@ -6,8 +6,8 @@ import { normalizePractice, type PracticeRecord } from './practice';
 import type { OpponentLevel } from './opponent';
 export type CoachMode = 'warn' | 'live' | 'after';
 export type SavedLesson = { id: string; move: string; best: string; text: string; fen: string; date: string; skill?: string; pattern?: string; count?: number; practice?: PracticeRecord };
-export type Progress = { lessonId: string; customFen?: string; moves: string[]; saved: SavedLesson[]; retries: number; played: number; sound: boolean; coachMode: CoachMode; opponentLevel: OpponentLevel; practiced: string[]; updatedAt: number; removedLessons: Record<string, number>; studyResults?:StudyResults; studyRun?:StudyRun };
-export const emptyProgress = (): Progress => ({lessonId:'free',moves:[],saved:[],retries:0,played:0,sound:false,coachMode:'warn',opponentLevel:'casual',practiced:[],updatedAt:0,removedLessons:{},studyResults:{}});
+export type Progress = { lessonId: string; customFen?: string; moves: string[]; saved: SavedLesson[]; retries: number; played: number; sound: boolean; autoHints?: boolean; coachMode: CoachMode; opponentLevel: OpponentLevel; practiced: string[]; updatedAt: number; removedLessons: Record<string, number>; studyResults?:StudyResults; studyRun?:StudyRun };
+export const emptyProgress = (): Progress => ({lessonId:'free',moves:[],saved:[],retries:0,played:0,sound:false,autoHints:true,coachMode:'warn',opponentLevel:'casual',practiced:[],updatedAt:0,removedLessons:{},studyResults:{}});
 export function normalizeProgress(value: unknown): Progress {
   const data = value && typeof value === 'object' ? value as Partial<Progress> : {};
   const clean = emptyProgress();
@@ -31,6 +31,7 @@ export function normalizeProgress(value: unknown): Progress {
   clean.practiced = Array.isArray(data.practiced) ? [...new Set(data.practiced.filter(id => skills.some(skill => skill.id === id)))] : [];
   clean.retries = Number.isSafeInteger(data.retries) && data.retries! >= 0 ? data.retries! : 0;
   clean.played = Number.isSafeInteger(data.played) && data.played! >= 0 ? data.played! : 0;
+  clean.autoHints = data.autoHints !== false;
   clean.sound = data.sound === true; clean.coachMode = data.coachMode === 'after' || data.coachMode === 'live' ? data.coachMode : 'warn';
   clean.opponentLevel = data.opponentLevel === 'club' || data.opponentLevel === 'challenge' ? data.opponentLevel : 'casual';
   clean.updatedAt = typeof data.updatedAt === 'number' && Number.isFinite(data.updatedAt) ? data.updatedAt : 0;

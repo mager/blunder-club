@@ -88,3 +88,10 @@ describe('authored study saves',()=>{
   expect(normalizeProgress({...emptyProgress(),lessonId:'mate',moves:studyRun.moves,studyRun}).studyRun?.recorded).toBe(true);
  });
 });
+
+it('defaults automatic hints on for old saves and retains explicit opt-out',()=>{
+  expect(normalizeProgress({moves:['e4','e5'],lessonId:'free'})).toMatchObject({autoHints:true,moves:['e4','e5']});
+  expect(normalizeProgress({autoHints:false})).toMatchObject({autoHints:false});
+  expect(normalizeProgress({autoHints:'false'})).toMatchObject({autoHints:true});
+  expect(normalizeProgress(emptyProgress())).toMatchObject({autoHints:true});
+});
