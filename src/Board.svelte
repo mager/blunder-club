@@ -83,5 +83,5 @@
       </button>
     {/each}
   </div>
-  {#if arrow}<svg class="board-arrows" viewBox="0 0 80 80" aria-hidden="true"><defs><marker id="hint-arrowhead" markerWidth="5" markerHeight="5" refX="3.7" refY="2.5" orient="auto"><path d="M0 0 L4.5 2.5 L0 5 Z" fill="var(--board-arrow)"/></marker></defs><line class="hint-arrow" x1={arrow.from.x} y1={arrow.from.y} x2={arrow.to.x} y2={arrow.to.y} marker-end="url(#hint-arrowhead)"/></svg>{/if}
+  {#if arrow}<svg class="board-arrows" viewBox="0 0 80 80" aria-hidden="true"><defs><marker id="hint-arrowhead" markerUnits="userSpaceOnUse" markerWidth="2.5" markerHeight="2.5" refX="2.1" refY="1.25" orient="auto"><path d="M0 0 L2.5 1.25 L0 2.5 Z" fill="var(--board-arrow)"/></marker></defs><line class="hint-arrow" x1={arrow.from.x} y1={arrow.from.y} x2={arrow.to.x} y2={arrow.to.y} marker-end="url(#hint-arrowhead)"/></svg>{/if}
 </div>

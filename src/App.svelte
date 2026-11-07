@@ -11,6 +11,7 @@
   import {acceptsStep, studyPosition, completeStudy, type StudyResults, type StudyRun} from './study';
   import { practiceQueue, acceptsPracticeMove, recordPractice, preserveGameDuringPractice } from './practice';
   import { fitBoard } from './fit-board';
+  import { hintMoves } from './hints';
   import SkillMap from './SkillMap.svelte';
   import { italian, classifyMistake, skills } from './learning';
   import Piece from './Piece.svelte';
@@ -94,21 +95,22 @@
   const assessed = new Set<number>();
   let openingIndex = $derived(study ? studyPosition(study,openingReview?.before || moves).index : 0);
   let step = $derived(study && !openingDone ? study.steps[openingIndex] : undefined);
+  let suggestedMoves = $derived(hintMoves(game.fen(), lines, step));
   let keyMoments = $derived([...moments].filter(m => m.loss >= 120).sort((a, b) => b.loss - a.loss).slice(0, 3));
   let storageReady = false;
   let audio: AudioContext | null = null;
   let status = $derived(study && openingDone ? 'Lesson complete' : phase === 'practice' ? (practiceComplete ? 'Practice complete' : practiceResult?.accepted ? 'Move found' : 'Try this again') : phase === 'report' ? 'Reviewing your game…' : phase === 'loading' ? 'Loading…' : phase === 'warning' ? 'Move not played' : phase === 'thinking' ? (checkingMove ? 'Checking your move…' : 'Thinking…') : phase === 'review' ? 'Your second chance' : phase === 'over' ? (game.isGameOver() ? 'Game complete' : 'Game paused') : phase === 'error' ? 'Coach is offline' : game.isCheck() ? 'You’re in check' : 'Your move');
 
-  let cueTitle = $derived(practice && phase === 'thinking' && !checkingMove ? 'Getting your position.' : practice && phase === 'ready' && !showIdeas ? 'Find a better move.' : step ? (hint ? 'Try this move.' : recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? (checkingMove ? 'One moment.' : 'Their move.') : showIdeas ? 'Try this idea.' : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
-  let cueText = $derived(practice && phase === 'thinking' && !checkingMove ? 'Look for checks, captures, and threats.' : practice && phase === 'ready' && !showIdeas ? 'Same position. A fresh decision. Check their threats.' : step ? (hint ? step.hint : recall ? 'Find the next move without a hint.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? (checkingMove ? `Checking ${checkingMove} before Black replies.` : 'Watch what Black changes.') : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
+  let cueTitle = $derived(practice && phase === 'thinking' && !checkingMove ? 'Getting your position.' : practice && phase === 'ready' && !showIdeas ? 'Find a better move.' : step ? (hint ? (suggestedMoves.length > 1 ? 'Moves to consider.' : 'A move to consider.') : recall ? 'What comes next?' : step.title) : phase === 'loading' ? 'Getting ready.' : phase === 'thinking' ? (checkingMove ? 'One moment.' : 'Their move.') : showIdeas ? (suggestedMoves.length > 1 ? 'Moves to consider.' : 'A move to consider.') : game.isCheck() ? 'Your king needs you.' : selected ? 'Where will it go?' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Your move.' : activeLesson.focus) : coachMode === 'after' ? 'Over to you.' : 'What changed?');
+  let cueText = $derived(practice && phase === 'thinking' && !checkingMove ? 'Look for checks, captures, and threats.' : practice && phase === 'ready' && !showIdeas ? 'Same position. A fresh decision. Check their threats.' : step ? (hint ? (hint === step.move ? step.hint : step.question) : recall ? 'Find the next move without a hint.' : step.question) : phase === 'loading' ? 'Your board is on its way.' : phase === 'thinking' ? (checkingMove ? `Checking ${checkingMove} before Black replies.` : 'Watch what Black changes.') : showIdeas ? 'Follow the arrow. Or explore another move.' : game.isCheck() ? 'Capture, block, or move your king.' : selected ? 'The dots show legal moves. Choose a square.' : moves.length === 0 ? (activeLesson.id === 'free' ? 'Take the center. Try a pawn or a knight.' : activeLesson.tip.split('. ')[0] + '.') : coachMode === 'after' ? 'We’ll find the turning points after the game.' : 'Check what their last move attacks.');
   function toggleHint() {
     if (showIdeas || hint) { showIdeas = false; hint = null; option = null; return; }
-    if (step) openingHint(); else preview(0);
+    if (suggestedMoves[0]) previewHint(suggestedMoves[0]);
   }
   function showAutomaticHint() {
     if (!autoHints || (study && recall) || phase !== 'ready' || openingDone || promotion || game.turn() !== 'w' || game.isGameOver()) return;
     if (!study && !practice && coachMode === 'after') return;
-    if (step) openingHint(); else preview(0);
+    if (suggestedMoves[0]) previewHint(suggestedMoves[0]);
   }
   function setAutomaticHints(enabled: boolean) {
     autoHints = enabled;
@@ -183,7 +185,7 @@
       }
       if (navigation !== navigationId) return;
       if (route.hint && phase === 'ready') {
-        if (step) openingHint();
+        if (step) openingHint(route.hintMove);
         else {
           let index=route.hintMove ? lines.findIndex(line=>line.move === route.hintMove) : 0;
           if (index < 0 && route.hintMove) {
@@ -404,7 +406,26 @@
     hint = null; option = null; showIdeas = false;
   }
   function preview(index: number) { if (phase !== 'ready' || !lines[index]) return; if (practice) practice.helped = true; if(studyRun) studyRun.helped=true; showIdeas = true; option = index; hint = lines[index].move; selected = null; persist(); }
-  function playOption() { if (option === null) return; const uci = lines[option].move; void play(uci.slice(0, 2) as Square, uci.slice(2, 4) as Square, uci[4] as PieceSymbol | undefined); }
+  function previewHint(move: string) {
+    if (step) openingHint(move);
+    else { const index = lines.findIndex(line => line.move === move); if (index >= 0) preview(index); }
+  }
+  function playHintMove() {
+    if (phase !== 'ready' || !hint) return;
+    void play(hint.slice(0,2) as Square,hint.slice(2,4) as Square,hint[4] as PieceSymbol | undefined);
+  }
+  function explainHint() {
+    if (!hint) return;
+    if (step) {
+      if (hint === step.move) explain(`${step.hint} ${step.why}`);
+      else {
+        const move = moveFromLine(game.fen(),{move:hint,pv:[hint],score:0,depth:0});
+        explain(`${move.san} moves your ${pieceNames[move.piece]} from ${move.from} to ${move.to}. This move also meets the lesson goal.`);
+      }
+    } else if (option !== null && lines[option]) {
+      explain(`${describeMove(game.fen(),hint).detail} One possible line: ${lineToSan(game.fen(),lines[option].pv).join(' → ')}.`);
+    }
+  }
   async function retry() {
     if (practice) { review=null; practiceResult=null; moves=[]; retries++; persist(); await prepare(); return; }
     if (openingReview) { moves = openingReview.before; openingReview = null; retries++; persist(); await prepare(); return; }
@@ -567,10 +588,11 @@
     panel=null; restoreProgress(data);
   }
   function startById(id: string) { start(allLessons.find(lesson => lesson.id === id) || lessons[0]); }
-  function openingHint() {
-    if (!step) return;
+  function openingHint(move?: string) {
+    if (!step || phase !== 'ready') return;
+    const choice = move && acceptsStep(step,game.fen(),move) ? move : step.move;
     if(studyRun) studyRun.helped=true;
-    hint = step.move; selected = null;persist();
+    hint = choice; selected = null;persist();
   }
   function exitOpening() {
     openingReview = null; recall=false; const fen=activeLesson.fen;activeLesson=fen===freePlay.fen ? freePlay : {...freePlay,id:'saved',fen};studyRun=null;openingDone=false;persist();void prepare();
@@ -657,10 +679,10 @@
           <h1>{cueTitle}</h1>{#if !showIdeas}<p>{cueText}</p>{/if}
           {#if step}
             <div class="opening-progress" aria-label={`Lesson step ${Math.min(openingIndex+1,study?.steps.length || 1)} of ${study?.steps.length}`}>{#each study?.steps || [] as item, i}<span class:done={i < openingIndex} class:current={i === openingIndex} title={item.short}></span>{/each}</div>
-            {#if hint}<div class="hint-actions"><button class="primary-button" onclick={() => {if(step) void play(step.move.slice(0,2) as Square,step.move.slice(2,4) as Square,step.move[4] as PieceSymbol | undefined);}}>Play {lineToSan(game.fen(),[step.move],1)[0]} <ArrowRight size={16}/></button><button class="text-button" onclick={() => {if(step) explain(`${step.hint} ${step.why}`);}}>Why?</button></div>{/if}
-          {:else if showIdeas && phase === 'ready'}
-            <div class="idea-choices" aria-label="Moves to explore">{#each lines as line, i}<button class:chosen={option === i} aria-pressed={option === i} onclick={() => preview(i)}>{moveFromLine(game.fen(),line).san}</button>{/each}</div>
-            {#if option !== null && lines[option]}<div class="hint-actions"><button class="primary-button" onclick={playOption}>Play {moveFromLine(game.fen(),lines[option]).san} <ArrowRight size={16}/></button><button class="text-button" onclick={() => {if(option !== null) explain(`${describeMove(game.fen(),lines[option].move).detail} One possible line: ${lineToSan(game.fen(),lines[option].pv).join(' → ')}.`);}}>Why? <ArrowUpRight size={14}/></button></div>{/if}
+          {/if}
+          {#if phase === 'ready' && hint}
+            {#if suggestedMoves.length > 1}<div class="idea-choices" role="group" aria-label="Moves to consider">{#each suggestedMoves as move}<button class:chosen={hint === move} aria-pressed={hint === move} aria-label={`Preview ${lineToSan(game.fen(),[move],1)[0]}`} onclick={() => previewHint(move)}>{lineToSan(game.fen(),[move],1)[0]}</button>{/each}</div>{/if}
+            <div class="hint-actions"><button class="secondary-button" onclick={playHintMove}>Play {lineToSan(game.fen(),[hint],1)[0]} <ArrowRight size={16}/></button><button class="text-button" onclick={explainHint}>Why? <ArrowUpRight size={14}/></button></div>
           {/if}
           {#if phase === 'ready' && !showIdeas && !hint}<div class="coach-actions"><button class="primary-button" onclick={toggleHint}>Show hint <Lightbulb size={17}/></button><button class="text-button" onclick={showThreats}>What’s the threat? <ArrowUpRight size={15}/></button></div>{/if}
         {/if}

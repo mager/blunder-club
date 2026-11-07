@@ -54,3 +54,7 @@ Live games, lessons, and saved or public replay show the latest recognized openi
 ## Automatic hints
 
 Move hints start on. A ready player turn shows a suggested move with its arrow and Play action. Coach settings has a saved Automatic hints switch. Hide hint or selecting a piece hides it for that turn; the next prepared position can show a new hint. Manual hints remain available. Automatic hints stay off during an attempt started with Try without hints and during free play with After the game coaching. Displayed automatic hints count as help, and lesson assistance survives reload. Hints never play a move automatically.
+
+## Move options
+
+Hints use a thin arrow and light endpoint marks. The guide offers up to three legal moves close to its best available analysis, with known forced mates preserved. It shows fewer choices when the alternatives are weak. Selecting a move updates the preview and Play action without making a move. Lessons offer only authored accepted alternatives or legal checkmates when mate is the goal. The selected move and assistance evidence survive reload.

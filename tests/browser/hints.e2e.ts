@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 const arrow = (page: Page) => page.locator('.hint-arrow');
-const playHint = (page: Page) => page.locator('.hint-actions .primary-button');
+const playHint = (page: Page) => page.locator('.hint-actions .secondary-button');
 const progress = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('blunder-club-v1') || '{}'));
 async function settings(page: Page) { await page.getByRole('button', {name:'Coach settings'}).click(); }
 async function close(page: Page) { await page.getByRole('dialog').getByRole('button', {name:'Back to board'}).click(); }
@@ -107,4 +107,46 @@ test('restored warning does not show a hint from the earlier position', async ({
   await page.goto('/#/play?moves=e4,e5,Qh5,Nc6&candidate=Qxe5%2B&stage=1');
   await expect(page.getByText('Move not played',{exact:true})).toBeVisible();
   await expect(arrow(page)).toHaveCount(0);
+});
+
+test('several good game options preview without playing and retain the chosen move on reload', async ({page}) => {
+  await page.goto('/#/play');
+  const choices=page.getByRole('group',{name:'Moves to consider'}).getByRole('button');
+  await expect.poll(()=>choices.count()).toBeGreaterThan(1);
+  expect(await choices.count()).toBeLessThanOrEqual(3);
+  const second=choices.nth(1);const san=await second.textContent();
+  await second.focus();await page.keyboard.press('Enter');
+  await expect(second).toHaveAttribute('aria-pressed','true');
+  await expect(playHint(page)).toHaveText(`Play ${san}`);
+  expect((await progress(page)).moves).toEqual([]);
+  const selected=new URLSearchParams(page.url().split('?')[1]).get('hintMove');
+  await page.reload();await expect(playHint(page)).toHaveText(`Play ${san}`);
+  expect(new URLSearchParams(page.url().split('?')[1]).get('hintMove')).toBe(selected);
+  for(const [name,width,height] of [['desktop',1440,900],['phone',320,568],['landscape',844,390]] as const) {
+    await page.setViewportSize({width,height});await fits(page);
+    await page.screenshot({path:`.impeccable/review/subtle-options-${name}.png`});
+    for(const choice of await choices.all()) expect((await choice.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  }
+  await playHint(page).click();
+  await expect.poll(async ()=>(await progress(page)).moves[0]).toBe(san);
+});
+
+test('lesson alternatives use their own arrow, explanation, Play and assisted result', async ({page}) => {
+  await page.goto('/#/practice/save-rook');
+  const choices=page.getByRole('group',{name:'Moves to consider'}).getByRole('button');
+  await expect(choices).toHaveCount(3);
+  await page.getByRole('button',{name:'Preview Ra2',exact:true}).click();
+  await expect(playHint(page)).toHaveText('Play Ra2');
+  await expect(page.locator('#square-a1')).toHaveClass(/hinted/);
+  await expect(page.locator('#square-a2')).toHaveClass(/hinted/);
+  expect((await progress(page)).moves).toEqual([]);
+  await page.reload();await expect(playHint(page)).toHaveText('Play Ra2');
+  await page.getByRole('button',{name:'Why?',exact:true}).click();
+  await expect(page.getByRole('dialog')).toContainText('Ra2 moves your rook from a1 to a2.');await close(page);
+  for(const [width,height] of [[320,568],[844,390],[1440,900]]) {await page.setViewportSize({width,height});await fits(page);}
+  await playHint(page).click();await expect(page.getByRole('heading',{name:'Now you see it.'})).toBeVisible();
+  expect((await progress(page)).moves).toEqual(['Ra2']);
+  expect((await progress(page)).studyResults['save-rook'].independent).toBe(0);
+  await page.goto('/#/learn/italian');await expect(playHint(page)).toHaveText('Play e4');
+  await expect(page.getByRole('group',{name:'Moves to consider'})).toHaveCount(0);
 });

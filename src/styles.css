@@ -197,7 +197,7 @@ button:hover:not(:disabled) {
   box-shadow: inset 0 0 0 3px var(--board-ink);
 }
 .square.hinted:before {
-  background: #f5d783a6;
+  background: #f5d78333;
 }
 .square.check:before {
   background: #df8f8b;
@@ -277,11 +277,9 @@ button:hover:not(:disabled) {
 }
 .hint-arrow {
   stroke: var(--board-arrow);
-  stroke-width: 1.25;
+  stroke-width: 0.55;
   stroke-linecap: round;
-  opacity: 0.86;
-  stroke-dasharray: 100;
-  animation: draw-hint 0.32s ease-out;
+  opacity: 1;
 }
 .player-strip {
   display: flex;
@@ -533,18 +531,17 @@ summary {
 .idea-choices {
   display: flex;
   gap: 8px;
-  margin: 20px 0 12px;
+  margin: 12px 0 8px;
 }
 .idea-choices button {
   flex: 1;
-  min-height: 48px;
+  min-height: 44px;
   border: 1px solid var(--line);
-  font-family: var(--display);
-  font-size: 24px;
+  font-size: 16px;
+  font-weight: 500;
   border-radius: 5px;
 }
 .idea-choices button.chosen {
-  background: var(--acid-dark);
   color: var(--acid);
   border-color: #688669;
 }
@@ -866,14 +863,6 @@ summary {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
-@keyframes draw-hint {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
 @keyframes breathe {
   from {
     opacity: 0.3;
@@ -1181,7 +1170,7 @@ summary {
 .coach-actions { margin-top: 12px; }
 .hint-actions { display: flex; align-items: center; gap: 16px; }
 .opening-progress + .hint-actions { margin-top: 12px; }
-.hint-actions .primary-button { flex: 1; }
+.hint-actions .secondary-button { flex: 1; min-height: 44px; }
 .coach-turn .moment-list { margin-top: 8px; }
 .coach-turn .moment-list button { min-height: 44px; padding: 8px 0; }
 .coach-turn > .text-button { min-height: 36px; }
@@ -1203,7 +1192,7 @@ summary {
   .opening-progress { margin-top: 8px; }
   .opening-invite { margin: 0; padding: 0; min-height: 32px; }
   .idea-choices { margin: 6px 0; }
-  .idea-choices button { min-height: 40px; }
+  .idea-choices button { min-height: 44px; }
   .replay-strip > span { display: none; }
   .replay-strip { justify-content: center; }
   .board-toolbar { gap: 4px; }

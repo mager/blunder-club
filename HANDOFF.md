@@ -2,7 +2,25 @@
 
 Updated 2026-11-07. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 
-## Latest session: clear pieces and automatic hints (November 7)
+## Latest session: subtle hints and several good options (November 7)
+
+Implemented on `codex/subtle-hint-options`, based on `811044a`.
+
+- Hint arrows now use a 0.55-unit stroke and a 2.5-unit head in the 80-unit board view. They retain opaque navy for contrast; endpoint tint is reduced to 20%. The draw animation is removed. Play is now an outlined secondary action, and move choices use compact 16px type with 44px touch targets.
+- `src/hints.ts` offers up to three legal, unique engine moves within 60 centipawns of the best available result. It preserves winning mates, excludes faster losing mates, and rejects immediate draws when a winning line exists. It never adds weak choices to fill the row.
+- Lessons show the expected move, declared alternatives, and other verified legal mates when mate is the goal, capped at three. Specific opening steps still show one move. Selection previews only; the arrow, SAN, Play, explanation, and reload use the chosen move. The default-on preference, manual controls, recall, and assistance evidence remain.
+- Unit tests: 160 pass, four unrelated rules tests skipped. Build: zero Svelte errors/warnings; existing main-bundle advisory remains at 530.13 kB. Strict specs: nine baselines and the active change pass. All 17 browser tests pass on the separate test origin with demo Firebase emulators, including the eight hint tests, replay, account flows, and three viewport sizes.
+- Desktop, 320x568, and 844x390 screenshots were inspected. The arrow remains clear, options fit, and no controls are clipped. Evidence: ignored `.impeccable/review/subtle-options-*.png`. A separate reviewer found no actionable defect. Impeccable reported advisory type/palette entries against the old design sidecar; the new 16px type and `#f5d78333` tint are documented in DESIGN.md. No unrelated sidecar repair was made.
+
+### Release state
+
+Active change: `subtle-hint-options`. Checks are complete. Commit, push, deployment, live verification, and archive are pending at this checkpoint. No merge to main.
+
+### Resume prompt
+
+“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Continue from `codex/subtle-hint-options`. Check the release state. Preserve subtle hints, sound move options, authored lesson goals, assistance evidence, opening names, and the one-screen board.”
+
+## Previous session: clear pieces and automatic hints (November 7)
 
 Implemented on `codex/clear-pieces-auto-hints`, based on `3a24cb8`. The user selected classic pieces with a clear king.
 
