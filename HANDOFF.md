@@ -14,7 +14,12 @@ Implemented on `codex/clear-pieces-auto-hints`, based on `3a24cb8`. The user sel
 
 ### Release state
 
-Implementation checks complete. Active OpenSpec change: `clear-pieces-auto-hints`. Commit, push, deployment, live verification, and archive are pending at this checkpoint. No merge to main.
+Implementation commit `f6b529f` is pushed to `origin/codex/clear-pieces-auto-hints`. `vercel --prod --yes` succeeded and aliased https://blunder-school.vercel.app/ to https://blunder-school-4vv4if1zp-mager1s-projects.vercel.app. No merge to main.
+
+- Live `main-D3A2DabW.js` matches the tested local build byte-for-byte by SHA-256 (`61c1444cd90e02b79b239167bb6a5484fc1b288e8fa1d3e9cf052a76c3d7a433`).
+- All six hint/piece browser tests pass on production in fresh agent-owned guest contexts, including three viewport sizes, opt-out/reload, assisted and independent completion, transition regressions, promotion, and check. No real account data was changed.
+- OpenSpec archived the completed change as `2026-11-07-clear-pieces-auto-hints` and updated three baseline specs. All nine baseline specs pass strict validation; no active change or implementation task remains.
+- This documentation/archive follow-up is committed and pushed after the verified app release. It does not change app code and needs no app redeployment. The existing bundle-size advisory and old design-sidecar/config drift remain optional maintenance, not unfinished work for this request.
 
 ### Resume prompt
 
