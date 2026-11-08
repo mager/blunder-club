@@ -1,8 +1,20 @@
 # Nextmove session handoff
 
-Updated 2026-11-07. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+Updated 2026-11-08. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
 
-## Latest session: subtle hints and several good options (November 7)
+## Latest direction: early checkmate challenges (November 8)
+
+- Recorded the user's product direction in PRODUCT.md: initial play and early lessons should start in middlegame or endgame positions near checkmate. Make repeated play inviting through learning, with clear stopping points and no harmful pressure.
+- This is a documentation update. No app behavior, lesson order, baseline specification, or production release changed. The app still defaults to full-board free play; existing authored lessons include several short checkmates.
+- No active OpenSpec change exists. Remaining work: define the first-play and early lesson sequence in an OpenSpec change, preserve saved games and explicit lesson URLs, implement the approved behavior, and test legal mates, hints, completion, reload, and all required viewport sizes.
+- Verification for this update: reviewed the authored-lessons baseline and current curriculum; `git diff --check` passed. App tests and build were not run because no app code changed. Latest verified app release remains implementation commit `6e33eb6`; the prior documentation commit is `cb398e8`.
+- This documentation update is to be committed and pushed on `codex/subtle-hint-options`; no app deployment is needed.
+
+### Resume prompt
+
+“Read AGENTS.md, HANDOFF.md, and PRODUCT.md in `/Users/mager/Code/blunder-club`. Plan the first-play experience around short middlegame and endgame checkmate challenges. Keep clear stopping points, optional retries, honest assistance records, and saved games. Use the project OpenSpec workflow and distinguish requested behavior from shipped behavior.”
+
+## Previous session: subtle hints and several good options (November 7)
 
 Implemented on `codex/subtle-hint-options`, based on `811044a`.
 

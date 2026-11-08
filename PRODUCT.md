@@ -23,6 +23,14 @@ Playable games as White against Casual, Club, and Challenge opponents; pre-move 
 ## Product Principles
 Make a mistake safe to explore. Keep the board primary. Explain concrete consequences. Show honest analysis, not invented praise.
 
+### First-play direction (requested November 8, 2026; not yet implemented)
+
+Start new players with short middlegame or endgame positions that lead toward checkmate. Let the player experience a clear finish early and learn why the move works. Use this direction for the initial play experience and early lesson order. Keep openings and full games available, and preserve returning players' saved games.
+
+Make players want another attempt through useful learning, varied positions, and visible consequences. Keep hints and retries easy to use. Each completed challenge must be a clear stopping point; another challenge is the player's choice. Stopping must not lose earned progress. Do not add streak pressure, countdowns, random reward schedules, guilt messages, or automatic entry into another challenge. Completion records must remain honest about help used and must not claim mastery.
+
+The current app still defaults to a full-board game. Changing the starting experience and lesson order needs an OpenSpec change and verification before this direction can be described as shipped behavior.
+
 ## Journey and revisitable play
 
 The header opens a connected six-place journey. Saved practice evidence distinguishes exploration, assisted solutions, and positions solved without help. All places are available; no mastery claim or invented progression. Each selected place and meaningful board view has a bookmarkable hash URL. Ask Rook is removed; direct hints, threat checks, and optional move explanations remain.
