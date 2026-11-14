@@ -118,11 +118,12 @@ test('hides the action for an empty board, lessons, and practice attempts', asyn
 });
 
 test('reports a failed device save and leaves the game available', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => {
     const put = IDBObjectStore.prototype.put;
     IDBObjectStore.prototype.put = function (...args) {
       if (this.transaction.db.name === 'nextmove-library-v1') {
-        this.transaction.abort();
         throw new DOMException('Device storage is full', 'QuotaExceededError');
       }
       return put.apply(this, args);
@@ -137,6 +138,7 @@ test('reports a failed device save and leaves the game available', async ({ page
   await expect(saveDialog(page).getByRole('status')).toHaveCount(0);
   await expect(saveButton(page)).toBeEnabled();
   expect(await storedProgress(page)).toBe(original);
+  expect(errors).toEqual([]);
 });
 
 test('keeps a synced save in its account and drops an unfinished save request on account switch', async ({ page }) => {

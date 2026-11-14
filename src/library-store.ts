@@ -54,7 +54,8 @@ export class LibraryStore {
         }
         const active = entries.filter(row => !row.game?.deleted && row.game?.id !== game.id);
         if (!game.deleted && active.length >= MAX_GAMES) { reason = 'Your library is full (100 games). Remove a game before saving another.'; tx.abort(); return; }
-        store.put({ ...entry, game, key: `${scope}:${game.id}`, scope });
+        try { store.put({ ...entry, game, key: `${scope}:${game.id}`, scope }); }
+        catch { tx.abort(); }
       };
       tx.oncomplete = () => resolve(saved);
       tx.onabort = tx.onerror = () => reject(new Error(reason));
