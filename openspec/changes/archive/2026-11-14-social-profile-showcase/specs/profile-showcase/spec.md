@@ -31,3 +31,18 @@ A public profile SHALL show its chosen spotlight before the remaining collection
 #### Scenario: Clipboard denied
 - **WHEN** the browser denies clipboard access
 - **THEN** the page shows the correct selectable link without claiming it was copied
+
+## MODIFIED Requirements
+
+### Requirement: Explicit showcase publication
+The owner SHALL be able to preview and publish up to eight selected favorite games with a public name, titles, and the chosen profile identity and game stories. The preview SHALL show all fields visitors will see. Publication SHALL expose only these fields and the selected games' validated replay data, player names, selected side, and result. Private notes, ratings, arbitrary PGN headers, and comments SHALL be excluded.
+
+#### Scenario: Publish a favorite
+- **WHEN** a signed-in player reviews the preview and selects Publish profile
+- **THEN** the app saves a public snapshot and offers its stable link only after the write succeeds
+- **AND** the public data contains no account UID, email, private style notes, or learning history
+
+#### Scenario: Edit after publication
+- **WHEN** the owner changes a title or adds a favorite after publishing
+- **THEN** the live profile retains its last published version until the owner selects Update public profile
+

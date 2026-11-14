@@ -40,7 +40,7 @@ Interface: ProfileGallery accepts existing profile/onOpen and optional profileId
 ## 4. Integrated verification and release
 
 - [x] 4.1 Run npm test, npm run build, npm run spec:check, rules tests, and affected browser suites; fix material review findings and verify final diff.
-- [ ] 4.2 Update HANDOFF.md with actual checks, release state, active change, and a resume prompt; commit and push completed work; deploy rules and app and verify the live version without real user writes.
+- [x] 4.2 Update HANDOFF.md with actual checks, release state, active change, and a resume prompt; commit and push completed work; deploy rules and app and verify the live version without real user writes.
 
 ## Workflow follow-up
 
