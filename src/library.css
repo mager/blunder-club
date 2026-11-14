@@ -81,3 +81,74 @@
   .library-empty { padding: 32px 0; }
 }
 @media (max-width: 370px) { .library-header .wordmark span { display: none; } .library-header nav { gap: 18px; } .library-game-row { gap: 12px; } .library-game-copy h2 { font-size: 16px; } }
+
+/* Personal profiles extend the board and row system. */
+.profile-identity { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; align-items: start; gap: 24px; margin: 8px 0 40px; }
+.profile-avatar { display: grid; place-items: center; width: 80px; height: 80px; background: var(--board-dark); border-radius: 5px; flex-shrink: 0; }
+.profile-avatar .chess-piece { width: 60px; height: 60px; }
+.profile-introduction { min-width: 0; }
+.profile-gallery .profile-introduction h1 { font-size: clamp(28px, 3.2vw, 40px); line-height: 1.15; letter-spacing: -.8px; margin-bottom: 12px; }
+.profile-introduction p { margin: 8px 0 0; overflow-wrap: anywhere; max-width: 60ch; }
+.profile-introduction .profile-bio { font-size: 16px; }
+.profile-introduction > .library-muted { font-size: 12px; }
+.profile-identity > .share-link { max-width: 190px; }
+.profile-spotlight { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); align-items: center; gap: 32px; padding-bottom: 36px; border-bottom: 1px solid var(--line); }
+.profile-spotlight .spotlight-board { width: 100%; }
+.profile-spotlight .mini-board { width: 100%; }
+.spotlight-copy { min-width: 0; }
+.profile-gallery .spotlight-copy h2 { font-size: 28px; line-height: 1.2; letter-spacing: -.5px; }
+.spotlight-copy p { overflow-wrap: anywhere; margin: 8px 0; }
+.spotlight-copy .spotlight-marker { color: var(--acid); font-size: 12px; margin: 10px 0 20px; }
+.profile-gallery .game-story { font-size: 16px; line-height: 1.65; margin: 16px 0 22px; overflow-wrap: anywhere; }
+.spotlight-copy .library-actions { margin-top: 22px; }
+.spotlight-copy > .share-link { margin-top: 8px; }
+.profile-collection-title { margin-top: 32px; }
+.share-link { min-width: 0; }
+.share-link > button { min-height: 44px; }
+.share-status { display: block; font-size: 12px; color: var(--acid); }
+.share-fallback { width: 100%; max-width: 30rem; }
+.share-fallback p { font-size: 12px; color: var(--muted); }
+.share-fallback .library-field { margin: 8px 0; }
+.profile-editor { margin-top: 24px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.profile-edit-identity { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; align-items: start; }
+.profile-edit-copy { min-width: 0; }
+.profile-edit-copy .library-field:first-child { margin-top: 0; }
+.profile-editor .library-field textarea { min-height: 92px; }
+.profile-avatar-options { display: flex; gap: 8px; flex-wrap: wrap; border: 0; margin: 0; padding: 0; min-width: 0; }
+.profile-avatar-options legend { margin-bottom: 12px; font-size: 13px; }
+.profile-avatar-options label { position: relative; width: 72px; min-height: 110px; padding: 28px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; font-size: 12px; }
+.profile-avatar-options label.chosen { background: var(--acid-dark); border-color: var(--acid); }
+.profile-avatar-options input { position: absolute; top: 8px; left: 8px; width: 16px; height: 16px; accent-color: var(--acid); }
+.profile-avatar-options label:has(input:focus-visible) { outline: 2px solid var(--acid); outline-offset: 3px; }
+.profile-avatar-options label > span:first-of-type { width: 44px; height: 44px; display: grid; place-items: center; }
+.profile-avatar-options .chess-piece { width: 44px; height: 44px; }
+.profile-character-count { font-size: 12px !important; color: var(--muted); margin-top: -10px; text-align: right; }
+.profile-pick { border-bottom: 1px solid var(--line); padding: 8px 0; }
+.profile-picks .profile-story-field { flex-direction: column; align-items: stretch; font-size: 13px; margin: 8px 0 16px 30px; }
+.profile-story-field textarea { min-height: 80px !important; }
+.profile-publish { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 24px; }
+.profile-publish > span { font-size: 12px; }
+.private-favorites-heading { margin: 32px 0 8px; }
+.profile-sign-in { display: flex; align-items: start; gap: 24px; margin: 28px 0 0; }
+.profile-sign-in h3 { font-size: 20px; font-weight: 500; }
+.profile-sign-in p { margin: 12px 0; max-width: 55ch; }
+.profile-sign-in .secondary-button { margin: 6px 0; }
+.library-page ::selection, .library-dialog ::selection { background: var(--acid); color: var(--action-ink); }
+.library-page a { text-underline-offset: 4px; }
+@media (max-width: 760px) {
+  .profile-identity { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; margin-bottom: 28px; }
+  .profile-avatar { width: 64px; height: 64px; }
+  .profile-avatar .chess-piece { width: 48px; height: 48px; }
+  .profile-identity > .share-link { grid-column: 2; max-width: 100%; margin-top: -8px; }
+  .profile-spotlight { gap: 24px; }
+  .profile-edit-identity { grid-template-columns: 1fr; gap: 24px; }
+  .profile-gallery .spotlight-copy h2 { font-size: 24px; }
+  .profile-sign-in { flex-direction: column; gap: 16px; }
+}
+@media (max-width: 580px) {
+  .profile-spotlight { grid-template-columns: minmax(0, 1fr); }
+  .profile-spotlight .spotlight-board { max-width: 360px; }
+  .profile-gallery .game-story { font-size: 15px; }
+  .profile-picks .profile-story-field { margin-left: 0; }
+  .profile-gallery .profile-introduction h1 { font-size: 28px; }
+}

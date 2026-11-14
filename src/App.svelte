@@ -7,6 +7,12 @@
   import Board from './Board.svelte';
   import OpeningLabel from './OpeningLabel.svelte';
   import LessonLibrary from './LessonLibrary.svelte';
+  import SaveGameDialog from './SaveGameDialog.svelte';
+  import { playedGameDraft, savePlayedGame } from './played-game';
+  import type { GameDraft } from './imported-games';
+  import { cloudServices } from './firebase-client';
+  import { CloudLibrary } from './library-cloud';
+  import { GameLibrary, LibraryStore, message, type LibraryState } from './library-store';
   import {allLessons, studies, findStudy, freePlay} from './curriculum';
   import {acceptsStep, studyPosition, completeStudy, type StudyResults, type StudyRun} from './study';
   import { practiceQueue, acceptsPracticeMove, recordPractice, preserveGameDuringPractice } from './practice';
@@ -50,6 +56,10 @@
   let option = $state<number | null>(null);
   let flipped = $state(false);
   let panel = $state<Panel | null>(null);
+  let gameToSave = $state.raw<{ draft: GameDraft | null; error: string } | null>(null);
+  let gameStore: LibraryStore | undefined;
+  let gameLibrary: GameLibrary | undefined;
+  let gameLibraryState = $state.raw<LibraryState>({ entries: [], loading: true, status: '', error: '' });
   let urlReady=$state(false);
   let navigating=$state(false);
   let lastUrl='';
@@ -90,6 +100,8 @@
   let reportMoves = $state<string[] | null>(null);
   let recommendation = $state<{skill: string; source: string; confidence?: number; action?: string} | null>(null);
   let reviewingReport = $state(false);
+  let canSaveGame = $derived(!practice && !study && (activeLesson.id === 'free' || activeLesson.id === 'saved') &&
+    (reviewingReport ? reportMoves?.length ?? 0 : moves.length) > 0);
   type Moment = TurningPoint;
   let moments = $state<Moment[]>([]);
   const assessed = new Set<number>();
@@ -141,6 +153,30 @@
     node.showModal();
     return { destroy() { node.close(); previous?.focus(); } };
   }
+  function openSaveGame() {
+    if (!canSaveGame) return;
+    try {
+      const draft = playedGameDraft(activeLesson.fen, reviewingReport && reportMoves ? reportMoves : moves, opponentLevel);
+      gameToSave = { draft, error: '' };
+      if (!gameLibrary) {
+        gameStore = new LibraryStore();
+        const services = cloudServices();
+        gameLibrary = new GameLibrary(gameStore, services ? new CloudLibrary(services.db) : null,
+          state => { gameLibraryState = state; });
+        void gameLibrary.selectAccount(account?.uid ?? null);
+      }
+    } catch (error) { gameToSave = { draft: null, error: message(error) }; }
+    panel = null;
+  }
+  async function saveCurrentGame(favorite: boolean) {
+    const snapshot = gameToSave;
+    const library = gameLibrary;
+    if (!snapshot?.draft || !library) throw new Error('Open Save game again.');
+    const current = () => snapshot === gameToSave;
+    const saved = await savePlayedGame(library, snapshot.draft, favorite, current);
+    void library.sync().catch(() => { /* The library keeps the pending device copy for retry. */ });
+    return saved;
+  }
 
   $effect(() => {
     if (!urlReady || navigating || saveStatus === 'loading' || isLibraryHash(location.hash)) return;
@@ -160,6 +196,7 @@
   });
   async function visitRoute(route:GameRoute) {
     if (!lastProgress) return;
+    gameToSave = null;
     const navigation=++navigationId; navigating=true; panel=null; request++;
     try {
       if (route.position && route.fen) {
@@ -221,7 +258,13 @@
     engine = new ChessEngine(); opponent = new PracticeOpponent();
     sync = createProgressSync({
       apply: data => {restoreProgress(data,false);if(initial && initialRoute) {initial=false;void visitRoute(initialRoute);} else {initial=false;urlReady=true;void prepare();}},
-      account: value => { account = value; },
+      account: value => {
+        if (value?.uid !== account?.uid) {
+          gameToSave = null;
+          void gameLibrary?.selectAccount(value?.uid ?? null);
+        }
+        account = value;
+      },
       status: value => {
         saveStatus = value;
         if (value === 'loading') { request++; phase = 'loading'; storageReady = false; }
@@ -229,7 +272,7 @@
       error: message => { notification = message; },
     });
     sync.start();
-    return () => { navigationId++;window.removeEventListener('popstate',onNavigate);window.removeEventListener('hashchange',onNavigate);request++; sync.dispose(); engine.dispose(); opponent.dispose(); void audio?.close(); };
+    return () => { navigationId++;window.removeEventListener('popstate',onNavigate);window.removeEventListener('hashchange',onNavigate);request++; sync.dispose(); engine.dispose(); opponent.dispose(); void audio?.close(); gameToSave = null; gameLibrary?.dispose(); void gameStore?.close().catch(() => {}); };
   });
   function restoreProgress(data: Progress,analyze=true) {
     practice = null; practiceResult = null; practiceComplete = false;
@@ -670,7 +713,7 @@
         {:else if phase === 'over'}
           <h1>{game.isCheckmate() ? (game.turn() === 'w' ? 'Let’s run it back.' : 'That’s checkmate.') : game.isDraw() ? 'A draw.' : 'The turning points.'}</h1>{#if game.isGameOver()}<p>{resultText(game)}</p>{/if}
           {#if keyMoments.length}<div class="moment-list">{#each keyMoments.slice(0,1) as moment}<button onclick={() => inspectMoment(moment)}><b>{Math.floor(moment.before.length/2)+1}. {moment.move.san}</b><span>{classifyMistake(moment.move,moment.reply,moment.best).name}</span><ArrowRight size={15}/></button>{/each}</div>{:else}<p>No large mistakes found in the positions checked.</p>{/if}
-          <div class="coach-actions">{#if reportMoves && !game.isGameOver()}<button class="primary-button" onclick={resumeReport}>Keep playing <ArrowRight size={16}/></button>{:else if keyMoments[0]}<button class="primary-button" onclick={() => practiceMoment(keyMoments[0])}>Practice this <ArrowRight size={16}/></button>{:else}<button class="primary-button" onclick={() => start(lessons[0])}>Play again <ArrowRight size={16}/></button>{/if}{#if keyMoments.length}<button class="text-button" onclick={() => panel='report'}>Full review <ArrowRight size={14}/></button>{/if}</div>
+          <div class="coach-actions">{#if reportMoves && !game.isGameOver()}<button class="primary-button" onclick={resumeReport}>Keep playing <ArrowRight size={16}/></button>{:else if keyMoments[0]}<button class="primary-button" onclick={() => practiceMoment(keyMoments[0])}>Practice this <ArrowRight size={16}/></button>{:else}<button class="primary-button" onclick={() => start(lessons[0])}>Play again <ArrowRight size={16}/></button>{/if}{#if keyMoments.length}<button class="text-button" onclick={() => panel='report'}>Full review <ArrowRight size={14}/></button>{/if}{#if canSaveGame && game.isGameOver()}<button class="text-button" onclick={openSaveGame}>Save game <Bookmark size={16}/></button>{/if}</div>
 
         {:else if openingDone && study}
           <h1>{studyRun?.recorded ? studyRun.helped || studyRun.mistakes ? 'Now you see it.' : 'You found it.' : 'Lesson complete.'}</h1><p>{study.completion}</p>
@@ -705,6 +748,7 @@
         {#if nextPractice.length}<button class="primary-button" onclick={() => beginPractice()}>Practice my mistakes <ArrowRight size={16}/></button>{/if}
         {#if recommendation}<button class="text-button" onclick={() => {panel=null;followRecommendation();}}>Practice {skills.find(s => s.id === recommendation?.skill)?.name.toLowerCase()} <ArrowUpRight size={14}/></button>{/if}
       {:else if panel === 'game'}
+        {#if canSaveGame}<button class="menu-row" onclick={openSaveGame}>Save game <Bookmark size={19}/></button>{/if}
         <button class="menu-row" onclick={() => openLibrary('games')}>My games · Paste a PGN <Bookmark size={19}/></button>
         <button class="menu-row" onclick={() => openLibrary('me')}>My profile <UserRound size={19}/></button>
         <fieldset class="game-setting"><legend>Move hints</legend>
@@ -742,6 +786,10 @@
       {/if}
     </div>
   </dialog>
+{/if}
+{#if gameToSave}
+  <SaveGameDialog draft={gameToSave.draft} draftError={gameToSave.error} libraryState={gameLibraryState} signedIn={!!account}
+    show={openPanel} onSave={saveCurrentGame} onClose={() => gameToSave = null} onOpenLibrary={() => openLibrary('games')}/>
 {/if}
 {#if promotion}<dialog class="promotion-picker" use:showPromotion oncancel={() => promotion=null} aria-label="Choose a promotion piece"><h2>Choose your piece.</h2><div class="promotion-pieces">{#each ['q','r','b','n'] as piece}<button aria-label={`Promote to ${pieceNames[piece as PieceSymbol]}`} onclick={() => {if(promotion) void play(promotion.from,promotion.to,piece as PieceSymbol);}}><Piece type={piece as PieceSymbol} color="w"/></button>{/each}</div><button class="text-button" onclick={() => promotion=null}>Cancel</button></dialog>{/if}
 {#if notification}<div class="notification" role="status"><span>{notification}</span><button class="icon-button" aria-label="Dismiss notification" onclick={() => notification=''}><X size={18}/></button></div>{/if}

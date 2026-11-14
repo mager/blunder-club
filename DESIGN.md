@@ -260,3 +260,12 @@ Coach settings places Move hints before the coaching mode. A full-width button u
 ### Subtle move options
 
 Moves to consider groups up to three legal, sound options. Use 16px medium DM Sans in outlined buttons with a 44px minimum height. The selected option has jade text and a muted jade outline, with an aria-pressed state. Only the selected move gets an arrow. Play is an outlined secondary action; Why remains a text action. Selecting a choice only previews it. The selected arrow, move notation, Play, and explanation must agree, including authored alternatives and promotion. A single accepted lesson move needs no redundant option row.
+
+
+### Personal profile and spotlight
+
+The owner profile places identity and sharing controls before the private favorite list. Public name, About you, three original piece avatars, selected favorites, short game stories, and Spotlight game use existing field and button styles. Piece choices are native radio controls with a jade selected outline and visible focus. Bio and stories use compact text areas with a 160-character limit. Preview public profile remains the primary action. Publication and account errors remain visible.
+
+The public gallery opens with an 80px blue tile containing the chosen original white piece, the public name at up to 40px, optional 16px bio, a count of only the published games, and Copy profile link. The spotlight pairs a final board up to 340px wide with a 28px title, the owner's story, player names, result, Open finish, Replay, and Copy game link. The remaining games retain compact rows and decorative final boards. No rating, follower count, or invented achievement appears.
+
+At widths of 760px or less, the avatar is 64px and the editor becomes one column. Below 581px, the spotlight stacks. Long names and stories wrap anywhere rather than widening the page. The public preview uses the same gallery without share controls. Clipboard failure reveals a selectable link. Profile pages may scroll; game and replay controls keep the one-viewport requirement. Save game uses a focused dialog and the existing board and control palette.

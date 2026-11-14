@@ -12,20 +12,46 @@ service cloud.firestore {
     }
     function shortText(value, max) { return value is string && value.size() > 0 && value.size() <= max; }
     function validPublicGame(g) {
-      return g is map && g.keys().hasOnly(['id','title','white','black','side','result','fen','moves'])
-        && publicId(g.id) && shortText(g.title,80) && shortText(g.white,80) && shortText(g.black,80)
-        && g.side in ['w','b'] && g.result in ['1-0','0-1','1/2-1/2','*']
-        && shortText(g.fen,200) && shortText(g.moves,6000)
+      // These eight required field accesses and the count exclude extra keys.
+      // The regex calls also reject non-string fields.
+      return g is map && g.keys().size() == 8 && g.id.matches('^[a-f0-9]{32}$')
+        && g.title.matches('(?s)^.{1,80}$') && g.white.matches('(?s)^.{1,80}$') && g.black.matches('(?s)^.{1,80}$')
+        && g.side.matches('^[wb]$') && g.result.matches('^(1-0|0-1|1/2-1/2|\\*)$')
+        && g.fen.matches('(?s)^.{1,200}$') && g.moves.size() <= 6000
         && g.moves.matches('^[a-h][1-8][a-h][1-8][qrbn]?( [a-h][1-8][a-h][1-8][qrbn]?)*$');
     }
     function validSlot(games, featured, i) {
       return games.size() <= i || (validPublicGame(games[i]) && games[i].id == featured[i]);
     }
+    function validDetailText(value) {
+      // RE2 lengths count Unicode code points. Match JavaScript trim at text edges.
+      return value is string
+        && value.matches('^(?:[^\\p{Cc}\\p{Z}\\x{FEFF}](?:[^\\p{Cc}]{0,158}[^\\p{Cc}\\p{Z}\\x{FEFF}])?)?$');
+    }
+    function validStorySlot(stories, i) {
+      return stories.size() <= i || validDetailText(stories[i]);
+    }
+    function validStories(stories, featured) {
+      let values = stories.values();
+      return stories.size() <= 8 && stories.keys().hasOnly(featured)
+        && validStorySlot(values,0) && validStorySlot(values,1)
+        && validStorySlot(values,2) && validStorySlot(values,3)
+        && validStorySlot(values,4) && validStorySlot(values,5)
+        && validStorySlot(values,6) && validStorySlot(values,7);
+    }
+    function validDetails(details, featured) {
+      return details is map && details.keys().hasOnly(['bio','avatar','spotlight','stories'])
+        && validDetailText(details.bio) && details.avatar in ['n','r','q']
+        && (details.spotlight == null || details.spotlight in featured)
+        && details.stories is map && validStories(details.stories, featured);
+    }
     function validProfile(id) {
       let d = request.resource.data;
-      let s = getAfter(settingsPath(request.auth.uid)).data;
-      return d.keys().hasOnly(['version','revision','name','games']) && d.version == 1
+      let settings = settingsPath(request.auth.uid);
+      let s = getAfter(settings).data;
+      return d.keys().hasOnly(['version','revision','name','games','details']) && d.version == 1
         && d.revision is int && d.revision == s.revision && s.publicId == id && s.published == true
+        && d.revision == (exists(settings) ? get(settings).data.revision + 1 : 1)
         && shortText(d.name,40) && d.games is list && d.games.size() <= 8 && d.games.size() == s.featured.size()
         && validSlot(d.games,s.featured,0) && validSlot(d.games,s.featured,1)
         && validSlot(d.games,s.featured,2) && validSlot(d.games,s.featured,3)
@@ -57,14 +83,21 @@ service cloud.firestore {
         && getAfter(settingsPath(request.auth.uid)).data.publicId == id;
     }
     match /users/{uid}/profile/settings {
+      function validPublishedProfile(d, path) {
+        let profile = getAfter(path).data;
+        // The public write requires this settings change. Validate details here
+        // to leave room for all eight game checks in the public write rule.
+        return profile.revision == d.revision
+          && (!('details' in profile) || validDetails(profile.details, d.featured));
+      }
       function validSettings() {
         let d = request.resource.data;
+        let path = /databases/$(database)/documents/profiles/$(d.publicId);
         return d.keys().hasOnly(['publicId','revision','featured','published']) && publicId(d.publicId)
           && d.revision is int && d.featured is list && d.featured.size() <= 8
           && d.featured.toSet().size() == d.featured.size() && d.published is bool
           && ownsProfileAfter(d.publicId)
-          && (d.published ? getAfter(/databases/$(database)/documents/profiles/$(d.publicId)).data.revision == d.revision
-            : d.featured.size() == 0 && !existsAfter(/databases/$(database)/documents/profiles/$(d.publicId)));
+          && (d.published ? validPublishedProfile(d, path) : d.featured.size() == 0 && !existsAfter(path));
       }
       allow get: if signedOwner(uid);
       allow create: if signedOwner(uid) && validSettings() && request.resource.data.revision == 1;

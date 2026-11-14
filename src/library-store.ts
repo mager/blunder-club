@@ -15,7 +15,7 @@ export class LibraryStore {
         records.createIndex('scope', 'scope');
       };
       request.onsuccess = () => { request.result.onversionchange = () => request.result.close(); resolve(request.result); };
-      request.onerror = () => { this.opening = undefined; reject(new Error('Device storage is unavailable. Keep the pasted game and try again.')); };
+      request.onerror = () => { this.opening = undefined; reject(new Error('Device storage is unavailable. Try again.')); };
       request.onblocked = () => reject(new Error('Close other Nextmove tabs, then try saving again.'));
     });
   }
@@ -32,21 +32,31 @@ export class LibraryStore {
       request.onerror = () => reject(new Error('Your games could not load from this device. Try again.'));
     });
   }
-  async put(scope: string, entry: LibraryEntry): Promise<void> {
+  async put(scope: string, entry: LibraryEntry, keepExisting?: () => boolean): Promise<ImportedGame> {
     const game = normalizeImportedGame(entry.game);
     if (!game) throw new Error('This game record is not valid. Nothing was saved.');
     const db = await this.open();
     return new Promise((resolve, reject) => {
       const tx = db.transaction('records', 'readwrite');
       const store = tx.objectStore('records');
-      let reason = 'Device storage is full or unavailable. Keep the pasted game and try again.';
+      let reason = 'Device storage is full or unavailable. Try again.';
+      let saved = game;
       const all = store.index('scope').getAll(scope);
       all.onsuccess = () => {
-        const active = (all.result as StoredEntry[]).filter(row => !row.game?.deleted && row.game?.id !== game.id);
+        const entries = all.result as StoredEntry[];
+        if (keepExisting) {
+          const entry = entries.find(row => row.game?.id === game.id);
+          const existing = normalizeImportedGame(entry?.game);
+          if (!keepExisting()) { reason = 'The account changed. Try again.'; tx.abort(); return; }
+          if (existing?.deleted) { reason = 'This game was removed. Choose Restore game to keep it again.'; tx.abort(); return; }
+          if (normalizeImportedGame(entry?.conflict)) { reason = 'Resolve this game’s sync conflict before editing it.'; tx.abort(); return; }
+          if (existing) { saved = existing; return; }
+        }
+        const active = entries.filter(row => !row.game?.deleted && row.game?.id !== game.id);
         if (!game.deleted && active.length >= MAX_GAMES) { reason = 'Your library is full (100 games). Remove a game before saving another.'; tx.abort(); return; }
         store.put({ ...entry, game, key: `${scope}:${game.id}`, scope });
       };
-      tx.oncomplete = () => resolve();
+      tx.oncomplete = () => resolve(saved);
       tx.onabort = tx.onerror = () => reject(new Error(reason));
     });
   }
@@ -102,7 +112,7 @@ export class GameLibrary {
     this.queue = result.catch(() => {});
     return result;
   }
-  save(game: ImportedGame, restore = false): Promise<ImportedGame> {
+  save(game: ImportedGame, restore = false, keepExisting?: () => boolean): Promise<ImportedGame> {
     return this.run(async (epoch, uid) => {
       const scope = libraryScope(uid);
       const entries = await this.store.list(scope);
@@ -111,10 +121,11 @@ export class GameLibrary {
       if (old?.conflict) throw new Error('Resolve this game’s sync conflict before editing it.');
       const next = { ...game, publicId: old?.game.publicId || game.publicId, revision: old?.game.revision || 0 };
       if (epoch !== this.generation) throw new Error('The account changed. Try again.');
-      await this.store.put(scope, { game: next, baseRevision: old?.baseRevision || 0, pending: !!uid });
+      const saved = await this.store.put(scope, { game: next, baseRevision: old?.baseRevision || 0, pending: !!uid },
+        keepExisting ? () => epoch === this.generation && keepExisting() : undefined);
       await this.refresh(epoch, scope);
       if (epoch === this.generation) this.emit({ error: '', status: uid ? 'Saved here. Cloud save pending.' : 'Saved on this device' });
-      return next;
+      return saved;
     });
   }
   async resolve(id: string, useLocal: boolean) {

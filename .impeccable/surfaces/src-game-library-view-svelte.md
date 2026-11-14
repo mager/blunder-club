@@ -52,3 +52,20 @@ Read PRODUCT.md, DESIGN.md, the existing play brief, and all five new UI source 
 The parent implementation session reports passing checks at 1440×900, 320×568, and 844×390, plus keyboard replay, reload, and reduced motion. These checks were not repeated during documentation. Source confirms accessible header names and the 280px replay control width. Static captures do not prove live cloud behavior or keyboard operation. Long titles, expanded style notes, and eight-game galleries were not visually inspected in this documentation pass.
 
 The original play brief retains historical stone/ivory palette wording, a 60px header, and a coach-question reference. Its later sections and current DESIGN.md supersede that history. This extension does not rewrite it. Existing design tokens and `.impeccable/design.json` remain unchanged.
+
+## Social profile extension — November 14, 2026
+
+THESIS: A player presents a small collection of meaningful games, with one game leading the page. The profile is a personal collection rather than a dashboard.
+
+OWN-WORLD: Preserve graphite, jade, DM Sans, original white/navy pieces, and blue/cool-white boards. Use a chess piece as a chosen avatar, a larger board for the spotlight, and the existing thin-rule rows for the collection. No raster assets.
+
+STORY: Save a Nextmove game or import one, choose favorites, add a public name and optional bio/story, inspect the exact page, and publish. A visitor opens a finish, steps through its moves, and copies its link.
+
+FIRST VIEWPORT: A piece avatar sits beside the name and bio, with Copy profile link nearby. Below, a two-column spotlight pairs a large final board with the title, story, result, and replay actions. The remaining collection follows as rows. Phones stack the spotlight. Owner sharing controls precede the private favorite list.
+
+FORM: Extend the established library surface with a spotlight composition; user delegated design judgment with “use your judgement, be creative.” seed: none (pinned). Profile editor is Operate; public gallery is Experience.
+
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+
+
+Verified this extension with the full 24-test browser suite at the three required sizes. Reviewed social-desktop.png, social-mobile.png, social-landscape.png, social-mobile-long.png, social-mobile-editor.png, and the three save-dialog captures. Public profile and editor content remains readable without horizontal overflow; game and replay controls fit their viewports. The independent review found no actionable defect. This extension uses only original SVG/code assets, with no new raster provenance to record.

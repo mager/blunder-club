@@ -1,7 +1,7 @@
 import { collection, doc, getDocFromServer, getDocsFromServer, runTransaction, serverTimestamp, type Firestore, type DocumentData } from 'firebase/firestore';
 import { gameIdentity, normalizeImportedGame, publicId, validPublicId, type ImportedGame } from './imported-games';
 import { LibraryConflict, type LibraryRemote } from './library-store';
-import { normalizePublicProfile, projectProfile, type ProfileOwnerState, type ProfileSettings, type PublicProfile } from './profile';
+import { normalizePublicProfile, projectProfile, type ProfileDetails, type ProfileOwnerState, type ProfileSettings, type PublicProfile } from './profile';
 
 async function decode(data: DocumentData): Promise<ImportedGame> {
   let game: ImportedGame | null = null;
@@ -36,18 +36,23 @@ export class CloudLibrary implements LibraryRemote {
         throw new Error('The remote game is missing. Reload your account games before retrying.');
       }
       const stateSnap = await tx.get(stateRef); const state = settings(stateSnap.data());
-      const removePublic = state?.featured.includes(game.publicId) && (game.deleted || !game.favorite);
-      const profileRef = state ? doc(this.db, 'profiles', state.publicId) : null;
-      const profileSnap = removePublic && profileRef ? await tx.get(profileRef) : null;
       const next = normalizeImportedGame({ ...game, revision: expected + 1, publicId: prior?.publicId || game.publicId });
       if (!next || await gameIdentity(next) !== next.id) throw new Error('This game is not valid. Nothing was uploaded.');
-      if (removePublic && state && profileRef) {
+      if (state?.featured.includes(next.publicId) && (next.deleted || !next.favorite)) {
+        const profileRef = doc(this.db, 'profiles', state.publicId);
+        const profileSnap = await tx.get(profileRef);
         const revision = state.revision + 1;
-        tx.set(stateRef, { ...state, revision, featured: state.featured.filter(id => id !== game.publicId) });
-        if (profileSnap?.exists()) {
+        tx.set(stateRef, { ...state, revision, featured: state.featured.filter(id => id !== next.publicId) });
+        if (profileSnap.exists()) {
           const profile = normalizePublicProfile(profileSnap.data());
           if (!profile) throw new Error('The public profile could not load. Public removal is pending.');
-          tx.set(profileRef, { ...profile, revision, games: profile.games.filter(g => g.id !== game.publicId) });
+          profile.revision = revision;
+          profile.games = profile.games.filter(g => g.id !== next.publicId);
+          if (profile.details) {
+            delete profile.details.stories[next.publicId];
+            if (profile.details.spotlight === next.publicId) profile.details.spotlight = null;
+          }
+          tx.set(profileRef, profile);
         }
       }
       tx.set(ref, { schemaVersion: 1, revision: next.revision, payload: JSON.stringify(next), publicId: next.publicId,
@@ -68,7 +73,7 @@ export class CloudLibrary implements LibraryRemote {
     const state = settings(snap.data());
     return { settings: state, profile: state?.published ? await this.readPublic(state.publicId) : null };
   }
-  async publish(uid: string, name: string, games: ImportedGame[], expected: number): Promise<ProfileOwnerState> {
+  async publish(uid: string, name: string, games: ImportedGame[], expected: number, details?: ProfileDetails): Promise<ProfileOwnerState> {
     const candidate = publicId();
     return runTransaction(this.db, async tx => {
       const stateRef = doc(this.db, 'users', uid, 'profile', 'settings');
@@ -83,7 +88,7 @@ export class CloudLibrary implements LibraryRemote {
         if (remote.revision !== game.revision || !remote.favorite || remote.deleted) throw new Error('A selected game changed. Sync games and reload the preview.');
         committed.push(remote);
       }
-      const profile = projectProfile(name, committed, expected + 1);
+      const profile = projectProfile(name, committed, expected + 1, details);
       const state: ProfileSettings = { publicId: prior?.publicId || candidate, revision: expected + 1, published: true, featured: profile.games.map(g => g.id) };
       if (!prior) tx.set(doc(this.db, 'profileOwners', state.publicId), { uid });
       tx.set(stateRef, state); tx.set(doc(this.db, 'profiles', state.publicId), profile);

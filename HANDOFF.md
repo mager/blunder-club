@@ -1,6 +1,22 @@
 # Nextmove session handoff
 
-Updated 2026-11-08. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+Updated 2026-11-14. Work in `/Users/mager/Code/blunder-club`, not `magerblog`.
+
+## Latest session: social profile and played games (November 14)
+
+The user requested a social profile to show games, then delegated creative choices. Implemented on `codex/social-profile-showcase`, based on `696ff50`. The chosen first version extends the public collection: original piece avatars, a short bio, one spotlight game, short “Why I kept it” stories, and profile/game link controls. No follower feed, comments, uploaded photos, or invented stats were added.
+
+- The profile editor appears before private favorites. The exact publication preview includes the name, bio, avatar, selected games, spotlight, and stories. Public pages show a large spotlight board and remaining game rows. Clipboard failure shows a selectable link. Old profiles remain readable.
+- Normal Nextmove games can be saved from More and game completion. The private snapshot uses actual legal history, starting FEN, and an honest opponent label; rehearsals and authored/personal-practice attempts are excluded. Repeated saves preserve titles/favorite choices. Deleted snapshots need explicit restore. Account changes invalidate unfinished requests; atomic IndexedDB checks protect concurrent edits.
+- Public details are allowlisted and bounded. Removing a featured game also removes its story and spotlight selection atomically. Coordinated settings/profile rules split validation to fit the expression budget at eight games; the public write requires the settings revision to advance.
+- Tests: `npm test` passed 182, with 9 emulator-only cases skipped in that invocation. A separate local demo-emulator run passed all 9 rules/transaction cases, including first publication with eight games/stories. `npm run build` passed with zero Svelte errors/warnings; the existing bundle advisory remains (548 kB main chunk). Strict specs passed all 9 baselines and this change. Full browser suite passed all 24 tests on `127.0.0.1:5176` with synthetic demo accounts and guest sessions.
+- Browser checks cover desktop 1440×900, phone 320×568, and landscape 844×390; keyboard, hint, check, promotion, completion, reload, original-game preservation, account switching, publication/unpublish, and anonymous replay. Rendered profile/editor/save-dialog screenshots were reviewed. A transient screenshot paint issue after viewport resize was fixed in capture setup by navigating and checking scroll access; final captures show the complete content.
+- Independent code review found no actionable defects and ran 32 focused tests. Impeccable context launcher could not use its missing engine cache; its references and existing product/design files guided the work. Existing sidecar drift was not expanded into this task.
+- Active OpenSpec change: `social-profile-showcase`; implementation and verification complete, release tracking remains open until commit/push/deployment/live checks. Production still refers to the prior verified release until the release record below is updated. No real user account, profile, or saved game was modified during testing.
+
+### Resume prompt
+
+“Read AGENTS.md and HANDOFF.md in `/Users/mager/Code/blunder-club`. Check `codex/social-profile-showcase` and its release state. Preserve explicit publication, private game saves, old profile support, opening names, honest learning records, and the one-screen board. Finish any recorded release checks before starting more work.”
 
 ## Latest direction: early checkmate challenges (November 8)
 

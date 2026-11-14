@@ -55,6 +55,14 @@ Private style notes count the chosen side's first moves, checks, captures, and c
 
 Guests keep up to 100 games on their device. Google accounts sync private game records separately from progress, with revision conflicts, deletion records, and retryable transfers. Public sharing requires a chosen public name and an explicit preview/publish action. A profile can feature up to eight selected favorites. Visitors can replay those games without signing in. Public copies contain only the chosen name, titles, player names, sides, results, starting positions, and moves. Style notes and Google identity stay private. Unpublish removes the public page; removing a featured game removes its public copy when cloud sync succeeds.
 
+## Social profile and game stories
+
+Profiles center on a chosen game. The owner can choose an original knight, rook, or queen avatar; add a public name and an optional short bio; select up to eight favorites; choose a spotlight game; and write a short “Why I kept it” story for each selected game. Bio and stories are limited to 160 plain-text characters. The exact public preview includes these fields. Edits need an explicit publish or update. Google identity and private learning notes are not copied.
+
+The public page shows the spotlight's final board first, then the remaining collection. Visitors can replay games and copy profile or finish links without signing in. When clipboard access fails, a selectable link remains available. Older profiles still open. Removing a featured game also removes its story and spotlight selection when cloud sync succeeds.
+
+Normal Nextmove games can be saved privately from More or the completion view. Save game captures the actual game history, including a custom start and promotions, and keeps the current game available. An unfinished game stays marked unfinished. Saving the same snapshot again keeps one record and preserves its existing title and favorite choice. Lessons and personal practice do not use this action. Favoriting and publication remain separate choices.
+
 ## Opening names during play
 
 Live games, lessons, and saved or public replay show the latest recognized opening family above the board. Names come from a bundled opening reference and follow the displayed move history, including undo, rehearsal, and reload. The label retains the last known name as play continues. A standard starting board says Play the first move; an unrecognized position says Not identified. This context gives no lesson credit and does not infer missing history from a custom board.

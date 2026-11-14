@@ -8,11 +8,12 @@
   import { createImportedGame, editImportedGame, gameIdentity, parseGamePgn, type GameDraft, type ImportedGame } from './imported-games';
   import { libraryHash, type LibraryRoute } from './library-routes';
   import { playingStyle } from './playing-style';
-  import { publicGameDraft, projectProfile, type ProfileOwnerState, type PublicProfile, type PublicGame } from './profile';
+  import { publicGameDraft, projectProfile, type ProfileOwnerState, type PublicProfile, type PublicGame, type ProfileDetails } from './profile';
   import { findStudy } from './curriculum';
   import MiniBoard from './MiniBoard.svelte';
   import GameReplay from './GameReplay.svelte';
   import ProfileGallery from './ProfileGallery.svelte';
+  import Piece from './Piece.svelte';
   import './library.css';
 
   let { route }: { route: LibraryRoute } = $props();
@@ -28,6 +29,8 @@
   let published = $state<PublicProfile | null>(null);
   let publicLoading = $state(true); let publicError = $state('');
   let name = $state(''); let selected = $state<string[]>([]);
+  let bio = $state(''); let avatar = $state<ProfileDetails['avatar']>('n');
+  let spotlight = $state(''); let stories = $state<Record<string, string>>({});
   let preview = $state<PublicProfile | null>(null);
   let previewGames = $state<ImportedGame[]>([]); let previewRevision = $state(0);
   let importing = $state(false); let pgn = $state(''); let draft = $state<GameDraft | null>(null);
@@ -62,7 +65,7 @@
     const uid = account?.uid || null;
     if (isPublic) { library.dispose(); libraryState = { entries: [], loading: true, status: '', error: '' }; return; }
     untrack(() => {
-      name = ''; selected = []; owner = { settings: null, profile: null }; ownerLoaded = !uid;
+      name = ''; selected = []; bio = ''; avatar = 'n'; spotlight = ''; stories = {}; owner = { settings: null, profile: null }; ownerLoaded = !uid;
       void library!.selectAccount(uid).then(() => loadOwner(true));
     });
   });
@@ -85,6 +88,8 @@
       owner = result;
       if (resetDraft) {
         name = result.profile?.name || '';
+        bio = result.profile?.details?.bio || ''; avatar = result.profile?.details?.avatar || 'n';
+        spotlight = result.profile?.details?.spotlight || ''; stories = { ...result.profile?.details?.stories };
         selected = games.filter(g => result.settings?.featured.includes(g.publicId)).map(g => g.id);
       }
       ownerLoaded = true;
@@ -147,14 +152,15 @@
       const chosen = favorites.filter(g => selected.includes(g.id));
       if (libraryState.entries.some(row => selected.includes(row.game.id) && (row.pending || row.conflict))) throw new Error('Sync the selected games before publishing.');
       previewGames = chosen; previewRevision = owner.settings?.revision || 0;
-      preview = projectProfile(name, chosen, previewRevision + 1); error = '';
+      const details: ProfileDetails = { bio, avatar, spotlight: chosen.find(g => g.publicId === spotlight)?.publicId || chosen[0]?.publicId || null, stories: Object.fromEntries(chosen.filter(g => stories[g.publicId]?.trim()).map(g => [g.publicId, stories[g.publicId]])) };
+      preview = projectProfile(name, chosen, previewRevision + 1, details); error = '';
     } catch (e) { error = message(e); }
   }
   async function publish() {
     const uid = account?.uid; const current = preview; const epoch = generation;
     if (!uid || !cloud || !current) return;
     await action(async () => {
-      const result = await cloud!.publish(uid, current.name, previewGames, previewRevision);
+      const result = await cloud!.publish(uid, current.name, previewGames, previewRevision, current.details);
       if (epoch !== generation) return;
       owner = result; preview = null; notice = 'Your public profile is ready. Copy its link to share it.';
     });
@@ -191,18 +197,35 @@
     {:else if route.kind === 'public-game'}
       {#if publicGame}<GameReplay game={publicGameDraft(publicGame)} side={publicGame.side} title={publicGame.title} ply={route.ply} back={`#/profile/${route.profileId}`} onPly={ply => { if (route.kind === 'public-game') location.hash = libraryHash({ ...route, ply }); }}/>
       {:else}<main class="library-page"><h1>Game not available</h1><p>This game is no longer featured.</p><a href={`#/profile/${route.profileId}`}>Back to profile</a></main>{/if}
-    {:else}<main class="library-page"><ProfileGallery profile={published} onOpen={openPublic}/></main>{/if}
+    {:else}<main class="library-page"><ProfileGallery profile={published} onOpen={openPublic} profileId={publicProfileId || undefined}/></main>{/if}
   {:else if !authReady || libraryState.loading}<main class="library-page"><p role="status">Loading your games…</p></main>
   {:else if route.kind === 'private-game'}
     {#if privateGame}<GameReplay game={privateGame} side={privateGame.side} title={privateGame.title} ply={route.ply} back="#/games" onPly={ply => { if (route.kind === 'private-game') location.hash = libraryHash({ ...route, ply }); }}/>
     {:else}<main class="library-page"><h1>Game not found here</h1><p>Open this link on the device where you saved it, or sign in to its account.</p>{#if !account && cloudConfigured}<button class="primary-button" disabled={busy} onclick={login}>Continue with Google</button>{/if}<a href="#/games">Back to my games</a></main>{/if}
   {:else}
     <main class="library-page">
-      <div class="library-heading"><div><h1>{route.kind === 'owner' ? 'Your favorite games' : 'Your games'}</h1><p class="library-muted">{route.kind === 'owner' ? 'Keep the games you want to play again.' : 'Bring a game. Keep the finish. Find your next lesson.'}</p></div><button class="primary-button" disabled={busy} onclick={openImport}><Plus size={18}/> Paste a game</button></div>
+      <div class="library-heading"><div><h1>{route.kind === 'owner' ? 'Your profile' : 'Your games'}</h1><p class="library-muted">{route.kind === 'owner' ? 'A little about you. The games you want to share.' : 'Bring a game. Keep the finish. Find your next lesson.'}</p></div><button class="primary-button" disabled={busy} onclick={openImport}><Plus size={18}/> Paste a game</button></div>
       {#if error || libraryState.error}<div class="library-error" role="alert"><p>{error || libraryState.error}</p><button class="text-button" disabled={busy} onclick={retry}>Retry cloud save</button></div>{/if}
       {#if notice}<p class="library-notice" role="status">{notice}</p>{/if}
       <div class="library-save"><span>{libraryState.status || 'Saved on this device'}</span>{#if account}<button class="text-button" disabled={busy} onclick={retry}>Sync games</button><button class="text-button" disabled={busy} onclick={logout}>Sign out</button>{:else if cloudConfigured}<button class="text-button" disabled={busy} onclick={login}>Sign in to save across devices <ArrowRight size={14}/></button>{/if}</div>
       {#each libraryState.entries.filter(row => row.conflict) as row}<section class="library-conflict"><h2>Choose a version: {row.game.title}</h2><p>Your edit is kept on this device. {row.conflict?.deleted ? 'This game was removed on another device.' : 'The account has a newer version.'}</p><div class="library-actions"><button class="secondary-button" disabled={busy} onclick={() => action(async () => { await library?.resolve(row.game.id, false); })}>Use account version</button>{#if !row.conflict?.deleted}<button class="secondary-button" disabled={busy} onclick={() => action(async () => { await library?.resolve(row.game.id, true); })}>Keep my local edit</button>{/if}</div></section>{/each}
+      {#if route.kind === 'owner'}
+        <section class="profile-sharing profile-editor" aria-labelledby="profile-edit-title">
+          <h2 id="profile-edit-title">Make it yours</h2><p class="library-muted">Choose what people see. Your learning notes stay private.</p>
+          {#if !account}<div class="profile-sign-in"><span class="profile-avatar" aria-hidden="true"><Piece type="n" color="w"/></span><div><h3>Your own corner of the board.</h3><p>A public name, a few words about you, and the games worth keeping.</p>{#if cloudConfigured}<button class="secondary-button" disabled={busy} onclick={login}>Continue with Google</button>{/if}<p class="library-muted">Your favorites stay on this device until you sign in.</p></div></div>
+          {:else}
+            <div class="profile-edit-identity">
+              <fieldset class="profile-avatar-options" disabled={busy || !ownerLoaded}><legend>Your piece</legend>{#each [{ type: 'n', name: 'Knight' }, { type: 'r', name: 'Rook' }, { type: 'q', name: 'Queen' }] as piece}<label class:chosen={avatar === piece.type}><input type="radio" name="profile-avatar" value={piece.type} bind:group={avatar} aria-label={piece.name}/><span><Piece type={piece.type as ProfileDetails['avatar']} color="w"/></span><span>{piece.name}</span></label>{/each}</fieldset>
+              <div class="profile-edit-copy"><label class="library-field">Public name<input disabled={busy || !ownerLoaded} maxlength={40} bind:value={name} placeholder="Choose a name" autocomplete="nickname"/></label><label class="library-field">About you<textarea disabled={busy || !ownerLoaded} maxlength={160} bind:value={bio} rows={2} placeholder="What brings you to the board?"></textarea></label><p class="profile-character-count">{bio.length}/160 · Optional</p></div>
+            </div>
+            <fieldset class="profile-picks"><legend>Choose up to 8 favorite games</legend>{#each favorites as game}<div class="profile-pick"><label><input type="checkbox" value={game.id} bind:group={selected} disabled={busy || !ownerLoaded || (!selected.includes(game.id) && selected.length >= 8)}/><span>{game.title}</span></label>{#if selected.includes(game.id)}<label class="library-field profile-story-field">Why I kept it<textarea aria-label={`Why I kept it: ${game.title}`} disabled={busy || !ownerLoaded} maxlength={160} rows={2} value={stories[game.publicId] || ''} oninput={event => { stories = { ...stories, [game.publicId]: event.currentTarget.value }; }} placeholder="A move, a lesson, or a finish worth remembering."></textarea></label>{/if}</div>{/each}{#if !favorites.length}<p class="library-muted">Mark a saved game as a favorite first. You can paste a game or save one from the board.</p>{/if}</fieldset>
+            {#if selected.length}<label class="library-field">Spotlight game<select bind:value={spotlight} disabled={busy || !ownerLoaded} aria-label="Spotlight game"><option value="">First selected game</option>{#each favorites.filter(game => selected.includes(game.id)) as game}<option value={game.publicId}>{game.title}</option>{/each}</select><span class="library-muted">This game gets the main board on your profile.</span></label>{/if}
+            <div class="profile-publish"><button class="primary-button" disabled={busy || !ownerLoaded || !selected.length} onclick={makePreview}>Preview public profile <ArrowRight size={16}/></button><span class="library-muted">Review it before it goes public.</span></div>
+            {#if owner.settings?.published}<div class="library-actions"><button class="secondary-button" disabled={busy} onclick={copyProfile}><Link size={16}/> Copy public link</button><a href={`#/profile/${owner.settings.publicId}`}>View public profile</a><button class="text-button" disabled={busy} onclick={unpublish}>Unpublish profile</button></div><p class="library-muted">Edits stay private until you update the public profile. Removing a featured game removes its public copy when sync succeeds.</p>{/if}
+          {/if}
+        </section>
+        <h2 class="private-favorites-heading">Your private favorites</h2>
+      {/if}
       {#if !shown.length}<div class="library-empty"><Bookmark size={30}/><h2>{games.length ? 'Choose a game to keep here.' : 'Your next favorite starts here.'}</h2><p>{games.length ? 'Mark a saved game as a favorite. It stays private until you publish it.' : 'Paste a PGN from a chess site. Choose your side, then replay every move.'}</p>{#if games.length}<a href="#/games">Choose from my games <ArrowRight size={16}/></a>{:else}<p class="library-muted">Guest games stay on this device.</p>{/if}</div>{/if}
       {#each shown as game (game.id)}
         <article class="library-game-row">
@@ -220,17 +243,7 @@
           {#if style.suggestion}<div class="style-suggestion"><p>{style.suggestion.reason}</p><a class="primary-button" href={style.suggestion.lesson === 'castle-short' ? '#/practice/castle-short' : `#/learn/${style.suggestion.lesson}`}>Try {findStudy(style.suggestion.lesson)?.title} <ArrowRight size={16}/></a></div>{/if}
         </details>
       {/if}
-      {#if route.kind === 'owner'}
-        <section class="profile-sharing"><h2>Share your favorites</h2><p class="library-muted">Only the games you select and the name below become public. Style notes stay private.</p>
-          {#if !account}<p>Sign in with Google to publish a profile. Your favorites stay on this device until you sign in.</p>{#if cloudConfigured}<button class="secondary-button" disabled={busy} onclick={login}>Continue with Google</button>{/if}
-          {:else}
-            <label class="library-field">Public name<input disabled={busy || !ownerLoaded} maxlength={40} bind:value={name} placeholder="Choose a name" autocomplete="nickname"/></label>
-            <fieldset class="profile-picks"><legend>Choose up to 8 favorite games</legend>{#each favorites as game}<label><input type="checkbox" value={game.id} bind:group={selected} disabled={busy || !ownerLoaded || (!selected.includes(game.id) && selected.length >= 8)}/><span>{game.title}</span></label>{/each}{#if !favorites.length}<p class="library-muted">Mark a saved game as a favorite first.</p>{/if}</fieldset>
-            <button class="primary-button" disabled={busy || !ownerLoaded || !selected.length} onclick={makePreview}>Preview public profile <ArrowRight size={16}/></button>
-            {#if owner.settings?.published}<div class="library-actions"><button class="secondary-button" disabled={busy} onclick={copyProfile}><Link size={16}/> Copy public link</button><a href={`#/profile/${owner.settings.publicId}`}>View public profile</a><button class="text-button" disabled={busy} onclick={unpublish}>Unpublish profile</button></div><p class="library-muted">Title changes and new favorites appear only after you update the public profile. Removing a featured game also removes its public copy when sync succeeds.</p>{/if}
-          {/if}
-        </section>
-      {/if}
+
     </main>
   {/if}
 </div>
@@ -243,4 +256,4 @@
 {/if}
 {#if editing}<dialog class="game-dialog library-dialog" use:modal oncancel={() => editing = null} aria-labelledby="edit-title"><div class="dialog-header"><h2 id="edit-title">Your game</h2><button class="icon-button" aria-label="Close edit" onclick={() => editing = null}><X size={22}/></button></div><form class="dialog-body" onsubmit={event => { event.preventDefault(); if (editing) void changeGame(editing, { title, side: editSide }); }}><label class="library-field">Game title<input maxlength={80} required bind:value={title}/></label><label class="library-field">Your side<select aria-label="Your side" bind:value={editSide}><option value="w">White</option><option value="b">Black</option></select></label>{#if error}<p class="library-error" role="alert">{error}</p>{/if}<button type="submit" class="primary-button" disabled={busy}>Save changes</button></form></dialog>{/if}
 {#if removing}<dialog class="game-dialog library-dialog" use:modal oncancel={() => removing = null} aria-labelledby="remove-title"><div class="dialog-header"><h2 id="remove-title">Remove this game?</h2></div><div class="dialog-body"><p>{removing.title}</p><p class="library-muted">Its style evidence will be removed. If it is featured publicly, its public copy will be removed when cloud sync succeeds.</p><button class="primary-button" disabled={busy} onclick={() => { if (removing) void changeGame(removing, { deleted: true, favorite: false }); }}>Remove game</button><button class="secondary-button" disabled={busy} onclick={() => removing = null}>Keep game</button></div></dialog>{/if}
-{#if preview}<dialog class="game-dialog wide library-dialog" use:modal oncancel={() => preview = null} aria-label="Public profile preview"><div class="dialog-header"><h2>Public profile preview</h2><button class="icon-button" aria-label="Close preview" onclick={() => preview = null}><X size={22}/></button></div><div class="dialog-body"><p class="library-muted">Anyone with the link can see these names, titles, results, sides, and game moves.</p><ProfileGallery profile={preview} onOpen={game => { const source = previewGames.find(g => g.publicId === game.id); if (source) { preview = null; location.hash = privateLink(source, true); } }}/>{#if error}<p class="library-error" role="alert">{error}</p>{/if}<button class="primary-button" disabled={busy} onclick={publish}>{busy ? 'Publishing…' : owner.settings?.published ? 'Update public profile' : 'Publish profile'} <ArrowRight size={17}/></button></div></dialog>{/if}
+{#if preview}<dialog class="game-dialog wide library-dialog" use:modal oncancel={() => preview = null} aria-label="Public profile preview"><div class="dialog-header"><h2>Public profile preview</h2><button class="icon-button" aria-label="Close preview" onclick={() => preview = null}><X size={22}/></button></div><div class="dialog-body"><p class="library-muted">Anyone with the link can see this name, bio, chosen piece, game stories, titles, player names, results, sides, and moves.</p><ProfileGallery profile={preview} onOpen={game => { const source = previewGames.find(g => g.publicId === game.id); if (source) { preview = null; location.hash = privateLink(source, true); } }}/>{#if error}<p class="library-error" role="alert">{error}</p>{/if}<button class="primary-button" disabled={busy} onclick={publish}>{busy ? 'Publishing…' : owner.settings?.published ? 'Update public profile' : 'Publish profile'} <ArrowRight size={17}/></button></div></dialog>{/if}

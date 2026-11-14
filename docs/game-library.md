@@ -14,6 +14,12 @@ Private games use `/users/<uid>/games/<gameId>` with revisions and retained tomb
 
 Public profiles use `/profiles/<random-public-id>`. Their ownership mapping and settings remain private. A public snapshot contains the chosen public name and up to eight games: title, player names, side, result, starting position, and moves. No Google identity, rating, comments, arbitrary headers, or style evidence is copied. Public writes require a fresh preview and an explicit Publish/Update action. Unpublish removes the public snapshot while retaining private games. Public removals that fail remain clearly pending.
 
+## Personal profiles and Nextmove games
+
+The optional public `details` map stores a bio, original piece avatar (`n`, `r`, or `q`), a spotlight public game ID or null, and a map of selected public game IDs to stories. Text is trimmed, excludes control characters, and is at most 160 Unicode code points. Old version-1 snapshots without details stay readable. Rules allow only these fields and selected game IDs. Removing a featured game prunes its story and clears its spotlight in the same transaction.
+
+Normal Nextmove games can enter the private library through Save game. A snapshot uses the true starting position and legal history, selected opponent label, and an unknown date for stable duplicate identity. Repeated saves retain existing title and favorite edits. Removed snapshots need explicit restore through the library flow. Saving does not publish, replace the playable game, or give lesson credit.
+
 ## Tests
 
 Run `npm test` for parser, storage, style, routes, and projection tests. Run `npm run test:rules` for real Firestore rules and cloud transaction tests. The latter requires Firebase CLI 14.26+ and Java 21 on PATH; it starts a local emulator with the demo project `demo-nextmove`. On Homebrew, use `PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH" npm run test:rules`. No production credentials or account data are needed.
